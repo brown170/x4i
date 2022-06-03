@@ -1,0 +1,17 @@
+__pycache__/
+x4i/__pycache__/
+x4i/test/__pycache__/
+build/
+*.zip
+x4i/data/*.zip
+x4i/data/db.tar.gz
+x4i/data/db/
+.idea/
+doc/x4i/user-guide/_minted-x4i/
+x4i.egg-info/
+.DS_Store
+*/.DS_Store
+*/*/.DS_Store
+x4i/*.pyc
+dist/
+MANIFEST
