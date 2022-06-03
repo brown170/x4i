@@ -1,0 +1,5 @@
+include *.txt
+include *.md
+recursive-include doc *.txt *.pdf *.gif *.css *.html *.js *.png *.md
+recursive-include bin *.py
+recursive-include examples *.py
