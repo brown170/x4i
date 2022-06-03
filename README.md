@@ -9,14 +9,14 @@ x4i - The EXFOR Interface
 x4i provides a "simple" python interface to the EXFOR library, allowing users to
 search for and then translate EXFOR files into an easy to understand (and then plot) form.
 
-Detailed instructions are provided in https://git.nndc.bnl.gov/dbrown/x4i/-/blob/master/doc/x4i/user-guide/x4i.pdf
+Detailed instructions are provided in https://github.com/brown170/x4i/blob/main/doc/x4i/user-guide/x4i.pdf
 
 
 
 Easiest installation: using pip & git
 =====================================
 
-    > $ pip install git+https://git.nndc.bnl.gov/dbrown/x4i
+    > $ pip install git+https://github.com/brown170/x4i
 
 
 
@@ -47,7 +47,7 @@ This installation does not automatically include the IAEA data files.
 You will need to download them yourself as described in step 3. below.
 
 1. Clone the project
-   > $ git clone https://git.nndc.bnl.gov/dbrown/x4i.git
+   > $ git clone https://github.com/brown170/x4i.git
 
 2. Installation options:
    * Old-fashioned local installation: put x4i in your $PYTHONPATH.  Assuming you are in the directory containing x4i's `setup.py` file:
