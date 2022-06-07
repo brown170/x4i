@@ -18,6 +18,7 @@ Easiest installation: using pip & git
 
     > $ pip install git+https://github.com/brown170/x4i
 
+This version of the installation process automatically installs the 2021-03-08 version of the EXFOR database.
 
 
 Installation from a tarball distribution
