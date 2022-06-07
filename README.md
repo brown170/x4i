@@ -11,6 +11,8 @@ search for and then translate EXFOR files into an easy to understand (and then p
 
 Detailed instructions are provided in https://github.com/brown170/x4i/blob/main/doc/x4i/user-guide/x4i.pdf
 
+Please ensure your `git` installation has large file support (see https://git-lfs.github.com).
+
 
 
 Easiest installation: using pip & git
