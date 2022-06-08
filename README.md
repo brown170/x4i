@@ -11,16 +11,14 @@ search for and then translate EXFOR files into an easy to understand (and then p
 
 Detailed instructions are provided in https://github.com/brown170/x4i/blob/main/doc/x4i/user-guide/x4i.pdf
 
-Please ensure your `git` installation has large file support (see https://git-lfs.github.com).
-
-
 
 Easiest installation: using pip & git
 =====================================
 
-    > $ pip install git+https://github.com/brown170/x4i
+    > $ pip install git+https://github.com/brown170/x4i -v
 
-This version of the installation process automatically installs the 2021-03-08 version of the EXFOR database.
+This version of the installation process automatically installs the 2021-03-08 version of the EXFOR database.  As x4i must rebuild the database,
+installation may take some time.
 
 
 Installation from a tarball distribution

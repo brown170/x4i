@@ -67,6 +67,7 @@ class PostDevelopCommand(develop):
 class PostInstallCommand(install):
     """Post-installation for installation mode."""
     def run(self):
+        print("X4i is rebuilding the EXFOR index.\n-->THIS WILL TAKE A LONG TIME, DON'T END THE PROCESS!! Just go get a snack.")
         install.run(self)
 
         # Get the version of EXFOR that we've been using for a while
