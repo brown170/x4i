@@ -61,7 +61,7 @@ with open("x4i/data/database_info.json") as jsonfile:
 with urllib.request.urlopen(urllib.request.Request(EXFORURL, {}, {'User-Agent': "x4i"})) as response:
     with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
         shutil.copyfileobj(response, tmp_file)
-subprocess.run(["bin/setup-exfor-db.py", "--just-unpack", "--x4c4-master", "%s"%tmp_file.name])
+subprocess.run(["bin/setup-exfor-db.py", "--x4c4-master", "%s"%tmp_file.name])
 tmp_file.close()
 if os.path.exists(tmp_file.name):
     os.remove(tmp_file.name)
