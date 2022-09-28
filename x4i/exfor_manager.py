@@ -156,7 +156,7 @@ class X4DBManager:
         return self.CURSOR.execute(q)
 
     def query(self, author=None, reaction=None, target=None, projectile=None, quantity=None, product=None, MF=None,
-              MT=None, C=None, S=None, I=None, SUBENT=None, ENTRY=None):
+              MT=None, C=None, S=None, I=None, SUBENT=None, ENTRY=None, POINTER=None):
         """Use this function to search for all (Sub)Entries matching criteria in query call.
         This function returns a dictionary with the following structure:
             { ENTRY#0:[ SUBENT001, SUBENT#1, SUBENT#2, ... ], ... }.
@@ -166,7 +166,7 @@ class X4DBManager:
         raise NotImplementedError("Do not use X4DBManager directly, use derived class")
 
     def retrieve(self, author=None, reaction=None, target=None, projectile=None, quantity=None, product=None, MF=None,
-                 MT=None, C=None, S=None, I=None, SUBENT=None, ENTRY=None):
+                 MT=None, C=None, S=None, I=None, SUBENT=None, ENTRY=None, POINTER=None):
         """Execute a query, matching the criteria specified.
         This function returns a dictionary with the following structure:
             { ENTRY#0:[ SUBENT001, SUBENT#1, SUBENT#2, ... ], ... }.
@@ -197,7 +197,7 @@ class X4DBManagerPlainFS(X4DBManager):
         self.CURSOR = self.CONNECTION.cursor()
 
     def query(self, author=None, reaction=None, target=None, projectile=None, quantity=None, product=None, MF=None,
-              MT=None, C=None, S=None, I=None, SUBENT=None, ENTRY=None, reference=None):
+              MT=None, C=None, S=None, I=None, SUBENT=None, ENTRY=None, POINTER=None, reference=None):
         """Use this function to search for all (Sub)Entries matching criteria in query call.
         This function returns a dictionary with the following structure:
             { ENTRY#0:[ SUBENT001, SUBENT#1, SUBENT#2, ... ], ... }.
@@ -244,6 +244,10 @@ class X4DBManagerPlainFS(X4DBManager):
         if ENTRY is not None:
             criteria.append("entry = '%s' " % ENTRY)
 
+        # Search for matching POINTER
+        if POINTER is not None:
+            criteria.append("pointer = '%s' " % POINTER)
+
         if reference is not None:
             criteria.append("reference = '%s' " % reference)
 
@@ -268,7 +272,7 @@ class X4DBManagerPlainFS(X4DBManager):
         return result_map
 
     def retrieve(self, author=None, reaction=None, target=None, projectile=None, quantity=None, product=None, MF=None,
-                 MT=None, C=None, S=None, I=None, SUBENT=None, ENTRY=None, rawEntry=False, reference=None,
+                 MT=None, C=None, S=None, I=None, SUBENT=None, ENTRY=None, POINTER=None, rawEntry=False, reference=None,
                  as_JSON=False):
         """Execute a query, matching the criteria specified.
         This function returns a dictionary with the following structure:
@@ -290,6 +294,7 @@ class X4DBManagerPlainFS(X4DBManager):
             C=C, S=S, I=I,
             SUBENT=SUBENT,
             ENTRY=ENTRY,
+            pointer=POINTER,
             reference=reference)
 
         for e in smap:
