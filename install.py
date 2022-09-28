@@ -58,10 +58,22 @@ with open("x4i/data/database_info.json") as jsonfile:
     EXFORZIP = jsondata["zipfile"]
     EXFORURL = jsondata["url"] + EXFORZIP
 
-with urllib.request.urlopen(urllib.request.Request(EXFORURL, {}, {'User-Agent': "x4i"})) as response:
-    with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
-        shutil.copyfileobj(response, tmp_file)
-subprocess.run(["bin/setup-exfor-db.py", "--x4c4-master", "%s"%tmp_file.name])
-tmp_file.close()
-if os.path.exists(tmp_file.name):
-    os.remove(tmp_file.name)
+try:
+    with urllib.request.urlopen(urllib.request.Request(EXFORURL, {}, {'User-Agent': "x4i"})) as response:
+        with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+            shutil.copyfileobj(response, tmp_file)
+
+except Exception as ex:
+    print("\n ERROR encountered while downloading the EXFOR database:\n  ", ex)
+    print(f"""\n\nAs an alternative, please manually download the database zip file from {EXFORURL},
+place it in the x4i directory and issue the following command (this takes a while):
+
+./bin/setup-exfor-db.py --x4c4-master {EXFORZIP}
+
+Once that command finishes, {EXFORZIP} can be safely deleted.""")
+
+else:
+    subprocess.run(["bin/setup-exfor-db.py", "--x4c4-master", "%s"%tmp_file.name])
+    tmp_file.close()
+    if os.path.exists(tmp_file.name):
+        os.remove(tmp_file.name)
