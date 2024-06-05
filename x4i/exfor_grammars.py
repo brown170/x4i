@@ -36,7 +36,7 @@ exfor_grammars module - Collection of pyparsing grammars for parsing Exfor objec
 __version__ = "0.0.1"
 __author__ = "David Brown <brown170@llnl.gov>"
 
-from .pyparsing import *
+from pyparsing import *
 from .exfor_dicts import *
 
 # ------------------------------------------------------
@@ -121,7 +121,7 @@ x4codefield = Group(x4code) + ZeroOrMore(x4word)
 x4textfield = OneOrMore(Group(x4codefield))
 
 x4authorfield = nestedExpr() + restOfLine
-x4authorlist = commaSeparatedList
+x4authorlist = common.comma_separated_list
 
 x4refcode = nestedExpr() + restOfLine
 x4refcodetautology = (lpar + nestedExpr() + OneOrMore(equals + nestedExpr()) + rpar) + restOfLine

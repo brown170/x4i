@@ -58,7 +58,7 @@ __author__ = "David Brown <brown170@llnl.gov>"
 from .exfor_exceptions import *
 from .exfor_grammars import *
 from .exfor_dicts import *
-import x4i.pyparsing as pyparsing
+import pyparsing
 
 # ------------------------------------------------------
 # Global data

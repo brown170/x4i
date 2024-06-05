@@ -66,7 +66,7 @@ import x4i.exfor_dicts as exfor_dicts
 import x4i.exfor_grammars as exfor_grammars
 import x4i.exfor_reference as exfor_reference
 import x4i.exfor_exceptions as exfor_exceptions
-import x4i.pyparsing as pyparsing
+import pyparsing
 import copy
 
 

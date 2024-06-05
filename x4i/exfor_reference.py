@@ -38,7 +38,7 @@ from __future__ import print_function, division
 from .exfor_utilities import *
 from .exfor_grammars import *
 from .exfor_exceptions import ReferenceParsingError
-import x4i.pyparsing as pyparsing
+import pyparsing
 
 
 def parseX4Year(date):
@@ -83,7 +83,7 @@ class X4ReferenceCode:
         if not str:
             raise TypeError("X4ReferenceCode.__init__ takes a string as an argument")
         try:
-            self.refcode = commaSeparatedList.parseString(x).asList()
+            self.refcode = pyparsing.common.comma_separated_list.parseString(x).asList()
         except pyparsing.ParseException as err:
             raise ReferenceParsingError(
                 'Can not parse reference code "' + x + '",\n    got error "' + str(err) + '"\n   ')

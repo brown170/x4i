@@ -67,6 +67,82 @@ from .exfor_section import X4BibMetaData
 from .exfor_utilities import unique, COMMENTSTRING
 
 
+class X4DataSetNew(X4BibMetaData):
+    def __init__(self, meta=None, common=None, reaction=None, monitor=None, data=None, pointer=None):
+        # Initialize merged meta data, a needlessly complicated process
+        X4BibMetaData.__init__(self, author="None", institute="None", title="None", pubType="None", year="None")
+        if meta is not None:
+            for m in meta:
+                if m is None:
+                    continue
+                for k in m.__slots__:
+                    if not getattr(m, k) in [None, "None"]:
+                        setattr(self, k, getattr(m, k))
+        # Initializing the reaction is easy!
+        self.reaction = reaction
+        self.monitor = monitor
+        # Initializing the data is less so...
+        self.labels = []
+        self.units = []
+        self.data = []
+        self.simplified = False
+        if reaction is None:
+            self.coupled = False
+        else:
+            self.coupled = isinstance(reaction[0], X4ReactionCombination)
+        if data is not None:
+            self.setData(data, common, pointer)
+
+    def setData(self, data, common=None, pointer=None):
+        """This should set up the data, labels and units such that all columns in all COMMON sections are in self
+        and such that all columns in DATA which either have no pointer or matching pointer are in self"""
+        raise NotImplementedError()
+
+    def strHeader(self):
+        raise NotImplementedError()
+
+    def reprHeader(self):
+        raise NotImplementedError()
+
+    def __str__(self):
+        raise NotImplementedError()
+
+    def __repr__(self):
+        raise NotImplementedError()
+
+    def __len__(self):
+        raise NotImplementedError()
+
+    def sort(self, **kw):
+        """In place sort, see Python documentation for list().sort()"""
+        raise NotImplementedError()
+
+    def getSimplified(self, parserMap=None, columnNames=None, makeAllColumns=False, failIfMissingErrors=False):
+        """Returns a simplified version of self.
+        inputs:
+            parserMap            = { 'column name 1':parserList1, 'column name 2':parserList2, ... }
+            columnNames          = [ 'column name 1', 'column name 2', ... ] #put them in the order *you* want
+            makeAllColumns       will make uncertainty columns even if no uncertainties are given on a particular column
+            failIfMissingErrors  fail (raising exception) if missing an error column
+        """        
+        raise NotImplementedError()
+
+    def append(self, other):
+        raise NotImplementedError()
+
+    def csv(self, f):
+        raise NotImplementedError()
+
+    def numcols(self):
+        raise NotImplementedError()
+
+    def numrows(self):
+        raise NotImplementedError()
+
+    def __getitem__(self, k):
+        raise NotImplementedError()
+   
+
 class X4DataSet(X4BibMetaData):
 
     def __init__(self, meta=None, common=None, reaction=None, monitor=None, data=None, pointer=None):
