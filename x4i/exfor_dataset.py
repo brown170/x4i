@@ -66,6 +66,8 @@ from .exfor_reactions import X4ReactionCombination
 from .exfor_section import X4BibMetaData
 from .exfor_utilities import unique, COMMENTSTRING
 
+from pint_pandas import *
+
 
 class X4DataSetNew(X4BibMetaData):
     def __init__(self, meta=None, common=None, reaction=None, monitor=None, data=None, pointer=None):
