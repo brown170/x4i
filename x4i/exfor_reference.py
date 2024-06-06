@@ -103,20 +103,15 @@ class X4ReferenceCode:
 
     def getRefName(self):
         if self.reftype in ['A', 'B', 'C']:
-            #return get_dict_entry('Conferences', self.name) + ' '
-            return x4Dictionaries['ConferencesAndBooks'][self.name][0] + ' '
+            return get_dict_entry('Conferences', self.name)['expansion'] + ' '
         elif self.reftype in ['J', 'K']:
             return get_dict_entry('Journals', self.name)['expansion'] + ' '
-            #return x4Dictionaries['Journals'][self.name][0] + ' '
         elif self.reftype in ['P', 'R', 'S']:
-            #return get_dict_entry('ReferenceTypes', self.reftype) + ': ' + self.name + ' '
-            return x4Dictionaries['ReferenceTypes'][self.reftype][1] + ': ' + self.name + ' '
+            return get_dict_entry('Reference types', self.reftype)['expansion'] + ': ' + self.name + ' '
         elif self.reftype in ['T', 'W', 'X']:
-            #return get_dict_entry('ReferenceTypes', self.reftype) + ': ' + self.name.capitalize() + ' '
-            return x4Dictionaries['ReferenceTypes'][self.reftype][1] + ': ' + self.name.capitalize() + ' '
+            return get_dict_entry('Reference types', self.reftype)['expansion'] + ': ' + self.name.capitalize() + ' '
         elif self.reftype in ['0', '3', '4']:
-            #return get_dict_entry('ReferenceTypes', self.reftype) + ': ' + self.name.capitalize() + ' '
-            return x4Dictionaries['ReferenceTypes'][self.reftype][1] + ': ' + self.name.capitalize() + ' '
+            return get_dict_entry('Reference types', self.reftype)['expansion'] + ': ' + self.name.capitalize() + ' '
         else:
             raise LookupError("X4ReferenceCode.__str__: can't find type of reference for '" + self.reftype + "'")
         return None
