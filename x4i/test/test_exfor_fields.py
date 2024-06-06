@@ -409,6 +409,7 @@ class TestX4InstituteField(unittest.TestCase):
 class TestX4ReferenceField(unittest.TestCase):
 
     def setUp(self):
+        self.maxDiff=None
         self.short_example = '''REFERENCE  (J,NIM,217,397,1983)'''
         self.long_example = '''REFERENCE  (J,ANE,11,623,8412)\n           (P,ANL-NDM-85,8406)'''
         self.really_long_example = '''REFERENCE  (J,APP/B,2,489,1971) Full information\n           (P,INR-1318,29,197104)Partial,total sigmas cfd theory\n           (P,INDC(SEC)-18,120,197108) Identical to INR-1318\n           (R,INR-1224,197009)Experim.set-up described.Full paper\n           (P,INR-1197,26,197005)Small reprt.Same info as INR-1224\n           (J,CJP,47,2849,196912) Theo. Calculation of (n,g) sigma'''
@@ -482,13 +483,13 @@ class TestX4ReferenceField(unittest.TestCase):
         self.assertEqual(repr(exfor_field.X4ReferenceField(self.ya_tautology_example.split('\n'))),
                          self.ya_tautology_example)
         self.assertEqual(str(exfor_field.X4ReferenceField(self.ya_tautology_example.split('\n'))),
-                         'J. of Nuclear Science and Technology, Tokyo 31, 1239 (1994); Report containing conference proc.: JAERI-M-94-019 171 (1993); Report containing conference proc.: INDC(JPN)-169/L 171 (1993)')
+                         'Jour. of Nuclear Science and Technology 31, 1239 (1994); Report containing conference proc.: JAERI-M-94-019 171 (1993); Report containing conference proc.: INDC(JPN)-169/L 171 (1993)')
 
     def test_tricky_tautology_example(self):
         self.assertEqual(repr(exfor_field.X4ReferenceField(self.tricky_tautology_example.split('\n'))),
                          self.tricky_tautology_example)
         self.assertEqual(str(exfor_field.X4ReferenceField(self.tricky_tautology_example.split('\n'))),
-                         'Report other than progress report: YK-5(49) 17 (1982); Vop. At.Nauki i Tekhn.,Ser.Yadernye Konstanty 1982, (5), 17 (1982)')
+                         'Report other than progress report: YK-5(49) 17 (1982); Vop.At.Nauki i Tekhn.,Ser.Yaderno-Reak.Konstanty 1982, (5), 17 (1982)')
 
     def test_bathroom_sink(self):
         self.assertEqual(repr(exfor_field.X4ReferenceField(self.bathroom_sink_tautology_example.split('\n'))),
@@ -500,7 +501,7 @@ class TestX4ReferenceField(unittest.TestCase):
         self.assertEqual(repr(exfor_field.X4ReferenceField(self.kitchen_sink_tautology_example.split('\n'))),
                          self.kitchen_sink_tautology_example)
         self.assertEqual(str(exfor_field.X4ReferenceField(self.kitchen_sink_tautology_example.split('\n'))),
-                         'J.Nucl.Science and Technol.Tokyo,Supplement 2, (1), 204 (2002); J.Nucl.Science and Technol.Tokyo,Supplement 1, 683 (2000); Nucl. Instrum. Methods in Physics Res., Sect.A 446, (3), 536 (2000); Report containing conference proc.: JAERI-C-2000-005 243 (1999); Report containing conference proc.: INDC(JPN)-185/U 243 (1999); Report containing conference proc.: JAERI-C-99-002 153 (1998); Report containing conference proc.: INDC(JPN)-182/U 153 (1998)')
+                         'Jour. of Nuclear Science and Technology Suppl. 2, (1), 204 (2002); Jour. of Nuclear Science and Technology Suppl. 1, 683 (2000); Nucl. Instrum. Methods in Physics Res., Sect.A 446, (3), 536 (2000); Report containing conference proc.: JAERI-C-2000-005 243 (1999); Report containing conference proc.: INDC(JPN)-185/U 243 (1999); Report containing conference proc.: JAERI-C-99-002 153 (1998); Report containing conference proc.: INDC(JPN)-182/U 153 (1998)')
 
 
 if __name__ == "__main__":

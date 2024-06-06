@@ -237,7 +237,7 @@ class TestTheWorks(TestCaseWithTableTests):
 #  Title:     Partial Gamma-Ray Cross Sections For The Reaction 239Pu(N,2Ng) And The 239Pu(N,2N) Cross Section
 #  Year:      2002
 #  Institute: Lawrence Livermore National Laboratory, Livermore, CA
-#  Reference: J.Nucl.Science and Technol.Tokyo,Supplement 2, (1), 620 (2002)
+#  Reference: Jour. of Nuclear Science and Technology Suppl. 2, (1), 620 (2002)
 #  Subent:    14129002
 #  Reaction:  Cross section for 239Pu(n,2n)238Pu
 #        Energy        Data          d(Energy)     d(Data)

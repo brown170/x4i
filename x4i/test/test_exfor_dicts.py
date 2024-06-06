@@ -28,13 +28,13 @@ class TestX4Dicts(unittest.TestCase):
         self.assertEqual(self.d['Facility']['FRS'], ['Fragment separator'])
         self.assertEqual(exfor_dicts.ALL_DICTIONARIES[str(self.d.getDictionaryIndex("Facility")).zfill(3)]['FRS']['expansion'], 
                          'Fragment separator')
-        self.assertEqual(exfor_dicts.get_dict_entry('Facilities', 'FRS'), 'Fragment separator')
-        self.assertEqual(exfor_dicts.get_dict_entry('Particles', 'K'), 'Kaons,unspecified')
-        self.assertEqual(exfor_dicts.get_dict_entry('Institutes', '1USAKAP'), 
+        self.assertEqual(exfor_dicts.get_dict_entry('Facilities', 'FRS')["expansion"], 'Fragment separator')
+        self.assertEqual(exfor_dicts.get_dict_entry('Particles', 'K')["expansion"], 'Kaons,unspecified')
+        self.assertEqual(exfor_dicts.get_dict_entry('Institutes', '1USAKAP')["expansion"], 
                          'Knolls Atomic Power Laboratory, Schenectady, NY')
-        self.assertEqual(exfor_dicts.get_dict_entry('Conferences', '69STUDSVIK'), 'Neutron Capture Gamma-Ray Spectroscopy,Studsvik,1969')
-        self.assertEqual(exfor_dicts.get_dict_entry('Processes (REACTION SF 3)', 'PAI'), 'Pair production')
-        self.assertEqual(exfor_dicts.get_dict_entry('Quantities (REACTION SF 5-8)', ',SIG'), 'Cross section')
+        self.assertEqual(exfor_dicts.get_dict_entry('Conferences', '69STUDSVIK')["expansion"], 'Neutron Capture Gamma-Ray Spectroscopy,Studsvik,1969')
+        self.assertEqual(exfor_dicts.get_dict_entry('Processes (REACTION SF 3)', 'PAI')["expansion"], 'Pair production')
+        self.assertEqual(exfor_dicts.get_dict_entry('Quantities (REACTION SF 5-8)', ',SIG')["expansion"], 'Cross section')
 
     def test_particle_like_contents(self):
         """
