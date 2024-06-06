@@ -16,7 +16,12 @@ class TestX4Dicts(unittest.TestCase):
         self.assertEqual(self.d.getDictionaryName(33), "Particles")
 
     def test_getitem(self):
-        pass 
+        self.assertEqual(self.d['Institutes']['KAP'], ['Knolls Atomic Power Laboratory, Schenectady, NY', 'USA'])
+        self.assertEqual(self.d['Particles']['K'], ['Kaons,unspecified'])
+        self.assertEqual(self.d['Compounds']['14-SI-CMP'], ['Silicon compound'])
+        self.assertEqual(self.d["ConferencesAndBooks"]['69STUDSVIK'], ['Neutron Capture Gamma-Ray Spectroscopy,Studsvik,1969'])
+        self.assertEqual(self.d['Process']['PAI'], ['Pair production'])
+        self.assertEqual(self.d['Quantities'][',SIG'], ['Cross section'])
 
     def test_particle_like_contents(self):
         """
@@ -57,6 +62,7 @@ class TestX4Dicts(unittest.TestCase):
     def test_institute_contents(self):
         """(3, "Institutes"),"""
         self.assertEqual(len(self.d.getDictionary(self.d.getDictionaryIndex("Institutes"))), 1019)
+
 
     def test_facility_like_contents(self):
         """
