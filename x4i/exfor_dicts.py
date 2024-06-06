@@ -46,6 +46,12 @@ import json
 from . import __path__
 
 
+PATHTODICTIONARYFILES = __path__[0] + os.sep + "dicts" + os.sep
+ALL_DICTIONARIES=json.load(open(PATHTODICTIONARYFILES + "dict_arc_all.json"))
+# 
+# >>> print(dict["236"]["CUM,FY,,FRC"]["expansion"])
+#
+
 # ---------- getDictionary ----------
 def getDictionary(filename, VERBOSELEVEL=0):
     if type(filename) is not str:
@@ -94,14 +100,14 @@ def getDictionary(filename, VERBOSELEVEL=0):
 class X4DictionaryServer:
 
     # ---------- __init__ ----------
-    def __init__(self, pathToDictionaryFiles=__path__[0] + os.sep + "dicts" + os.sep):
+    def __init__(self, pathToDictionaryFiles=PATHTODICTIONARYFILES):
         self.pathToDictionaryFiles = pathToDictionaryFiles
         self.DictionaryNames = (
             (3, "Institutes"),
             (4, "ReferenceTypes"),
             (5, "Journals"),
             (7, "ConferencesAndBooks"),
-            (9, "Compounds"),
+            (9, "Compounds"), #209
             (15, "History"),
             (16, "Status"),
             (17, "Rel_Ref"),
@@ -116,7 +122,7 @@ class X4DictionaryServer:
             (33, "Particles"),
             (34, "Modifiers"),
             (35, "DataType"),
-            (36, "Quantities"),
+            (36, "Quantities"), #113
             (37, "Result"))
 
     # ---------- __getitem__ ----------
@@ -185,6 +191,7 @@ class X4DictionaryServer:
         @rtype: matrix
         @return: the dictionary
         """
+        #return ALL_DICTIONARIES[str(self.getDictionaryIndex(x)).zfill(3)]
         filename = self.getDictionaryFilename(x)
         return getDictionary(self.pathToDictionaryFiles + filename, VERBOSELEVEL=VERBOSELEVEL)
 
