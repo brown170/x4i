@@ -121,7 +121,7 @@ x4codefield = Group(x4code) + ZeroOrMore(x4word)
 x4textfield = OneOrMore(Group(x4codefield))
 
 x4institute = Word(alphanums + " ", exact=7)
-x4institutefield = lpar + delimitedList(x4institute, ",") + rpar + restOfLine
+x4institutefield = OneOrMore(Group(lpar + delimitedList(x4institute, ",") + rpar) + ZeroOrMore(x4word))
 
 x4authorfield = nestedExpr() + restOfLine
 x4authorlist = common.comma_separated_list

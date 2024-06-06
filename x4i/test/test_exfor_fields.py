@@ -404,7 +404,7 @@ class TestX4InstituteField(unittest.TestCase):
         self.assertEqual(repr(exfor_field.X4InstituteField(self.really_long_example.split('\n'))),
                          self.really_long_example)
         self.assertEqual(str(exfor_field.X4InstituteField(self.really_long_example.split('\n'))),
-                         'Niewodniczanski Institute of Nuclear Physics, Krakow; Bhabha Atomic Research Centre (BARC), Trombay, Mumbai; Forschungszentrum Juelich, Juelich; Jagiellonian University, Krakow; Univ. of Bonn; Universitaet Duisburg-Essen; Joint Institute for Nuclear Research (JINR), Dubna; Univ.of Sofia; Slovakia (Technical University, Kosice, Slovakia); United States of America (George Mason University, Fairfax, Va, Usa); Slovakia (P.J. Safarik University, Kosice, Slovakia); Bulgaria (University Of Chemical Technology And Metallurgy, Sofia, Bulgaria); 2UK (Department Of Physics And Astronomy, Ucl, London, Uk)')
+                         'Niewodniczanski Institute of Nuclear Physics, Krakow; Bhabha Atomic Research Centre (BARC), Trombay, Mumbai; Forschungszentrum Juelich, Juelich; Jagiellonian University, Krakow; Univ. of Bonn; Universitaet Duisburg-Essen; Joint Institute for Nuclear Research (JINR), Dubna; Univ.of Sofia; Slovakia (P.J. Safarik University, Kosice, Slovakia); United States of America (George Mason University, Fairfax, Va, Usa); Bulgaria (University Of Chemical Technology And Metallurgy, Sofia, Bulgaria)')
 
 
 class TestX4ReferenceField(unittest.TestCase):
