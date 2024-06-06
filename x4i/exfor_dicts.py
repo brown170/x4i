@@ -48,6 +48,40 @@ from . import __path__
 
 PATHTODICTIONARYFILES = __path__[0] + os.sep + "dicts" + os.sep
 ALL_DICTIONARIES=json.load(open(PATHTODICTIONARYFILES + "dict_arc_all.json"))
+DICTIONARYNAMES = (
+            (3, "Institutes"),
+            (4, "ReferenceTypes"),
+            (5, "Journals"),
+            (7, "ConferencesAndBooks"),
+            (9, "Compounds"), #209
+            (15, "History"),
+            (16, "Status"),
+            (17, "Rel_Ref"),
+            (18, "Facility"),
+            (19, "IncidentSource"),
+            (20, "AdditionalResults"),
+            (21, "Method"),
+            (22, "Detectors"),
+            (23, "Analysis"),
+            (24, "DataHeadings"),
+            (30, "Process"),
+            (33, "Particles"),
+            (34, "Modifiers"),
+            (35, "DataType"),
+            (36, "Quantities"), #113
+            (37, "Result"))
+
+
+def get_dict_entry(_dict_key, _dict_entry):
+    try: 
+        _dict_index = int(_dict_key)
+        return ALL_DICTIONARIES[_dict_key.zfill(3)][_dict_entry]["expansion"]
+    except ValueError:
+        pass 
+    for i, n in DICTIONARYNAMES:
+        if _dict_key == n:
+            return ALL_DICTIONARIES[str(i).zfill(3)][_dict_entry]["expansion"]
+    return None
 # 
 # >>> print(dict["236"]["CUM,FY,,FRC"]["expansion"])
 #
@@ -102,28 +136,7 @@ class X4DictionaryServer:
     # ---------- __init__ ----------
     def __init__(self, pathToDictionaryFiles=PATHTODICTIONARYFILES):
         self.pathToDictionaryFiles = pathToDictionaryFiles
-        self.DictionaryNames = (
-            (3, "Institutes"),
-            (4, "ReferenceTypes"),
-            (5, "Journals"),
-            (7, "ConferencesAndBooks"),
-            (9, "Compounds"), #209
-            (15, "History"),
-            (16, "Status"),
-            (17, "Rel_Ref"),
-            (18, "Facility"),
-            (19, "IncidentSource"),
-            (20, "AdditionalResults"),
-            (21, "Method"),
-            (22, "Detectors"),
-            (23, "Analysis"),
-            (24, "DataHeadings"),
-            (30, "Process"),
-            (33, "Particles"),
-            (34, "Modifiers"),
-            (35, "DataType"),
-            (36, "Quantities"), #113
-            (37, "Result"))
+        self.DictionaryNames = DICTIONARYNAMES
 
     # ---------- __getitem__ ----------
     def __getitem__(self, i):
