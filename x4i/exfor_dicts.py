@@ -65,7 +65,7 @@ def get_dict_entry(_dict_key, _dict_entry):
     except ValueError:
         pass 
 
-    # OK, have to lookt it up by name
+    # OK, have to look it up by name
     for key, val in ALL_DICTIONARIES['950'].items():
         if _dict_key == val['dictionary_name']:
             return ALL_DICTIONARIES[key][_dict_entry]["expansion"] 
