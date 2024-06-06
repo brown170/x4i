@@ -55,8 +55,8 @@ VERBOSELEVEL = 2
 x4ReactionMap = {'TOT': 'Total', 'EL': 'Elastic', 'ABS': 'Absorption', 'INL': 'Inelastic', 'TCC': 'TotalChargeChanging',
                  'FUS': 'Fusion', 'NON': 'Nonelastic', 'SCT': 'Scattering', 'F': 'Fission', 'PAI': 'PairProduction',
                  'THS': 'ThermalScattering', 'X': 'Unspecified', '0': 'None'}
-x4QuantityMap = get_dict('Quantities (REACTION SF 5-8)')  # x4Dictionaries['Quantities']
-x4ModifierMap = get_dict('Modifiers (REACTION SF 8)')  # x4Dictionaries['Modifiers']
+x4QuantityMap = get_dict('Quantities (REACTION SF 5-8)')
+x4ModifierMap = get_dict('Modifiers (REACTION SF 8)')
 
 
 class X4Process:
@@ -233,7 +233,6 @@ class X4Reaction(X4Process, X4Measurement):
         result = ''
         for i in self.quantity:
             if i in x4ModifierMap.keys():
-                #print(i, x4ModifierMap[i])
                 result = x4ModifierMap[i]['expansion'] + ' '
                 break
 
@@ -242,7 +241,6 @@ class X4Reaction(X4Process, X4Measurement):
 
         for i in self.quantity + [addcomma(x) for x in self.quantity]:
             if i in x4QuantityMap.keys():
-                #print(i, x4QuantityMap[i])
                 result += x4QuantityMap[i]['expansion']
                 break
         return result

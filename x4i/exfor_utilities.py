@@ -64,7 +64,6 @@ from .exfor_exceptions import BrokenNumberError
 # DataSectionTags = ( 'DATA', 'COMMON' )
 # TagPrefixes     = ( 'NO', 'END' )
 # SystemTags      = ( 'TRANS', 'ENTRY', 'SUBENT', 'BIB', 'COMMON', 'DATA', 'REQUEST' )
-x4Dictionaries = X4DictionaryServer().getAllDictionaries()
 COMMENTSTRING = '#'
 VERBOSE = False
 
