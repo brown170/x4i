@@ -28,7 +28,7 @@ class TestX4Dicts(unittest.TestCase):
         self.assertEqual(self.d['Facility']['FRS'], ['Fragment separator'])
         self.assertEqual(exfor_dicts.ALL_DICTIONARIES[str(self.d.getDictionaryIndex("Facility")).zfill(3)]['FRS']['expansion'], 
                          'Fragment separator')
-        self.assertEqual(exfor_dicts.get_dict_entry('Facility', 'FRS'), 'Fragment separator')
+        self.assertEqual(exfor_dicts.get_dict_entry('Facilities', 'FRS'), 'Fragment separator')
         self.assertEqual(exfor_dicts.get_dict_entry('Particles', 'K'), 'Kaons,unspecified')
         self.assertEqual(exfor_dicts.get_dict_entry('Institutes', '1USAKAP'), 
                          'Knolls Atomic Power Laboratory, Schenectady, NY')

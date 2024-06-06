@@ -48,43 +48,29 @@ from . import __path__
 
 PATHTODICTIONARYFILES = __path__[0] + os.sep + "dicts" + os.sep
 ALL_DICTIONARIES=json.load(open(PATHTODICTIONARYFILES + "dict_arc_all.json"))
-DICTIONARYNAMES = (
-            (3, "Institutes"),
-            (4, "ReferenceTypes"),
-            (5, "Journals"),
-            (7, "ConferencesAndBooks"),
-            (9, "Compounds"), #209
-            (15, "History"),
-            (16, "Status"),
-            (17, "Rel_Ref"),
-            (18, "Facility"),
-            (19, "IncidentSource"),
-            (20, "AdditionalResults"),
-            (21, "Method"),
-            (22, "Detectors"),
-            (23, "Analysis"),
-            (24, "DataHeadings"),
-            (30, "Process"),
-            (33, "Particles"),
-            (34, "Modifiers"),
-            (35, "DataType"),
-            (36, "Quantities"), #113
-            (37, "Result"))
 
 
 def get_dict_entry(_dict_key, _dict_entry):
+    """
+    _dict_key: either int, zfilled string of an int, or the key word itself
+    _dict_entry: the entry in the _dict_key's dictionary aought for
+
+    >>> print(dict["236"]["CUM,FY,,FRC"]["expansion"])
+    """
+    # If it is an int (like thing), turn it into a zfilled index
+    _dict_index = None 
     try: 
-        _dict_index = int(_dict_key)
-        return ALL_DICTIONARIES[_dict_key.zfill(3)][_dict_entry]["expansion"]
+        _dict_index = str(int(_dict_key)).zfill(3)
+        return ALL_DICTIONARIES[_dict_index][_dict_entry]["expansion"]
     except ValueError:
         pass 
-    for i, n in DICTIONARYNAMES:
-        if _dict_key == n:
-            return ALL_DICTIONARIES[str(i).zfill(3)][_dict_entry]["expansion"]
-    return None
-# 
-# >>> print(dict["236"]["CUM,FY,,FRC"]["expansion"])
-#
+
+    # OK, have to lookt it up by name
+    for key, val in ALL_DICTIONARIES['950'].items():
+        if _dict_key == val['dictionary_name']:
+            return ALL_DICTIONARIES[key][_dict_entry]["expansion"] 
+        
+
 
 # ---------- getDictionary ----------
 def getDictionary(filename, VERBOSELEVEL=0):
@@ -136,7 +122,28 @@ class X4DictionaryServer:
     # ---------- __init__ ----------
     def __init__(self, pathToDictionaryFiles=PATHTODICTIONARYFILES):
         self.pathToDictionaryFiles = pathToDictionaryFiles
-        self.DictionaryNames = DICTIONARYNAMES
+        self.DictionaryNames = (
+            (3, "Institutes"),
+            (4, "ReferenceTypes"),
+            (5, "Journals"),
+            (7, "ConferencesAndBooks"),
+            (9, "Compounds"), #209
+            (15, "History"),
+            (16, "Status"),
+            (17, "Rel_Ref"),
+            (18, "Facility"),
+            (19, "IncidentSource"),
+            (20, "AdditionalResults"),
+            (21, "Method"),
+            (22, "Detectors"),
+            (23, "Analysis"),
+            (24, "DataHeadings"),
+            (30, "Process"),
+            (33, "Particles"),
+            (34, "Modifiers"),
+            (35, "DataType"),
+            (36, "Quantities"), #113
+            (37, "Result"))
 
     # ---------- __getitem__ ----------
     def __getitem__(self, i):
