@@ -138,7 +138,7 @@ class TestTheWorks(TestCaseWithTableTests):
                                      '#  Authors:   K.Hatanaka, N.Matsuoka, H.Sakai, T.Saito, H.Tamura, K.Hosono, M.Kondo, K.Imai, H.Shimizu, K.Nishimura\n'
                                      '#  Title:     Acceleration Of Protons And Deuterons Polarized In The Horizontal Planeby The Rcnp Cyclotron\n'
                                      '#  Year:      1983\n'
-                                     '#  Institute: Osaka Univ., Osaka (Research Center For Nuclear Physics, Osaka Univ.); Kyoto Univ.\n'
+                                     '#  Institute: Osaka Univ., Osaka (Research Center For Nuclear Physics, Osaka Univ.); Kyoto Univ., Kyoto\n'
                                      '#  Reference: Nuclear Instrum.and Methods in Physics Res. 217, 397 (1983)\n'
                                      '#  Subent:    E0783002\n'
                                      '#  Reaction:  Vector analyzing power, A(y), for incident beam Spin-polarization probability d/dA for 1H(d,Elastic)1H \n'
@@ -170,6 +170,7 @@ class TestTheWorks(TestCaseWithTableTests):
                                      '        56.0          160.562       0.1265        0.0197        None          \n        ')
 
     def test_cs_Pun2n(self):
+        self.maxDiff = None
         # Get all the data
         subents = self.dbMgr.retrieve(target="PU-239", reaction="N,2N", quantity="CS", rawEntry=True)
         # Lougheed dataset
@@ -193,7 +194,7 @@ class TestTheWorks(TestCaseWithTableTests):
         self.assertTablesAlmostEqual(str(ds[('21971', '21971003', ' ')]).strip(), '''
 #  Authors:   J.Frehaut, A.Bertin, R.Blois, E.Gryntakis, C.A.Philis
 #  Title:     -(N,2N) Cross Sections Of 2-H And 239-Pu
-#  Year:      1985\n#  Institute: 2FR
+#  Year:      1985\n#  Institute: CEA/DAM Ile-de-France, Bruyeres-le-Chatel, Arpajon
 #  Reference: Conf.on Nucl.Data f.Basic a.Appl.Sci.,Santa Fe 1985 , (IB06) (1985)
 #  Subent:    21971003
 #  Reaction:  Cross section for 239Pu(n,2n)238Pu
@@ -219,7 +220,7 @@ class TestTheWorks(TestCaseWithTableTests):
 #  Authors:   D.S.Mather, P.F.Bampton, R.E.Coles, G.James, P.J.Nind
 #  Title:     -Measurement Of (N,2N) Cross Sections For Incident Energies Between 6 And 14 Mev-.
 #  Year:      1972
-#  Institute: 2UK
+#  Institute: Atomic Weapons Establishment (AWE), Aldermaston
 #  Reference: Report other than progress report: AWRE-O-72/72  (1972); Report other than progress report: AWRE-O-47/69  (1969)
 #  Subent:    20795014
 #  Reaction:  Cross section for 239Pu(n,2n)238Pu
@@ -236,7 +237,7 @@ class TestTheWorks(TestCaseWithTableTests):
 #  Authors:   J.A.Becker, L.A.Bernstein, W.Younes, D.P.Mcnabb, P.E.Garrett, D.E.Archer, C.A.Mcgrath, M.A.Stoyer, H.Chen, W.E.Ormand, R.O.Nelson, M.B.Chadwick, G.D.Johns, D.Drake, P.G.Young, M.Devlin, N.Fotiades, W.S.Wilburn
 #  Title:     Partial Gamma-Ray Cross Sections For The Reaction 239Pu(N,2Ng) And The 239Pu(N,2N) Cross Section
 #  Year:      2002
-#  Institute: Lawrence Livermore National Laboratory, Livermore, CA
+#  Institute: Los Alamos National Laboratory, NM; Lawrence Livermore National Laboratory, Livermore, CA
 #  Reference: Jour. of Nuclear Science and Technology Suppl. 2, (1), 620 (2002)
 #  Subent:    14129002
 #  Reaction:  Cross section for 239Pu(n,2n)238Pu
@@ -1043,6 +1044,7 @@ class TestTheWorks(TestCaseWithTableTests):
         self.assertTablesAlmostEqual(str(simple), simpleanswer)
 
     def test_energy_spectrum(self):
+        self.maxDiff=None
         subent = self.dbMgr.retrieve(SUBENT='20576003', rawEntry=True)
         ds = exfor_entry.X4Entry(subent['20576']).getDataSets()
         # open( 'c', mode = 'w' ).writelines( str( ds[ ('20576', '20576003', ' ') ] ) )
@@ -1050,7 +1052,7 @@ class TestTheWorks(TestCaseWithTableTests):
 #  Authors:   H.Knitter
 #  Title:     -Measurement Of The Energy Spectrum Of Prompt Neutrons From The Fission Of Pu239 By 0.215 Mev Neutrons-
 #  Year:      1975
-#  Institute: Inst. for Ref. Mat. and Meas. (IRNM), Geel
+#  Institute: EC Joint Research Centre (EC-JRC), Geel
 #  Reference: Atomkernenergie 26, 76 (1975)
 #  Subent:    20576003
 #  Reaction:  Relative data  for 239Pu(n,Fission) Reference quantity not given
@@ -1244,7 +1246,7 @@ class TestTheWorks(TestCaseWithTableTests):
         simpleAnswer = """#  Authors:   H.Knitter
 #  Title:     -Measurement Of The Energy Spectrum Of Prompt Neutrons From The Fission Of Pu239 By 0.215 Mev Neutrons-
 #  Year:      1975
-#  Institute: Inst. for Ref. Mat. and Meas. (IRNM), Geel
+#  Institute: EC Joint Research Centre (EC-JRC), Geel
 #  Reference: Atomkernenergie 26, 76 (1975)
 #  Subent:    20576003
 #  Reaction:  Relative data  for 239Pu(n,Fission) Reference quantity not given

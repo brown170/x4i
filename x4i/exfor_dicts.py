@@ -50,6 +50,29 @@ PATHTODICTIONARYFILES = __path__[0] + os.sep + "dicts" + os.sep
 ALL_DICTIONARIES=json.load(open(PATHTODICTIONARYFILES + "dict_arc_all.json"))
 
 
+def get_dict(_dict_key):
+    """
+    _dict_key: either int, zfilled string of an int, or the key word itself
+
+    >>> print(dict["236"]["CUM,FY,,FRC"]["expansion"])
+    """
+    # If it is an int (like thing), turn it into a zfilled index
+    _dict_index = None 
+    try: 
+        _dict_index = str(int(_dict_key)).zfill(3)
+        return ALL_DICTIONARIES[_dict_index]
+    except ValueError:
+        pass 
+
+    # OK, have to look it up by name
+    for key, val in ALL_DICTIONARIES['950'].items():
+        if _dict_key == val['dictionary_name']:
+            return ALL_DICTIONARIES[key]
+
+    raise KeyError("Could not find key %s" % _dict_key)
+  
+
+
 def get_dict_entry(_dict_key, _dict_entry):
     """
     _dict_key: either int, zfilled string of an int, or the key word itself
@@ -57,6 +80,8 @@ def get_dict_entry(_dict_key, _dict_entry):
 
     >>> print(dict["236"]["CUM,FY,,FRC"]["expansion"])
     """
+    return get_dict(_dict_key)[_dict_entry]
+
     # If it is an int (like thing), turn it into a zfilled index
     _dict_index = None 
     try: 

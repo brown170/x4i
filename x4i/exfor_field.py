@@ -484,21 +484,31 @@ class X4InstituteField(X4PlainField):
 
     def __init__(self, x):
         X4PlainField.__init__(self, x)
-        self.exfor_institutes_dictionary = exfor_dicts.X4DictionaryServer()['Institutes']
+        #self.exfor_institutes_dictionary = exfor_dicts.get_dict('Institutes') #X4DictionaryServer()['Institutes']
         self.institutes = []
         for p in self:
+            print('0:', p, self[p], exfor_grammars.x4institutefield.parseString(str(self[p])).asList())
             try:
-                il = exfor_grammars.x4textfield.parseString(str(self[p])).asList()
+                il = exfor_grammars.x4institutefield.parseString(str(self[p])).asList()
             except pyparsing.ParseException as err:
                 raise exfor_exceptions.InstituteParsingError(
                     'Can not parse institute "' + str(x) + '",\n    got error "' + str(err) + '"\n   ')
+            #print('A:',il)
             for i in il:
-                tok = i[0][0]
-                comment = (' '.join(i[1:])).title()
-                if tok[-3:] in self.exfor_institutes_dictionary.keys():
-                    self.institutes.append((tok, self.exfor_institutes_dictionary[tok[-3:]][0], comment))
+                if len(i)==7: # is inst
+                    tok = i #[0][0]
+                    try:
+                        self.institutes.append((tok, exfor_dicts.get_dict_entry('Institutes', tok)['expansion'], ""))
+                    except:
+                        self.institutes.append((tok, tok, ""))
                 else:
-                    self.institutes.append((tok, tok, comment))
+                    comment = i.title().strip()
+                    self.institutes[-1] = ( self.institutes[-1][0], self.institutes[-1][1], comment)
+                #print('B:',tok, exfor_dicts.get_dict_entry('Institutes', tok))
+                #if tok in self.exfor_institutes_dictionary.keys():
+                #    self.institutes.append((tok, self.exfor_institutes_dictionary[tok]['expansion'], comment))
+                #else:
+                #    self.institutes.append((tok, tok, comment))
 
     def __str__(self):
         """Pretty version of field"""

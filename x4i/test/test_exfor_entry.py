@@ -149,7 +149,7 @@ class TestX4Entry(TestCaseWithTableTests):
         # open( 'a', mode='w' ).writelines( exfor_entry.X4Entry( self.entry ).meta().xmgrace_header() )
         # open( 'b', mode='w' ).writelines( '#Exfor Entry E0783\n#  Authors:   K.Hatanaka, N.Matsuoka, H.Sakai, T.Saito, H.Tamura, K.Hosono, M.Kondo, K.Imai, H.Shimizu, K.Nishimura\n#  Title:     Acceleration Of Protons And Deuterons Polarized In The Horizontal Planeby The Rcnp Cyclotron\n#  Year:      1983\n#  Institute: Osaka Univ., Osaka (Research Center For Nuclear Physics, Osaka Univ.); Kyoto Univ.\n#  Reference: Nuclear Instrum.and Methods in Physics Res. 217, 397 (1983)' )
         self.assertEqual(exfor_entry.X4Entry(self.entry).meta().xmgraceHeader(),
-                         '#Exfor Entry E0783\n#  Authors:   K.Hatanaka, N.Matsuoka, H.Sakai, T.Saito, H.Tamura, K.Hosono, M.Kondo, K.Imai, H.Shimizu, K.Nishimura\n#  Title:     Acceleration Of Protons And Deuterons Polarized In The Horizontal Planeby The Rcnp Cyclotron\n#  Year:      1983\n#  Institute: Osaka Univ., Osaka (Research Center For Nuclear Physics, Osaka Univ.); Kyoto Univ.\n#  Reference: Nuclear Instrum.and Methods in Physics Res. 217, 397 (1983)\n#  Subent:    E0783001')
+                         '#Exfor Entry E0783\n#  Authors:   K.Hatanaka, N.Matsuoka, H.Sakai, T.Saito, H.Tamura, K.Hosono, M.Kondo, K.Imai, H.Shimizu, K.Nishimura\n#  Title:     Acceleration Of Protons And Deuterons Polarized In The Horizontal Planeby The Rcnp Cyclotron\n#  Year:      1983\n#  Institute: Osaka Univ., Osaka (Research Center For Nuclear Physics, Osaka Univ.); Kyoto Univ., Kyoto\n#  Reference: Nuclear Instrum.and Methods in Physics Res. 217, 397 (1983)\n#  Subent:    E0783001')
         self.assertEqual(exfor_entry.X4Entry(self.entry).meta().legend(), '(1983) K.Hatanaka, N.Matsuoka, et al.')
         self.assertEqual(exfor_entry.X4Entry(self.entry)[1]['BIB'].meta(subent='E0783001').legend(),
                          '(1983) K.Hatanaka, N.Matsuoka, et al.')
@@ -179,7 +179,7 @@ class TestX4Entry(TestCaseWithTableTests):
         os.remove('junk3.csv')
         answer = '#  Authors:   K.Hatanaka, N.Matsuoka, H.Sakai, T.Saito, H.Tamura, K.Hosono, M.Kondo, K.Imai, H.Shimizu, K.Nishimura\n' \
                  '#  Title:     Acceleration Of Protons And Deuterons Polarized In The Horizontal Planeby The Rcnp Cyclotron\n' \
-                 '#  Year:      1983\n#  Institute: Osaka Univ., Osaka (Research Center For Nuclear Physics, Osaka Univ.); Kyoto Univ.\n' \
+                 '#  Year:      1983\n#  Institute: Osaka Univ., Osaka (Research Center For Nuclear Physics, Osaka Univ.); Kyoto Univ., Kyoto\n' \
                  '#  Reference: Nuclear Instrum.and Methods in Physics Res. 217, 397 (1983)\n' \
                  '#  Subent:    E0783002\n' \
                  '#  Reaction:  Vector analyzing power, A(y), for incident beam Spin-polarization probability d/dA for 1H(d,Elastic)1H \n' \
