@@ -143,10 +143,11 @@ class TestX4ReactionField(unittest.TestCase):
           3(44-RU-OXI(N,THS)44-RU-OXI,BA/COH,AMP) Bound molecule
             coherent scattering length at zero neutron energy.'''
         testField = exfor_field.X4ReactionField(testFieldString.split('\n'))
+        self.maxDiff=None
         self.assertEqual(str(testField),
-                         '[1] Bound-atom coherent scattering amplitude for Ruthenium oxide(n,ThermalScattering)Ruthenium oxide; '
-                         '[2] Bound-atom coherent scattering amplitude for Ruthenium oxide(n,ThermalScattering)Ruthenium oxide; '
-                         '[3] Bound-atom coherent scattering amplitude for Ruthenium oxide(n,ThermalScattering)Ruthenium oxide, Bound molecule coherent scattering length at zero neutron energy.'
+                         '[1] Bound-atom coherent scattering length for Ruthenium oxide(n,ThermalScattering)Ruthenium oxide; '
+                         '[2] Bound-atom coherent scattering length for Ruthenium oxide(n,ThermalScattering)Ruthenium oxide; '
+                         '[3] Bound-atom coherent scattering length for Ruthenium oxide(n,ThermalScattering)Ruthenium oxide, Bound molecule coherent scattering length at zero neutron energy.'
                          )
 
     def test_oh_god_no_2(self):

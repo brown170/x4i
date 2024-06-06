@@ -141,7 +141,7 @@ class TestTheWorks(TestCaseWithTableTests):
                                      '#  Institute: Osaka Univ., Osaka (Research Center For Nuclear Physics, Osaka Univ.); Kyoto Univ., Kyoto\n'
                                      '#  Reference: Nuclear Instrum.and Methods in Physics Res. 217, 397 (1983)\n'
                                      '#  Subent:    E0783002\n'
-                                     '#  Reaction:  Vector analyzing power, A(y), for incident beam Spin-polarization probability d/dA for 1H(d,Elastic)1H \n'
+                                     '#  Reaction:  Analyzing power Spin-polarization probability d/dA for 1H(d,Elastic)1H \n'
                                      '#        EN            ANG-CM        DATA          DATA-ERR      FLAG          \n'
                                      '#        MEV           ADEG          NO-DIM        NO-DIM        NO-DIM        \n'
                                      '        56.0          30.712        -0.002211     None          1.0           \n'
@@ -1055,7 +1055,7 @@ class TestTheWorks(TestCaseWithTableTests):
 #  Institute: EC Joint Research Centre (EC-JRC), Geel
 #  Reference: Atomkernenergie 26, 76 (1975)
 #  Subent:    20576003
-#  Reaction:  Relative data  for 239Pu(n,Fission) Reference quantity not given
+#  Reaction:  Relative data Diff. fiss. neutron multiplicity d/dE(n) for 239Pu(n,Fission) Reference quantity not given
 #        EN            EN-RSL        E             E-RSL         DATA          DATA-ERR      ERR-1
 #        KEV           KEV           MEV           MEV           ARB-UNITS     ARB-UNITS     PER-CENT
         215.0         32.0          0.28          0.01          66.8          2.5           2.0
@@ -1249,7 +1249,7 @@ class TestTheWorks(TestCaseWithTableTests):
 #  Institute: EC Joint Research Centre (EC-JRC), Geel
 #  Reference: Atomkernenergie 26, 76 (1975)
 #  Subent:    20576003
-#  Reaction:  Relative data  for 239Pu(n,Fission) Reference quantity not given
+#  Reaction:  Relative data Diff. fiss. neutron multiplicity d/dE(n) for 239Pu(n,Fission) Reference quantity not given
 #        EN            EN-RSL        E             E-RSL         DATA          DATA-ERR      ERR-1
 #        KEV           KEV           MEV           MEV           ARB-UNITS     ARB-UNITS     PER-CENT
         215.0         32.0          0.28          0.01          66.8          2.5           2.0

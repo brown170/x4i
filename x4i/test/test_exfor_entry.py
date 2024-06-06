@@ -177,12 +177,13 @@ class TestX4Entry(TestCaseWithTableTests):
                               '56.0,145.538,-0.02551,0.0148,\n', '56.0,150.255,0.104,0.0246,\n',
                               '56.0,155.357,0.0857,0.0246,\n', '56.0,160.562,0.1265,0.0197,\n'])
         os.remove('junk3.csv')
+        self.maxDiff=None
         answer = '#  Authors:   K.Hatanaka, N.Matsuoka, H.Sakai, T.Saito, H.Tamura, K.Hosono, M.Kondo, K.Imai, H.Shimizu, K.Nishimura\n' \
                  '#  Title:     Acceleration Of Protons And Deuterons Polarized In The Horizontal Planeby The Rcnp Cyclotron\n' \
                  '#  Year:      1983\n#  Institute: Osaka Univ., Osaka (Research Center For Nuclear Physics, Osaka Univ.); Kyoto Univ., Kyoto\n' \
                  '#  Reference: Nuclear Instrum.and Methods in Physics Res. 217, 397 (1983)\n' \
                  '#  Subent:    E0783002\n' \
-                 '#  Reaction:  Vector analyzing power, A(y), for incident beam Spin-polarization probability d/dA for 1H(d,Elastic)1H \n' \
+                 '#  Reaction:  Analyzing power Spin-polarization probability d/dA for 1H(d,Elastic)1H \n' \
                  '#        EN            ANG-CM        DATA          DATA-ERR      FLAG          \n' \
                  '#        MEV           ADEG          NO-DIM        NO-DIM        NO-DIM        \n' \
                  '        56.0          30.712        -0.002211     None          1.0           \n' \
