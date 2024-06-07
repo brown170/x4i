@@ -32,6 +32,8 @@
 #   3.     Switch dictionary metadata to use JSON so I can avoid exec() calls in the dictionary parser (David Brown <dbrown@bnl.gov>, 2018-12-04T20:49:58)
 #   4.     Clean up column parser and dicts (David Brown <dbrown@bnl.gov>, 2018-12-04T19:37:40)
 #   5.     Clear a few uninitialized variable warnings (David Brown <dbrown@bnl.gov>, 2014-03-04T13:53:51)
+#   6.     Removed all dictionaries, now pull down latest JSON version from the IAEA (https://www-nds.iaea.org/nrdc/file/dson.html), 
+#          this required refactoring this code and all codes that use EXFOR dictionaries (David Brown <dbrown@bnl.gov> 2024-06-07)
 #
 ################################################################################
 
