@@ -55,8 +55,8 @@ VERBOSELEVEL = 2
 x4ReactionMap = {'TOT': 'Total', 'EL': 'Elastic', 'ABS': 'Absorption', 'INL': 'Inelastic', 'TCC': 'TotalChargeChanging',
                  'FUS': 'Fusion', 'NON': 'Nonelastic', 'SCT': 'Scattering', 'F': 'Fission', 'PAI': 'PairProduction',
                  'THS': 'ThermalScattering', 'X': 'Unspecified', '0': 'None'}
-x4QuantityMap = get_dict('Quantities (REACTION SF 5-8)')
-x4ModifierMap = get_dict('Modifiers (REACTION SF 8)')
+x4QuantityMap = get_exfor_dict('Quantities (REACTION SF 5-8)')
+x4ModifierMap = get_exfor_dict('Modifiers (REACTION SF 8)')
 
 
 class X4Process:

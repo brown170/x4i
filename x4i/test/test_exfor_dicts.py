@@ -20,13 +20,13 @@ class TestX4Dicts(unittest.TestCase):
         #self.assertEqual(self.d['Facility']['FRS'], ['Fragment separator'])
         #self.assertEqual(exfor_dicts.ALL_DICTIONARIES[str(self.d.getDictionaryIndex("Facility")).zfill(3)]['FRS']['expansion'], 
         #                 'Fragment separator')
-        self.assertEqual(exfor_dicts.get_dict_entry('Facilities', 'FRS')["expansion"], 'Fragment separator')
-        self.assertEqual(exfor_dicts.get_dict_entry('Particles', 'K')["expansion"], 'Kaons,unspecified')
-        self.assertEqual(exfor_dicts.get_dict_entry('Institutes', '1USAKAP')["expansion"], 
+        self.assertEqual(exfor_dicts.get_exfor_dict_entry('Facilities', 'FRS')["expansion"], 'Fragment separator')
+        self.assertEqual(exfor_dicts.get_exfor_dict_entry('Particles', 'K')["expansion"], 'Kaons,unspecified')
+        self.assertEqual(exfor_dicts.get_exfor_dict_entry('Institutes', '1USAKAP')["expansion"], 
                          'Knolls Atomic Power Laboratory, Schenectady, NY')
-        self.assertEqual(exfor_dicts.get_dict_entry('Conferences', '69STUDSVIK')["expansion"], 'Neutron Capture Gamma-Ray Spectroscopy,Studsvik,1969')
-        self.assertEqual(exfor_dicts.get_dict_entry('Processes (REACTION SF 3)', 'PAI')["expansion"], 'Pair production')
-        self.assertEqual(exfor_dicts.get_dict_entry('Quantities (REACTION SF 5-8)', ',SIG')["expansion"], 'Cross section')
+        self.assertEqual(exfor_dicts.get_exfor_dict_entry('Conferences', '69STUDSVIK')["expansion"], 'Neutron Capture Gamma-Ray Spectroscopy,Studsvik,1969')
+        self.assertEqual(exfor_dicts.get_exfor_dict_entry('Processes (REACTION SF 3)', 'PAI')["expansion"], 'Pair production')
+        self.assertEqual(exfor_dicts.get_exfor_dict_entry('Quantities (REACTION SF 5-8)', ',SIG')["expansion"], 'Cross section')
 
     def test_particle_like_contents(self):
         """
@@ -34,13 +34,13 @@ class TestX4Dicts(unittest.TestCase):
         (9, "Compounds"), #209
         """
         #self.maxDiff=None
-        print(list(exfor_dicts.get_dict("Chemical compounds").keys()))
-        self.assertEqual(list(exfor_dicts.get_dict("Particles").keys()), 
+        print(list(exfor_dicts.get_exfor_dict("Chemical compounds").keys()))
+        self.assertEqual(list(exfor_dicts.get_exfor_dict("Particles").keys()), 
             ['comment', '0', 'A', 'AN', 'AP', 'AR', 'B', 'B+', 'B-', 'B12', 'B8', 'BE10', 
             'C14', 'CA40', 'D', 'DG', 'DN', 'E', 'EC', 'ER', 'ETA', 'FF', 'G', 'HE2', 'HE3', 
             'HE6', 'HF', 'ICE', 'K', 'K0', 'KN', 'KP', 'LCP', 'LF', 'LI6', 'LI7', 'LI9', 'N', 
             'NE20', 'O15', 'O16', 'P', 'PI', 'PI0', 'PIN', 'PIP', 'PN', 'RCL', 'RSD', 'SF', 'T', 'U238', 'XR']) 
-        self.assertEqual(list(exfor_dicts.get_dict("Chemical compounds").keys()), 
+        self.assertEqual(list(exfor_dicts.get_exfor_dict("Chemical compounds").keys()), 
             ['1-D-D2O', '1-D-DXX', '1-H-ARM', '1-H-BNZ', '1-H-BUT', '1-H-CMP', '1-H-CXX', '1-H-D2O', 
              '1-H-DXX', '1-H-ETH', '1-H-MTH', '1-H-PFN', '1-H-PHL', '1-H-PLE', '1-H-PRO', '1-H-TXX', 
              '1-H-WTR', '1-T-TXX', '2-HE-CMP', '3-LI-CMP', '4-BE-CMP', '4-BE-OXI', '5-B-CMP', '5-B-OXI', 
@@ -70,15 +70,15 @@ class TestX4Dicts(unittest.TestCase):
 
     def test_institute_contents(self):
         """(3, "Institutes"),"""
-        self.assertEqual(len(exfor_dicts.get_dict("Institutes")), 1243)
+        self.assertEqual(len(exfor_dicts.get_exfor_dict("Institutes")), 1243)
 
     def test_facility_like_contents(self):
         """
         (18, "Facility"),
         (19, "IncidentSource"),
         """
-        self.assertEqual(len(exfor_dicts.get_dict("Facilities")), 35)
-        self.assertEqual(len(exfor_dicts.get_dict("Incident sources")), 56)
+        self.assertEqual(len(exfor_dicts.get_exfor_dict("Facilities")), 35)
+        self.assertEqual(len(exfor_dicts.get_exfor_dict("Incident sources")), 56)
 
     def test_reference_like_contents(self):
         """
@@ -86,9 +86,9 @@ class TestX4Dicts(unittest.TestCase):
         (5, "Journals"),
         (7, "ConferencesAndBooks"),
         """
-        self.assertEqual(len(exfor_dicts.get_dict("Reference types")), 14)
-        self.assertEqual(len(exfor_dicts.get_dict("Journals")), 522)
-        self.assertEqual(len(exfor_dicts.get_dict("Conferences")), 485)
+        self.assertEqual(len(exfor_dicts.get_exfor_dict("Reference types")), 14)
+        self.assertEqual(len(exfor_dicts.get_exfor_dict("Journals")), 522)
+        self.assertEqual(len(exfor_dicts.get_exfor_dict("Conferences")), 485)
 
     def test_dataheadings_contents(self):
         """(24, "DataHeadings"),"""

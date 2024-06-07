@@ -388,4 +388,4 @@ class X4ChemicalCompound(X4ParticleBase):
         return str(self.parse_results[0])
 
     def prettyStyle(self):
-        return get_dict_entry("Chemical compounds", str(self.parse_results[0]))['expansion']
+        return get_exfor_dict_entry("Chemical compounds", str(self.parse_results[0]))['expansion']

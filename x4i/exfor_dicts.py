@@ -52,7 +52,7 @@ PATHTODICTIONARYFILES = __path__[0] + os.sep + "dicts" + os.sep
 ALL_DICTIONARIES=json.load(open(PATHTODICTIONARYFILES + "dict_arc_all.json"))
 
 
-def get_dict(_dict_key):
+def get_exfor_dict(_dict_key):
     """
     _dict_key: either int, zfilled string of an int, or the key word itself
 
@@ -74,12 +74,12 @@ def get_dict(_dict_key):
     raise KeyError("Could not find key %s" % _dict_key)
   
 
-def get_dict_entry(_dict_key, _dict_entry):
+def get_exfor_dict_entry(_dict_key, _dict_entry):
     """
     _dict_key: either int, zfilled string of an int, or the key word itself
     _dict_entry: the entry in the _dict_key's dictionary aought for
 
     >>> print(dict["236"]["CUM,FY,,FRC"]["expansion"])
     """
-    return get_dict(_dict_key)[_dict_entry]
+    return get_exfor_dict(_dict_key)[_dict_entry]
 

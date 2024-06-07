@@ -502,7 +502,7 @@ class X4InstituteField(X4PlainField):
             for ikey in il:          
                 comment_string = ' '.join(il[ikey])
                 try:
-                    self.institutes.append((ikey, exfor_dicts.get_dict_entry('Institutes', ikey)['expansion'], comment_string))
+                    self.institutes.append((ikey, exfor_dicts.get_exfor_dict_entry('Institutes', ikey)['expansion'], comment_string))
                 except:
                     self.institutes.append((ikey, ikey, comment_string))
 

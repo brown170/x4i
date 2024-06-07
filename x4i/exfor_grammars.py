@@ -73,12 +73,12 @@ altaddop = plus | minus
 x4isomer_modifier = Word('mMgGTL', max=1) + Optional(Word(nums))
 
 x4basicparticle = Optional(Literal('X')) + eval(
-    '^'.join(['Literal( \"' + x + '\" )' for x in get_dict("Particles").keys()]))
+    '^'.join(['Literal( \"' + x + '\" )' for x in get_exfor_dict("Particles").keys()]))
 x4particle = Combine(Word(alphas) + Optional(Word(nums)))
 x4element = Word(capsStar, alphas, min=1, max=2) ^ Literal("PI") ^ Literal("K0") ^ Literal("PIM") ^ Literal(
     "PIP") ^ Literal("P0")
 x4nucleus = Word(nums) + dash + x4element + dash + Word(nums) + ZeroOrMore(mathop + x4isomer_modifier)
-x4chemical_compound = eval('^'.join(['Literal( \"' + x + '\" )' for x in get_dict("Chemical compounds").keys()]))
+x4chemical_compound = eval('^'.join(['Literal( \"' + x + '\" )' for x in get_exfor_dict("Chemical compounds").keys()]))
 
 x4projectile = Group(x4nucleus) ^ x4particle ^ Literal('0')
 x4target = Group(x4chemical_compound | x4nucleus) ^ Literal("ELEM/MASS") ^ Literal("MASS") ^ Literal("ELEM")
