@@ -83,17 +83,3 @@ def get_dict_entry(_dict_key, _dict_entry):
     """
     return get_dict(_dict_key)[_dict_entry]
 
-    # If it is an int (like thing), turn it into a zfilled index
-    _dict_index = None 
-    try: 
-        _dict_index = str(int(_dict_key)).zfill(3)
-        return ALL_DICTIONARIES[_dict_index][_dict_entry]
-    except ValueError:
-        pass 
-
-    # OK, have to look it up by name
-    for key, val in ALL_DICTIONARIES['950'].items():
-        if _dict_key == val['dictionary_name']:
-            return ALL_DICTIONARIES[key][_dict_entry] 
-
-    raise KeyError("Could not find key %s" % _dict_key)
