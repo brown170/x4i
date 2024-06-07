@@ -186,8 +186,8 @@ class TestX4Reaction(unittest.TestCase):
                          'Maxwellian average Cross section for 239Pu(n,Absorption)')
 
     def test_what_the_heck_is_this(self):
-        self.assertEqual(str(exfor_reactions.X4Reaction("(92-U-238-M(0,F),TER,AKE,LCP)")),
-                         'Avg. kin.energy light chg. part., ternary fiss. for 238mU(None,Fission)')
+        self.assertEqual(str(exfor_reactions.X4Reaction("(92-U-238-M(0,F),PRE/TER,AKE,LF+HF)")),
+                         'Av. tot. kin. energy of primary fission fragments from ternary fission for 238mU(None,Fission)')
 
     def test_resonance_energy(self):
         self.assertEqual(str(exfor_reactions.X4Reaction("(94-PU-240(N,0),,EN)")), 'Resonance energy for 240Pu(n,None)')
@@ -218,8 +218,8 @@ class TestX4ReactionCombination(unittest.TestCase):
 
     def test_pathological(self):
         self.assertEqual(str(exfor_reactions.X4ReactionCombination(
-            "(((94-PU-239(N,F),,SIG)-(92-U-238-M(0,F),TER,AKE,LCP))/(94-PU-239(N,ABS),,SIG,,MXW))")),
-                         '((( Cross section for 239Pu(n,Fission) )-( Avg. kin.energy light chg. part., ternary fiss. for 238mU(None,Fission) ))/( Maxwellian average Cross section for 239Pu(n,Absorption) ))')
+            "(((94-PU-239(N,F),,SIG)-(92-U-238-M(0,F),PRE/TER,AKE,LF+HF))/(94-PU-239(N,ABS),,SIG,,MXW))")),
+                         '((( Cross section for 239Pu(n,Fission) )-( Av. tot. kin. energy of primary fission fragments from ternary fission for 238mU(None,Fission) ))/( Maxwellian average Cross section for 239Pu(n,Absorption) ))')
 
     def test_sum_with_isomer(self):
         self.assertEqual(str(exfor_reactions.X4ReactionCombination(
