@@ -66,7 +66,7 @@ __disclaimer__ = """LLNL Disclaimer:
       and shall not be used for advertising or product endorsement purposes."""
 
 from x4i.exfor_paths import *
-
+from x4i.exfor_dicts import get_exfor_dict, get_exfor_dict_entry
 from x4i import exfor_manager, exfor_entry
 
 __databaseManager = exfor_manager.X4DBManagerDefault()
