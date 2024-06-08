@@ -57,7 +57,7 @@ from x4i import exfor_entry
 from x4i import exfor_dataset
 from x4i.test import __path__
 from x4i.test.utilities import TestCaseWithTableTests
-
+import pint_pandas
 
 testDBPath = __path__[0] + os.sep + 'data'
 testIndexFileName = testDBPath + os.sep + 'index.tbl'
@@ -66,9 +66,9 @@ db = exfor_manager.X4DBManagerPlainFS(datapath=testDBPath, database=testIndexFil
 class TestX4NewDataSet(TestCaseWithTableTests):
 
     def setUp(self):
-        self.mather = {}
+        self.frehaut = {}
         for k,v in db.retrieve(ENTRY='21971', rawEntry=True).items():
-            self.mather[k]=exfor_entry.X4Entry(v)
+            self.frehaut[k]=exfor_entry.X4Entry(v)
 
         self.other = {}
         for k,v in db.retrieve(ENTRY='O1732', rawEntry=True).items():
@@ -77,7 +77,7 @@ class TestX4NewDataSet(TestCaseWithTableTests):
     def test_easy(self):
         entry = '21971'
         subent = '21971003'
-        new_set = exfor_dataset.X4DataSetNew(data=self.mather[entry][subent]['DATA'])
+        new_set = exfor_dataset.X4DataSetNew(data=self.frehaut[entry][subent]['DATA'])
         self.assertEqual(new_set.numrows(), 14)
         self.assertEqual(new_set.numcols(), 4)
         self.assertEqual(len(new_set), 14)
@@ -98,13 +98,13 @@ class TestX4NewDataSet(TestCaseWithTableTests):
         #self.assertEqual(new_set.sort(), "")
         #self.assertEqual(new_set.append(), "")
 
-    def test_easy_but_with_metadata(self):
+    def test_easy_but_with_some_metadata(self):
         entry = '21971'
         subent = '21971003'
-        print(self.mather[entry][subent]['BIB']['REACTION'].reactions[' '][0])
+        print(self.frehaut[entry][subent]['BIB']['REACTION'].reactions[' '][0])
         new_set = exfor_dataset.X4DataSetNew(
-            data=self.mather[entry][subent]['DATA'], 
-            reaction=self.mather[entry][subent]['BIB']['REACTION'].reactions[' '], 
+            data=self.frehaut[entry][subent]['DATA'], 
+            reaction=self.frehaut[entry][subent]['BIB']['REACTION'].reactions[' '], 
             monitor=None)
         self.assertEqual(new_set.numrows(), 14)
         self.assertEqual(new_set.numcols(), 4)
@@ -143,7 +143,9 @@ class TestX4NewDataSet(TestCaseWithTableTests):
                 'Reaction:  (94-PU-239(N,2N)94-PU-238,SIG)',
                 '']))
         self.maxDiff = None
-        self.assertEqual(str(new_set), "")
+        #pint_pandas.PintType.ureg.default_format = "P~"
+        #print(repr(new_set.data.pint.dequantify()))
+        #self.assertEqual(str(new_set), "")
         self.assertEqual(repr(new_set), "")
         self.assertEqual(new_set.getSimplified(), "")
         self.assertTrue(False)

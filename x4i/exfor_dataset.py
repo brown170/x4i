@@ -155,21 +155,26 @@ class X4DataSetNew(X4BibMetaData):
         return result
 
     def __str__(self):
+        pint_pandas.PintType.ureg.default_format = "P~"
+        body = str(self.data.pint.dequantify())
+        splbody = body.split('\n')
         return '\n'.join(
             [
                 self.strHeader(),
-                '#        ' + ' '.join([str(i).ljust(13) for i in self.labels]) + ' ',
-                '#        ' + ' '.join([str(i).ljust(13) for i in self.units]) + ' '] +
-            ['        ' + ' '.join([str(j).ljust(13) for j in i]) + ' ' for i in self.data])
+                '#        ' + splbody[0],
+                '#        ' + splbody[1],
+            ] + ['         '+x for x in splbody[2:]])
 
     def __repr__(self):
-        ans = self.reprHeader() + "["
-        ans += "['" + "','".join(self.labels) + "']" + ",\n"
-        ans += "['" + "','".join(self.units) + "']"
-        for row in self.data:
-            ans += ",\n" + "[" + ",".join(map(str, row)) + "]"
-        ans += "]"
-        return ans
+        pint_pandas.PintType.ureg.default_format = "P~"
+        return self.reprHeader() + repr(self.data.pint.dequantify())
+#        "["
+#        ans += "['" + "','".join(self.labels) + "']" + ",\n"
+#        ans += "['" + "','".join(self.units) + "']"
+#        for row in self.data:
+#            ans += ",\n" + "[" + ",".join(map(str, row)) + "]"
+#        ans += "]"
+#        return ans
 
     def __len__(self):
         return len(self.data)
