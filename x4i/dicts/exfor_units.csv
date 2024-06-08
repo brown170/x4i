@@ -1,7 +1,7 @@
 EXFOR Units, Expansion, Comments, Pint Units
 CM3/S/MOL,centimeters**3 per second per Mol,' = cm3 / (Mol * sec)',cm**3/sec/mole
 ARB-UNITS,arbitrary Units,"'To be combined with the REL, RAW or MSC modifier'",arb_units 
-NO-DIM,no Dimensions,,no_dim
+NO-DIM,no Dimensions,,dimensionless
 PER-CENT,per-cent,"'Used for relative errors.  Must not be used under the', "" headings 'DATA', 'RATIO', etc. (In such case,, divide"", "" data by 100 and use 'NO-DIM').""",percent
 ADEG,angular Degrees,,angular_degrees
 AMIN,angular Minutes,,angular_minutes

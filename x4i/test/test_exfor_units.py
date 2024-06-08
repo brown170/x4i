@@ -1,6 +1,6 @@
 import unittest
 from x4i import exfor_units
-
+from pint import DimensionalityError
 
 class TestX4Units(unittest.TestCase):
     def setUp(self):
@@ -21,10 +21,9 @@ class TestX4Units(unittest.TestCase):
         self.assertEqual(20.0 * self.ureg('fissions/MeV').to('_100fissions/eV'), self.ureg.Quantity(2e-07, '_100fission / electron_volt'))  
 
     def test_sqrt_units(self):
-        pass 
-
-    def test_no_dim(self):
-        pass 
+        lil_gamma = self.ureg.Quantity(7.0, 'squareroot_eV')
+        self.assertAlmostEqual((lil_gamma*lil_gamma).to('eV'), self.ureg.Quantity(49.0, 'eV'))
 
     def test_arb_units(self):
-        pass 
+        """just because the units are arbitrary does not mean we can convert them into anything""" 
+        self.assertRaises(DimensionalityError, self.ureg.Quantity(20.0, 'arb_units').to, 'eV')
