@@ -20,8 +20,7 @@ no_dim                = [no_dim] = _
 arb_unit              = [arb_units] = _
 _100projectile        = 100 * projectiles = _
 
-
 @context exfor = x4
     [squareroot_energy] -> [energy]: value**2
-    [energy] -> [squareroot_energy]: sqrt(value) 
+    [energy] -> [squareroot_energy]: sqrt(value)
 @end
