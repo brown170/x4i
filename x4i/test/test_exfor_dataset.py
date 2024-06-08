@@ -94,32 +94,81 @@ class TestX4NewDataSet(TestCaseWithTableTests):
                 10560.0, 11070.0, 11570.0, 12080.0,
                 12580.0, 13090.0])
         #self.assertEqual(new_set[1,1], '')
-        #self.assertEqual(new_set.strHeader(), "")
-        #self.assertEqual(new_set.reprHeader(), "")
-        #self.assertEqual(new_set.sort(), "")
-        #self.assertEqual(new_set.getSimplified(), "")
-        #self.assertEqual(new_set.append(), "")
-        #self.assertEqual(str(new_set.sort()), "")
-        #self.assertEqual(repr(new_set.sort()), "")
         #self.assertEqual(new_set.csv())
-        #self.assertTrue(False)
+        #self.assertEqual(new_set.sort(), "")
+        #self.assertEqual(new_set.append(), "")
 
+    def test_easy_but_with_metadata(self):
+        entry = '21971'
+        subent = '21971003'
+        print(self.mather[entry][subent]['BIB']['REACTION'].reactions[' '][0])
+        new_set = exfor_dataset.X4DataSetNew(
+            data=self.mather[entry][subent]['DATA'], 
+            reaction=self.mather[entry][subent]['BIB']['REACTION'].reactions[' '], 
+            monitor=None)
+        self.assertEqual(new_set.numrows(), 14)
+        self.assertEqual(new_set.numcols(), 4)
+        self.assertEqual(len(new_set), 14)
+        self.assertEqual(new_set.data.shape, (14, 4))
+        numpy.testing.assert_array_almost_equal(
+            new_set.data.EN.values.numpy_data.tolist(), 
+            [  6.49,  7.01,  7.52,  8.03,  8.54,  9.04,  
+               9.55, 10.06, 10.56, 11.07, 11.57,
+               12.08, 12.58, 13.09])
+        numpy.testing.assert_array_almost_equal(
+            new_set.data.EN.pint.to('keV').values.numpy_data.tolist(), 
+            [    6490.0, 7010.0,  7520.0,  8029.999999999999,
+                 8540.0, 9040.0,  9550.0,  10060.0,
+                10560.0, 11070.0, 11570.0, 12080.0,
+                12580.0, 13090.0])
+        self.assertEqual(
+            new_set.strHeader(), 
+            '\n'.join([
+                '#  Authors:   N, o, n, e', 
+                '#  Title:     None',
+                '#  Year:      None',
+                '#  Institute: None',
+                '#  Reference: None',
+                '#  Subent:    ????????',
+                '#  Reaction:  Cross section for 239Pu(n,2n)238Pu ']))
+        self.assertEqual(
+            new_set.reprHeader(),  
+            '\n'.join([
+                'Authors:   N, o, n, e',
+                'Title:     None',
+                'Year:      None',
+                'Institute: None',
+                'Reference: None',
+                'Subent:    ???????? ',
+                'Reaction:  (94-PU-239(N,2N)94-PU-238,SIG)',
+                '']))
+        self.maxDiff = None
+        self.assertEqual(str(new_set), "")
+        self.assertEqual(repr(new_set), "")
+        self.assertEqual(new_set.getSimplified(), "")
+        self.assertTrue(False)
+
+    @unittest.skip
     def test_with_common(self):
         entry = 'O1732'
         subent = 'O1732002'
         new_set = exfor_dataset.X4DataSetNew(
             data=self.other[entry][subent]['DATA'], 
             common=self.other[entry][subent]['COMMON'])
+        print(new_set.labels)
+        print(new_set.units)
+        print(new_set.data)
         self.assertEqual(new_set.numrows(), 6)
         self.assertEqual(new_set.numcols(), 5)
         self.assertEqual(len(new_set), 6)
         self.assertEqual(new_set.data.shape, (6, 5))
-        print(new_set.data)
         self.assertTrue(False)
 
+    @unittest.skip
     def test_with_pointer(self):
         pass 
 
+    @unittest.skip
     def test_with_pointer_and_common(self):
         pass
 

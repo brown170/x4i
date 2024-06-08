@@ -121,12 +121,14 @@ class X4DataSetNew(X4BibMetaData):
         This should set up the data, labels and units such that all columns in all COMMON sections are in self
         and such that all columns in DATA which either have no pointer or matching pointer are in self
         """
-        #data_labels = data.labels
-        #data_units = data.units
+        if pointer is not None:
+            raise NotImplimentedError("add pointers")
         if common is not None:
             self.labels = common.labels + data.labels
             self.units = common.units + data.units
-            self.data = dataframe_from_datasection(common) + dataframe_from_datasection(data)
+            common_df = dataframe_from_datasection(common)
+            data_df = dataframe_from_datasection(data)
+            raise NotImplementedError("adding common")
         else:
             self.data = dataframe_from_datasection(data)
             self.labels = data.labels
