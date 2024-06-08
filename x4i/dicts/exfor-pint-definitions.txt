@@ -18,3 +18,7 @@ decay                 = [number_decays] = _
 _100decay             = 100 * decays = _
 arb_unit              = [arb_units] = _
 _100projectile        = 100 * projectiles = _
+
+@context exfor = x4
+    [energy] -> [squareroot_energy]: value * value
+@end
