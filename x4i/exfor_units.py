@@ -6,7 +6,7 @@ import bidict
 
 # This is the NRDC generated dictionary of unit definitions for EXFOR files
 exfor_units_dict = exfor_dicts.get_exfor_dict("Data units")  
-for obsolete in ['PART/FIS' ,'K', 'PART/MUAHR']:
+for obsolete in ['PART/FIS' ,'DEG-K', 'PART/MUAHR']:  # get rid og obsolete defs
     del(exfor_units_dict[obsolete])
 del(exfor_units_dict['SEE TEXT'])  # this ain't a unit!
 
