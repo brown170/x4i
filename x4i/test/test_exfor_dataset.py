@@ -93,7 +93,7 @@ class TestX4NewDataSet(TestCaseWithTableTests):
                  8540.0, 9040.0,  9550.0,  10060.0,
                 10560.0, 11070.0, 11570.0, 12080.0,
                 12580.0, 13090.0])
-        #self.assertEqual(new_set[1,1], '')
+        self.assertEqual(str(new_set["EN", 1]), '7.01 MeV')
         #self.assertEqual(new_set.csv())
         #self.assertEqual(new_set.sort(), "")
         #self.assertEqual(new_set.append(), "")
@@ -143,8 +143,6 @@ class TestX4NewDataSet(TestCaseWithTableTests):
                 'Reaction:  (94-PU-239(N,2N)94-PU-238,SIG)',
                 '']))
         self.maxDiff = None
-        #pint_pandas.PintType.ureg.default_format = "P~"
-        #print(repr(new_set.data.pint.dequantify()))
         #self.assertEqual(str(new_set), "")
         self.assertEqual(repr(new_set), "")
         self.assertEqual(new_set.getSimplified(), "")

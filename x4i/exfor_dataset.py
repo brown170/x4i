@@ -59,7 +59,9 @@
 from __future__ import print_function, division
 
 import copy
-
+import pint 
+import pint_pandas
+import pandas
 from .exfor_column_parsing import *
 from .exfor_exceptions import *
 from .exfor_reactions import X4ReactionCombination
@@ -67,9 +69,8 @@ from .exfor_section import X4BibMetaData
 from .exfor_utilities import unique, COMMENTSTRING
 from .exfor_units import *
 
-import pint 
-import pint_pandas
-import pandas
+
+pint_pandas.PintType.ureg.default_format = "P~"  # by default, display units in non-silly ways
 
 
 def dataframe_from_datasection(_data):
@@ -122,7 +123,7 @@ class X4DataSetNew(X4BibMetaData):
         and such that all columns in DATA which either have no pointer or matching pointer are in self
         """
         if pointer is not None:
-            raise NotImplimentedError("add pointers")
+            raise NotImplementedError("add pointers")
         if common is not None:
             self.labels = common.labels + data.labels
             self.units = common.units + data.units
@@ -155,7 +156,6 @@ class X4DataSetNew(X4BibMetaData):
         return result
 
     def __str__(self):
-        pint_pandas.PintType.ureg.default_format = "P~"
         body = str(self.data.pint.dequantify())
         splbody = body.split('\n')
         return '\n'.join(
@@ -166,22 +166,15 @@ class X4DataSetNew(X4BibMetaData):
             ] + ['         '+x for x in splbody[2:]])
 
     def __repr__(self):
-        pint_pandas.PintType.ureg.default_format = "P~"
+        # print(type((self.data.pint.dequantify())))  # returns a dataframe
         return self.reprHeader() + repr(self.data.pint.dequantify())
-#        "["
-#        ans += "['" + "','".join(self.labels) + "']" + ",\n"
-#        ans += "['" + "','".join(self.units) + "']"
-#        for row in self.data:
-#            ans += ",\n" + "[" + ",".join(map(str, row)) + "]"
-#        ans += "]"
-#        return ans
 
     def __len__(self):
         return len(self.data)
 
     def sort(self, **kw):
         """In place sort, see Python documentation for list().sort()"""
-        self.data.sort(**kw)
+        raise NotImplementedError()
 
     def getSimplified(self, parserMap=None, columnNames=None, makeAllColumns=False, failIfMissingErrors=False):
         """Returns a simplified version of self.
@@ -208,16 +201,7 @@ class X4DataSetNew(X4BibMetaData):
     def __getitem__(self, k):
         if not isinstance(k,tuple) or len(k)!=2:
             raise TypeError("key must be a tuple of length 2")
-        i,j=k
-        if type(i) == str:
-            if i == 'LABELS':
-                return self.labels[j]
-            elif i == 'UNITS':
-                return self.units[j]
-            else:
-                raise KeyError('Invalid index: ' + i)
-        else:
-            return self.data[i][j]
+        return self.data[k[0]][k[1]]
    
 
 class X4DataSet(X4BibMetaData):
