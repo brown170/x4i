@@ -91,9 +91,9 @@ SEC,seconds,' (not angular)',second
 YR,years (=365.2422 Days),,year
 DEG-C,"degrees Celsius, Centigrade",,celsius
 DEG-F,degrees Fahrenheit,,fahrenheit
-DEG-K,degrees Kelvin,,kelvin
+# DEG-K,degrees Kelvin,,kelvin  # obsolete: renamed to just "K"
 DEG-R,degrees Rankine,' (not Reaumur)',rankine
-# K,Kelvin,,kelvin  # duplicate: is DEG-K preferred?
+K,Kelvin,,kelvin 
 K9,10**9 Kelvin,,_10e9kelvin
 ATOMS/B,atoms/barn,' for sample thickness',atoms/barn
 G/CM-SQ,grams per centimeters-squared,' for sample thickness',grams/cm**2

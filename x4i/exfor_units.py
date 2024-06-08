@@ -6,8 +6,10 @@ import bidict
 
 # This is the NRDC generated dictionary of unit definitions for EXFOR files
 exfor_units_dict = exfor_dicts.get_exfor_dict("Data units")  
-for obsolete in ['PART/FIS' ,'DEG-K', 'PART/MUAHR']:  # get rid og obsolete defs
-    del(exfor_units_dict[obsolete])
+for obsolete in ["GAM/100N", "GAM/PART", "PART/FIS", "1/INC/KEV", "DEG-K", "PART/MUAHR", "N/PART", "NUC/PART"]: # get rid of obsolete defs
+    del(exfor_units_dict[obsolete]) 
+    # I did this first:
+    #   if exfor_units_dict[ent]['status_code'] == 'OBS':  print(ent)  
 del(exfor_units_dict['SEE TEXT'])  # this ain't a unit!
 
 # Set up the mapping between EXFOR units and Pint units
