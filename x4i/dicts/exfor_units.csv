@@ -1,0 +1,202 @@
+EXFOR Units, Expansion, Comments, Pint Units
+CM3/S/MOL,centimeters**3 per second per Mol,' = cm3 / (Mol * sec)',cm**3/sec/mole
+ARB-UNITS,arbitrary Units,"'To be combined with the REL, RAW or MSC modifier'",arb_units 
+NO-DIM,no Dimensions,,no_dim
+PER-CENT,per-cent,"'Used for relative errors.  Must not be used under the', "" headings 'DATA', 'RATIO', etc. (In such case,, divide"", "" data by 100 and use 'NO-DIM').""",percent
+ADEG,angular Degrees,,angular_degrees
+AMIN,angular Minutes,,angular_minutes
+ARAD,radians,,radian
+ASEC,angular Seconds,,angular_seconds
+GAM/100N,gammas per 100 neutrons,,gammas/_100neutrons
+GAM/PART,gammas per incident projectile,,gammas/projectile
+P/FS/MEVSR,particles/fission/MeV/sr,,particles/fission/MeV/steradian
+PRT/FIS/SR,particles per fission per sterad,,particles/fission/steradian
+P/IN/MEVSR,particl./inc.proj. per Sr per MeV,' = (part./inc.proj.) / (sr * MeV)',particles/projectile/steradian/MeV
+PC/INC/SR,particles/100 incid.projectiles/s,,particles/_100projectiles/second
+PRD/INC/SR,products/inc.projectile/steradian,' = (prod.per inc.proj.) / sr',products/projectile/steradian
+PRT/INC/SR,partcles/inc.projectile/steradian,' = (part.per inc.proj.) / sr',particles/projectile/steradian
+PART/FIS,particles per fission,,particles/fission
+PC/FIS,particles per 100 fissions,,particles/_100fissions
+PRD/FIS,products/fission,,products/fission
+PRT/FIS,particles per fission,,particles/fission
+PRD/FIS/SR,products/fission/sr,,products/fission/steradian
+PC/FIS/MEV,particl. per 100 fissions per MeV,' = (part.per 100 fissions) / MeV',particles/_100fissions/MeV
+PD/FIS/MEV,products per fission per MeV,,products/fission/MeV
+PT/FIS/MEV,particles per fission per MeV,' = (part.per fission) / MeV',particles/fission/MeV
+FGY*M2,femtogrey * square meters,,femtogray*meter**2
+GY*M-SQ,Grey * square meters,,gray*m**2
+PGY*CM2,picogrey * square centimeters,,picogray*cm**2
+PRT/RCT/SR,particles per reaction per sterad,,particles/reaction/steradian
+PT/RCT/MEV,particles per reaction per MeV,,particles/reaction/MeV
+PC/REAC,particles/100 reactions,,particles/_100reactions
+PRD/REAC,products/reaction,,products/reaction
+PRT/REAC,particles/reaction,,particles/reaction
+PC/DECAY,particles per 100 decays,,particles/_100decays
+PRT/DECAY,particles per decay,,particles/decay
+1/EV,per eV,,1/eV
+1/GEV,per GeV,,1/GeV
+1/INC/KEV,per incident projectile per keV,,1/projectile/keV
+1/KEV,per keV,,1/keV
+1/MEV,per MeV,,1/MeV
+1/MILLI-EV,per milli-eV,,1/meV
+EV,electron-Volts,,eV
+GEV,GeV,,GeV
+GEV/A,GeV per mass number,,GeV/nuclear_mass_number
+KEV,keV,,keV
+MEV,MeV,,MeV
+MEV/A,MeV per mass number,,MeV/nuclear_mass_number
+MICRO-EV,micro-Electron-Volts,' (in American often microvolts)',microelectron_volt
+MILLI-EV,milli-Electron-Volts,' (in American often millivolts)',meV
+NANO-EV,nano-Electron-Volts,,neV
+TEV,tera-Electron-Volts,,TeV
+EV/C,eV per Velocity of Light,,eV/c
+GEV/C,GeV per Velocity of Light,,GeV/c
+KEV/C,keV per Velocity of Light,,keV/c
+MEV/C,MeV per Velocity of Light,,MeV/c
+EV-SQ,eV-squared,,eV**2
+GEV-SQ,GeV-squared,,GeV**2
+KEV-SQ,keV-squared,,keV**2
+MEV-SQ,MeV-squared,,MeV**2
+GEV2/C2,(GeV/c)**2,,(GeV/c)**2
+RT-EV,square-root(eV),,squareroot_eV
+MICROSEC/M,microseconds per Meter,,microsecond/meter
+MSEC/M,milliseconds per meter,,millisecond/meter
+NSEC/M,nanoseconds per meter,,nanosecond/meter
+1/FM,per fermi,,1/femtometer
+ANGSTROM,Angstroms,,angstrom
+CM,centimeters,,centimeter
+FERMI,fermis,,femtometer
+KM,kilometers,,kilometer
+M,meters,,meter
+MILLI-MU,milli-microns,,millimicron
+MM,millimeters,,millimeter
+MU,"micrometers, microns",,micrometer
+1/D,per day,,1/day
+1/HR,per hour,,1/hour
+1/MICROSEC,per microsecond,,1/microsecond
+1/MIN,per minute,,1/min
+1/MSEC,per milli-second,,1/millisecond
+1/NSEC,per nano-second,,1/nanosecond
+1/PSEC,per pico-second,,1/picosecond
+1/SEC,per second,,1/second
+D,days,,day
+FSEC,femtoseconds,,femtosecond
+HR,hours,,hour
+MICROSEC,microseconds,,microsecond
+MIN,minutes,' (not angular)',minute
+MSEC,milliseconds,,millisecond
+NSEC,nanoseconds,,nanosecond
+PSEC,picoseconds,,picosecond
+SEC,seconds,' (not angular)',second
+YR,years (=365.2422 Days),,year
+DEG-C,"degrees Celsius, Centigrade",,celsius
+DEG-F,degrees Fahrenheit,,fahrenheit
+DEG-K,degrees Kelvin,,kelvin
+DEG-R,degrees Rankine,' (not Reaumur)',rankine
+K,Kelvin,,kelvin
+K9,10**9 Kelvin,,_10e9kelvin
+ATOMS/B,atoms/barn,' for sample thickness',atoms/barn
+G/CM-SQ,grams per centimeters-squared,' for sample thickness',grams/cm**2
+P/RC/MEVSR,particles/reaction/MeV/sr,,particles/reaction/MeV/sr
+DPS/MUAHR,decays per Sec/micro-Ampere-hour,,decays/second/(microampere*hour)
+GBQ/COUL,Giga-Becquerel/Coulomb,,gigabecquerel/coulomb
+GBQ/MUAHR,Giga-Becquerel/micro-Ampere-hour,,gigabecquerel/(microampere*hour)
+KBQ/MUAHR,kilo-Becquerel/micro-Ampere-hour,,kilobecquerel/(microampere*hour)
+MBQ/COUL,Mega-Becquerel/Coulomb,,megabecquerel/coulomb
+MBQ/MUAHR,Mega-Becquerel/micro-Ampere-hour,,megabecquerel/(microampere*hour)
+MCI/MUAHR,milli-Curie/micro-Ampere-hour,,millicurie/(microampere*hour)
+MUCI/MUAHR,micro-Curie/micro-Ampere-Hour,,microcurie/(microampere*hour)
+PART/MUAHR,particles/micro-Ampere-hour,,particles/(microampere*hour)
+CI/AHR/MEV,Curie per Ampere-hour per MeV,"' = Ci / (Ahr * MeV)', ' = micro-Ci / (micro-Ahr * MeV)'",curie/A/MeV
+CI/ASECMEV,Curie per Ampere-second per MeV,"' = Ci / (Asec * MeV)', ' = micro-Ci / (micro-Asec * MeV)'",curie/(A*sec)/MeV
+MBQ/C/MEV,Mega-Becquerel/Coulomb/MeV,' = MBq / (Coul * MeV)',megabecquerel/coulomb/MeV
+DPS/MUA,decays per Sec/micro-Ampere,,decays/second/microampere
+GBQ/MUA,Giga-Becquerel/micro-Ampere,,gigabecquerel/microampere
+KBQ/MUA,kilo-Becquerel/micro-Ampere,,kilobecquerel/microampere
+MBQ/MUA,Mega-Becquerel/micro-Ampere,,megabecquerel/microampere
+MCI/MUA,milli-Curie/micro-Ampere,,millicurie/microampere
+MUCI/MUA,micro-Curie/micro-Ampere,,microcurie/microampere
+P/MEVMUCSR,particles/(MeV muC sr),' = particles / (MeV * muC * sr)',particles/(MeV*microC*sr)
+PRD/MUC/SR,products/micro-Coulomb/sr,' = prod. / (muCoul * sterad)',products/microcoulomb/steradian
+PRT/MUC/SR,particles/micro-Coulomb/steradian,' = part / (micro-Coulomb * sterad)',particles/microcoulomb/steradian
+PRD/IN/MEV,products per inc. proj. per MeV,,products/projectile/MeV
+PRT/IN/MEV,particles per inc. proj. per MeV,' = (part.per inc.proj.) / MeV',particles/projectile/MeV
+N/PART,neutrons per Incident Projectile,,neutrons/projectile
+NUC/PART,nuclei per incident projectile,,nuclei/projectile
+PC/INC,particles/100 incid.projectiles,,particles/_100projectiles
+PRD/INC,products/incident projectile,,products/projectile
+PRT/INC,particles per incident projectile,,particles/projectile
+PRD/MUAHR,products/micro-Ampere-hour,,products/(microampere*hour)
+PRD/MUCOUL,products/micro-Coulomb,,products/microcoulomb
+PRT/MAMIN,particles/milli-Ampere-minute,,particles/(milliampere*minute)
+PRT/MUAHR,particles/micro-Ampere-hour,,particles/(microampere*hour)
+PRT/MUCOUL,particles/micro-Coulomb,,particles/microcoulomb
+1/SR,per steradian,,1/steradian
+B,barns,,barn
+FB,femtobarns,,femtobarn
+KB,kilobarns,,kilobarn
+MB,millibarns,,millibarn
+MICRO-B,microbarns,,microbarn
+NB,nanobarns,,nanobarn
+PB,picobarns,,picobarn
+B*EV,barns * eV,,barns * eV
+B*KEV,barns * keV,,barns * keV
+B*MEV,barns * MeV,,barns * MeV
+B*MILLI-EV,barns * milli-eV,,barns * meV
+MB*EV,millibarns * eV,,millibarns * eV
+MB*MEV,millibarns * MeV,,millibarns * MeV
+MB*MILLIEV,millibarns * milli-eV,,millibarns * meV
+CM3/SEC,centimeters-cubed per second,' for reaction rate (cross section*velocity)',cm**3/sec
+B*EV-SQ,barns * eV-squared,,barns*eV**2
+MB*EV-SQ,millibarns * eV-squared,,millibarns*eV**2
+B*EV/SR,barns * eV per steradian,,barns*eV/steradian
+B*MEV/SR,barns * MeV per steradian,,barns*MeV/steradian
+MB*MEV/SR,millibarns*MeV per steradian,,millibarns*MeV/steradian
+B*EV*RT-EV,barns * eV * square-root(eV),' for Adler-Adler coefficients',barns*eV*squareroot_eV
+B*RT-EV,barns * square-root(eV),,barns*squareroot_eV
+B*RT-KEV,barns * square-root(keV),,barns*squareroot_keV
+MB*RT-EV,millibarns * square-root(eV),,millibarns*squareroot_eV
+MB/SR/MEV2,millibarns/sr. per MeV-squared,' = mb / (sr * MeV**2)',millibarns/steradian/MeV**2
+MB/SR2/MEV,mb per steradian-squared per MeV,' = mb / (sr**2 * MeV)',millibarns/(steradian**2*MeV)
+MUB/SR2KEV,microbarns per steradian**2 keV,' = micro-b / (sr**2 * keV)',microbarns/(steradian**2*keV)
+MUB/SR2MEV,microbarns per steradian**2 MeV,' = micro-b / (sr**2 * MeV)',microbarns/(steradian**2*MeV)
+MB/GEV2/C2,millibarns per (GeV/c)**2,,millibarns/(GeV/c)**2
+NB/GEV2/C2,nanobarns per (GeV/c)**2,,nanobarns/(GeV/c)**2
+MB/SR2MEV2,mb per steradian**2 MeV**2,' = mb / (sr**2 * MeV**2)',millibarn / megaelectron_volt ** 2 / steradian ** 2
+NB/SR2MEV2,nanobarns per steradian**2 MeV**2,,nanobarns per steradian**2 MeV**2
+B/SR,barns/steradian,,barns/steradian
+MB/SR,millibarns per steradian,,millibarns/steradian
+MU-B/SR,microbarns per steradian,,microbarns/steradian
+NB/SR,nanobarns per steradian,' = nanobarns / (sr * MeV)',nanobarns/steradian
+MB/SR2,millibarns per steradian-squared,,millibarns/steradian**2
+MUB/SR2,microbarns per steradian**2,,microbarns/steradian**2
+NB/SR2MEVC,nanobarns / (sr**2 * MeV/c),,nanobarns / (steradian**2 * MeV/c)
+B/SR/EV,barns per steradian per eV,' = barns / (sr * eV)',barns/steradian/eV
+B/SR/GEV,barns per steradian per GeV,' = barns / (sr * GeV)',barns/steradian/GeV
+B/SR/KEV,barns per steradian per keV,' = barns / (sr * keV)',barns/steradian/keV
+B/SR/MEV,barns per steradian per MeV,' = barns / (sr * MeV)',barns/steradian/MeV
+B/SR/MEVA,barns/steradian/(MeV/A),' = barns / (sr * MeV/A)',barns/steradian/(MeV/nuclear_mass_number)
+B/SR/MI-EV,barns per steradian per milli-eV,' = barns / (sr * milli-eV)',barns/steradian/meV
+MB/SR/EV,millibarns per steradian per eV,' = mb / (sr * eV)',millibarns/steradian/eV
+MB/SR/GEV,millibarns per steradian per GeV,' = mb / (sr * GeV)',millibarns/steradian/GeV
+MB/SR/KEV,millibarns per steradian per keV,' = mb / (sr * keV)',millibarns/steradian/keV
+MB/SR/MEV,millibarns per steradian per MeV,' = mb / (sr * MeV)',millibarns/steradian/MeV
+MUB/SR/MEV,microbarns per steradian per MeV,' = micro-b / (sr * MeV)',microbarns/steradian/MeV
+NB/SR/MEV,nanobarns per steradian per MeV,,nanobarns/steradian/MeV
+MB/SR/GEVC,millibarns/sr/(GeV/c),,millibarns/(steradian*(GeV/c))
+MB/SR/MEVC,millibarns/sr. per MeV/c,' = mb / (sr * (MeV/c))',millibarns /(steradian*(GeV/c))
+MUB/SRGEVC,microbarns /(sr*(GeV/c)),,microbarns /(steradian*(GeV/c))
+MUB/SRMEVC,microbarns /(sr*(MeV/c)),,microbarns /(steradian*(MeV/c))
+B/EV,barns per eV,,barn/eV
+B/KEV,barns per keV,,barn/keV
+B/MEV,barns per MeV,,barn/MeV
+B/MEVA,barns per (MeV/A),' = barns / (MeV/A)',barns/(MeV/nuclear_mass_number)
+B/MILLI-EV,barns per milli-eV,,barn/meV
+MB/EV,millibarns per eV,,millibarn/eV
+MB/KEV,millibarns per keV,,millibarn/keV
+MB/MEV,millibarns per MeV,,millibarn/MeV
+MU-B/MEV,micro-barns/MeV,,microbarns/MeV
+NB/MEV,nanobarns per MeV,,nanobarns/MeV
+MB/MEV/C,millibarns/(MeV/c),,millibarns/(MeV/c)
+MUB/GEV/C,microbarns/(GeV/c),,microbarns/(GeV/c)
+MUB/MEV/C,microbarns/(MeV/c),,microbarns/(MeV/c)

@@ -1,0 +1,35 @@
+Description              Name                  Definition
+gammas                   gammas                = [number_gammas] = _
+neutrons                 neutrons              = [number_neutrons] = _
+100 neutrons             _100neutrons          = 100 * neutrons = _
+particles                particles             
+fissions                 fissions              = [number_fissions] = _
+100 fissions             _100fissions          = 100 * fissions = _
+incident projectiles     projectiles           = [number_projectiles] = _
+projectiles              projectiles           
+products                 products              = [number_products] = _
+mass number              nuclear_mass_number   = [number_nucleons] = _
+square-root(eV)          squareroot_eV         = [squareroot_energy] = _
+square-root(keV)         squareroot_keV        = [squareroot_energy] = _
+10**9 K                  _10e9kelvin           = 1e9 * kelvin = T9
+nuclei                   nuclei                = [number_nuclei] = _
+atoms                    atoms                 = [number_atoms] = _
+reaction                 reactions             = [number_reactions] = _
+100 reactions            _100reactions         = 100 * reactions = _
+decay                    decays                = [number_decays] = _
+100 decays               _100decays            = 100 * decays = _
+no dimensions            no_dim                = [no_dim] = _
+arbitary units           arb_units             = [arb_units] = _
+100 projectiles          _100projectiles       = 100 * projectiles = _
+
+@context(n=1) spectroscopy = sp
+    # n index of refraction of the medium.
+    [length] <-> [frequency]: speed_of_light / n / value
+    [frequency] -> [energy]: planck_constant * value
+    [energy] -> [frequency]: value / planck_constant
+@end
+
+@context exfor = x4
+    [squareroot_energy] <-> [energy]: sqrt(value) 
+    [energy] <-> [squareroot_energy]: value**2
+@end
