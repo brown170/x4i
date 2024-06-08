@@ -46,6 +46,7 @@ __path__ = path.split(__file__)[0]
 
 # Paths for standard usage
 DATAPATH = sep.join([__path__, 'data'])
+DICTPATH = sep.join([__path__, 'dicts'])
 fullIndexFileName = DATAPATH + sep + indexFileName
 fullDictionaryFileName = DATAPATH + sep + dictionaryFileName
 fullDoiFileName = DATAPATH + sep + doiFileName

@@ -3,3 +3,4 @@ pandas
 pint_pandas
 pytest
 pyparsing
+bidict

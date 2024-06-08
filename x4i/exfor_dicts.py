@@ -41,15 +41,12 @@
 """
 exfor_dicts module - Class and Methods for Server that gives look-up tables for abbreviations in EXFOR files
 """
-from __future__ import print_function, division
-
 import os
 import json
-from . import __path__
+from x4i import DICTPATH
 
 
-PATHTODICTIONARYFILES = __path__[0] + os.sep + "dicts" + os.sep
-ALL_DICTIONARIES=json.load(open(PATHTODICTIONARYFILES + "dict_arc_all.json"))
+ALL_DICTIONARIES=json.load(open(DICTPATH + os.sep + "dict_arc_all.json"))
 
 
 def get_exfor_dict(_dict_key):
