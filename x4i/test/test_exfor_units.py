@@ -1,8 +1,10 @@
 import unittest
-from x4i import exfor_dicts
+from x4i import exfor_units
+import pint
 
 
 class TestX4Units(unittest.TestCase):
 
-    def setUp(self):
-        self.units_dict = exfor_dicts.get_exfor_dict("Data units")
+    def test_create_exfor_values(self):
+        for ex in exfor_units.exfor_units_dict:
+            pint.Unit(exfor_units.exfor_units_dict[ex])

@@ -15,7 +15,7 @@ P/IN/MEVSR,particl./inc.proj. per Sr per MeV,' = (part./inc.proj.) / (sr * MeV)'
 PC/INC/SR,particles/100 incid.projectiles/s,,particles/_100projectiles/second
 PRD/INC/SR,products/inc.projectile/steradian,' = (prod.per inc.proj.) / sr',products/projectile/steradian
 PRT/INC/SR,partcles/inc.projectile/steradian,' = (part.per inc.proj.) / sr',particles/projectile/steradian
-PART/FIS,particles per fission,,particles/fission
+# PART/FIS,particles per fission,,particles/fission  # obsolete coding
 PC/FIS,particles per 100 fissions,,particles/_100fissions
 PRD/FIS,products/fission,,products/fission
 PRT/FIS,particles per fission,,particles/fission
@@ -93,7 +93,7 @@ DEG-C,"degrees Celsius, Centigrade",,celsius
 DEG-F,degrees Fahrenheit,,fahrenheit
 DEG-K,degrees Kelvin,,kelvin
 DEG-R,degrees Rankine,' (not Reaumur)',rankine
-K,Kelvin,,kelvin
+# K,Kelvin,,kelvin  # duplicate: is DEG-K preferred?
 K9,10**9 Kelvin,,_10e9kelvin
 ATOMS/B,atoms/barn,' for sample thickness',atoms/barn
 G/CM-SQ,grams per centimeters-squared,' for sample thickness',grams/cm**2
@@ -106,7 +106,7 @@ MBQ/COUL,Mega-Becquerel/Coulomb,,megabecquerel/coulomb
 MBQ/MUAHR,Mega-Becquerel/micro-Ampere-hour,,megabecquerel/(microampere*hour)
 MCI/MUAHR,milli-Curie/micro-Ampere-hour,,millicurie/(microampere*hour)
 MUCI/MUAHR,micro-Curie/micro-Ampere-Hour,,microcurie/(microampere*hour)
-PART/MUAHR,particles/micro-Ampere-hour,,particles/(microampere*hour)
+# PART/MUAHR,particles/micro-Ampere-hour,,particles/(microampere*hour) # PART is obsolete word for particle
 CI/AHR/MEV,Curie per Ampere-hour per MeV,"' = Ci / (Ahr * MeV)', ' = micro-Ci / (micro-Ahr * MeV)'",curie/A/MeV
 CI/ASECMEV,Curie per Ampere-second per MeV,"' = Ci / (Asec * MeV)', ' = micro-Ci / (micro-Asec * MeV)'",curie/(A*sec)/MeV
 MBQ/C/MEV,Mega-Becquerel/Coulomb/MeV,' = MBq / (Coul * MeV)',megabecquerel/coulomb/MeV
