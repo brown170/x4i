@@ -61,26 +61,27 @@ from x4i.test.utilities import TestCaseWithTableTests
 
 testDBPath = __path__[0] + os.sep + 'data'
 testIndexFileName = testDBPath + os.sep + 'index.tbl'
-
+db = exfor_manager.X4DBManagerPlainFS(datapath=testDBPath, database=testIndexFileName)
 
 class TestX4NewDataSet(TestCaseWithTableTests):
 
     def setUp(self):
-        db = exfor_manager.X4DBManagerPlainFS(datapath=testDBPath, database=testIndexFileName)
-        l = db.retrieve(quantity='SIG', target='PU-239', reaction='N,2N', rawEntry=True)
-        self.ds = {}
-        for k,v in l.items():
-            self.ds[k]=exfor_entry.X4Entry(v)
-        
+        self.mather = {}
+        for k,v in db.retrieve(ENTRY='21971', rawEntry=True).items():
+            self.mather[k]=exfor_entry.X4Entry(v)
+
+        self.other = {}
+        for k,v in db.retrieve(ENTRY='O1732', rawEntry=True).items():
+            self.other[k]=exfor_entry.X4Entry(v)
+
     def test_easy(self):
         entry = '21971'
         subent = '21971003'
-        new_set = exfor_dataset.X4DataSetNew(data=self.ds[entry][subent]['DATA'])
+        new_set = exfor_dataset.X4DataSetNew(data=self.mather[entry][subent]['DATA'])
         self.assertEqual(new_set.numrows(), 14)
         self.assertEqual(new_set.numcols(), 4)
         self.assertEqual(len(new_set), 14)
         self.assertEqual(new_set.data.shape, (14, 4))
-        #print(dir(new_set.data.EN.values))
         numpy.testing.assert_array_almost_equal(
             new_set.data.EN.values.numpy_data.tolist(), 
             [  6.49,  7.01,  7.52,  8.03,  8.54,  9.04,  
@@ -92,14 +93,43 @@ class TestX4NewDataSet(TestCaseWithTableTests):
                  8540.0, 9040.0,  9550.0,  10060.0,
                 10560.0, 11070.0, 11570.0, 12080.0,
                 12580.0, 13090.0])
+        #self.assertEqual(new_set[1,1], '')
+        #self.assertEqual(new_set.strHeader(), "")
+        #self.assertEqual(new_set.reprHeader(), "")
+        #self.assertEqual(new_set.sort(), "")
+        #self.assertEqual(new_set.getSimplified(), "")
+        #self.assertEqual(new_set.append(), "")
+        #self.assertEqual(str(new_set.sort()), "")
+        #self.assertEqual(repr(new_set.sort()), "")
+        #self.assertEqual(new_set.csv())
         #self.assertTrue(False)
-    
+
+    def test_with_common(self):
+        entry = 'O1732'
+        subent = 'O1732002'
+        new_set = exfor_dataset.X4DataSetNew(
+            data=self.other[entry][subent]['DATA'], 
+            common=self.other[entry][subent]['COMMON'])
+        self.assertEqual(new_set.numrows(), 6)
+        self.assertEqual(new_set.numcols(), 5)
+        self.assertEqual(len(new_set), 6)
+        self.assertEqual(new_set.data.shape, (6, 5))
+        print(new_set.data)
+        self.assertTrue(False)
+
+    def test_with_pointer(self):
+        pass 
+
+    def test_with_pointer_and_common(self):
+        pass
+
     @unittest.skip
     def test_all(self):
         print(self.ds.keys())
         for entry in self.ds.keys():
             print(22*'=')
             print(self.ds[entry].keys())
+            print([ (entry,'COMMON' in self.ds[entry][entry+'001']) for x in self.ds ])
             common = None
             for subent in self.ds[entry].keys():
                 if not 'DATA' in self.ds[entry][subent]:
@@ -130,7 +160,6 @@ class TestX4NewDataSet(TestCaseWithTableTests):
 class TestX4DataSet(TestCaseWithTableTests):
 
     def setUp(self):
-        db = exfor_manager.X4DBManagerPlainFS(datapath=testDBPath, database=testIndexFileName)
         l = db.retrieve(quantity='SIG', target='PU-239', reaction='N,2N', rawEntry=True)
         self.ds = {}
         for k in l:

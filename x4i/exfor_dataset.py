@@ -82,6 +82,7 @@ def dataframe_from_datasection(_data):
 
 
 class X4DataSetNew(X4BibMetaData):
+
     def __init__(self, meta=None, common=None, reaction=None, monitor=None, data=None, pointer=None):
         """
         meta, 
@@ -122,13 +123,14 @@ class X4DataSetNew(X4BibMetaData):
         """
         #data_labels = data.labels
         #data_units = data.units
-        data_data = dataframe_from_datasection(data)
-        common_data = None
         if common is not None:
-            common_data = dataframe_from_datasection(common)
-        self.data = data_data
-        self.labels = data.labels
-        self.units = data.units
+            self.labels = common.labels + data.labels
+            self.units = common.units + data.units
+            self.data = dataframe_from_datasection(common) + dataframe_from_datasection(data)
+        else:
+            self.data = dataframe_from_datasection(data)
+            self.labels = data.labels
+            self.units = data.units
 
     def strHeader(self):
         out = self.xmgraceHeader()
@@ -197,7 +199,18 @@ class X4DataSetNew(X4BibMetaData):
         return self.data.shape[0]
 
     def __getitem__(self, k):
-        raise NotImplementedError()
+        if not isinstance(k,tuple) or len(k)!=2:
+            raise TypeError("key must be a tuple of length 2")
+        i,j=k
+        if type(i) == str:
+            if i == 'LABELS':
+                return self.labels[j]
+            elif i == 'UNITS':
+                return self.units[j]
+            else:
+                raise KeyError('Invalid index: ' + i)
+        else:
+            return self.data[i][j]
    
 
 class X4DataSet(X4BibMetaData):
