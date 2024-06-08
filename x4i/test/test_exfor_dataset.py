@@ -49,6 +49,7 @@
 from __future__ import print_function, division
 import os
 import unittest
+import numpy
 
 # Set up the paths to x4i & friends
 from x4i import exfor_manager
@@ -57,8 +58,73 @@ from x4i import exfor_dataset
 from x4i.test import __path__
 from x4i.test.utilities import TestCaseWithTableTests
 
+
 testDBPath = __path__[0] + os.sep + 'data'
 testIndexFileName = testDBPath + os.sep + 'index.tbl'
+
+
+class TestX4NewDataSet(TestCaseWithTableTests):
+
+    def setUp(self):
+        db = exfor_manager.X4DBManagerPlainFS(datapath=testDBPath, database=testIndexFileName)
+        l = db.retrieve(quantity='SIG', target='PU-239', reaction='N,2N', rawEntry=True)
+        self.ds = {}
+        for k,v in l.items():
+            self.ds[k]=exfor_entry.X4Entry(v)
+        
+    def test_easy(self):
+        entry = '21971'
+        subent = '21971003'
+        new_set = exfor_dataset.X4DataSetNew(data=self.ds[entry][subent]['DATA'])
+        self.assertEqual(new_set.numrows(), 14)
+        self.assertEqual(new_set.numcols(), 4)
+        self.assertEqual(len(new_set), 14)
+        self.assertEqual(new_set.data.shape, (14, 4))
+        #print(dir(new_set.data.EN.values))
+        numpy.testing.assert_array_almost_equal(
+            new_set.data.EN.values.numpy_data.tolist(), 
+            [  6.49,  7.01,  7.52,  8.03,  8.54,  9.04,  
+               9.55, 10.06, 10.56, 11.07, 11.57,
+               12.08, 12.58, 13.09])
+        numpy.testing.assert_array_almost_equal(
+            new_set.data.EN.pint.to('keV').values.numpy_data.tolist(), 
+            [    6490.0, 7010.0,  7520.0,  8029.999999999999,
+                 8540.0, 9040.0,  9550.0,  10060.0,
+                10560.0, 11070.0, 11570.0, 12080.0,
+                12580.0, 13090.0])
+        #self.assertTrue(False)
+    
+    @unittest.skip
+    def test_all(self):
+        print(self.ds.keys())
+        for entry in self.ds.keys():
+            print(22*'=')
+            print(self.ds[entry].keys())
+            common = None
+            for subent in self.ds[entry].keys():
+                if not 'DATA' in self.ds[entry][subent]:
+                    if 'COMMON' in self.ds[entry][subent]:
+                        common = self.ds[entry][subent]['COMMON']
+                        print("THIS GUY HAS A COMMON")
+                else:
+                    print("SUBENT %s" % subent)
+                    new_set = exfor_dataset.X4DataSetNew(data=self.ds[entry][subent]['DATA'], common=common)
+                    print(new_set.labels)
+                    print(new_set.units)
+                    print(new_set.data)
+                    print(type(new_set.data))
+                    print(new_set.data.EN.values)
+                    print("size:", new_set.data.size)
+                    print("shape:", new_set.data.shape)
+                    print("length:", len(new_set.data))
+                    print(new_set.data.EN.pint.to('keV').values)
+            print()
+        #print(old_set.labels)
+        #print(old_set.units)
+        #print(old_set.data)
+        #new_set = exfor_dataset.X4DataSetNew(data=old_set.data)
+        #self.assertListEqual(old_set.labels, new_set.labels)
+        self.assertTrue(False)
 
 
 class TestX4DataSet(TestCaseWithTableTests):

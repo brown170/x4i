@@ -65,12 +65,32 @@ from .exfor_exceptions import *
 from .exfor_reactions import X4ReactionCombination
 from .exfor_section import X4BibMetaData
 from .exfor_utilities import unique, COMMENTSTRING
+from .exfor_units import *
 
-from pint_pandas import *
+import pint 
+import pint_pandas
+import pandas
+
+
+def dataframe_from_datasection(_data):
+        _columns = {}
+        for _ic, _label in enumerate(_data.labels):
+            _columns[_label] = pandas.Series(
+                [x[_ic] for x in _data.data], 
+                dtype="pint[%s]" % exfor_pint_unit_map[_data.units[_ic]])
+        return pandas.DataFrame(_columns)
 
 
 class X4DataSetNew(X4BibMetaData):
     def __init__(self, meta=None, common=None, reaction=None, monitor=None, data=None, pointer=None):
+        """
+        meta, 
+        common is a COMMON section 
+        reaction=None, 
+        monitor=None, 
+        data is a DATA section, 
+        pointer=None
+        """
         # Initialize merged meta data, a needlessly complicated process
         X4BibMetaData.__init__(self, author="None", institute="None", title="None", pubType="None", year="None")
         if meta is not None:
@@ -86,7 +106,7 @@ class X4DataSetNew(X4BibMetaData):
         # Initializing the data is less so...
         self.labels = []
         self.units = []
-        self.data = []
+        self.data = None
         self.simplified = False
         if reaction is None:
             self.coupled = False
@@ -96,28 +116,63 @@ class X4DataSetNew(X4BibMetaData):
             self.setData(data, common, pointer)
 
     def setData(self, data, common=None, pointer=None):
-        """This should set up the data, labels and units such that all columns in all COMMON sections are in self
-        and such that all columns in DATA which either have no pointer or matching pointer are in self"""
-        raise NotImplementedError()
+        """
+        This should set up the data, labels and units such that all columns in all COMMON sections are in self
+        and such that all columns in DATA which either have no pointer or matching pointer are in self
+        """
+        #data_labels = data.labels
+        #data_units = data.units
+        data_data = dataframe_from_datasection(data)
+        common_data = None
+        if common is not None:
+            common_data = dataframe_from_datasection(common)
+        self.data = data_data
+        self.labels = data.labels
+        self.units = data.units
 
     def strHeader(self):
-        raise NotImplementedError()
+        out = self.xmgraceHeader()
+        try:
+            out += '\n' + COMMENTSTRING + '  Reaction:  ' + ' '.join(map(str, self.reaction))
+        except TypeError as e:
+            raise TypeError(str(e) + ', got ' + str(type(self.reaction)) + " with value " + str(self.reaction))
+        try:
+            if self.monitor is not None:
+                out += '\n' + COMMENTSTRING + '  Monitor(s): ' + ' '.join(map(str, self.monitor))
+        except TypeError as e:
+            raise TypeError(str(e) + ', got ' + str(type(self.monitor)) + " with value " + str(self.monitor))
+        return out
 
     def reprHeader(self):
-        raise NotImplementedError()
+        result = X4BibMetaData.__repr__(self) + ' \nReaction:  ' + repr(self.reaction[0])
+        if self.monitor is not None and len(self.monitor) > 0:
+            result += ' \nMonitor(s):' + repr([x[0] for x in self.monitor])
+        result += "\n"
+        return result
 
     def __str__(self):
-        raise NotImplementedError()
+        return '\n'.join(
+            [
+                self.strHeader(),
+                '#        ' + ' '.join([str(i).ljust(13) for i in self.labels]) + ' ',
+                '#        ' + ' '.join([str(i).ljust(13) for i in self.units]) + ' '] +
+            ['        ' + ' '.join([str(j).ljust(13) for j in i]) + ' ' for i in self.data])
 
     def __repr__(self):
-        raise NotImplementedError()
+        ans = self.reprHeader() + "["
+        ans += "['" + "','".join(self.labels) + "']" + ",\n"
+        ans += "['" + "','".join(self.units) + "']"
+        for row in self.data:
+            ans += ",\n" + "[" + ",".join(map(str, row)) + "]"
+        ans += "]"
+        return ans
 
     def __len__(self):
-        raise NotImplementedError()
+        return len(self.data)
 
     def sort(self, **kw):
         """In place sort, see Python documentation for list().sort()"""
-        raise NotImplementedError()
+        self.data.sort(**kw)
 
     def getSimplified(self, parserMap=None, columnNames=None, makeAllColumns=False, failIfMissingErrors=False):
         """Returns a simplified version of self.
@@ -136,10 +191,10 @@ class X4DataSetNew(X4BibMetaData):
         raise NotImplementedError()
 
     def numcols(self):
-        raise NotImplementedError()
+        return self.data.shape[1]
 
     def numrows(self):
-        raise NotImplementedError()
+        return self.data.shape[0]
 
     def __getitem__(self, k):
         raise NotImplementedError()
