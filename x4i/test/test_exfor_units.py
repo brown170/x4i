@@ -1,4 +1,5 @@
 import unittest
+import math
 from x4i import exfor_units
 from pint import DimensionalityError
 
@@ -22,6 +23,8 @@ class TestX4Units(unittest.TestCase):
 
     def test_sqrt_units(self):
         lil_gamma = self.ureg.Quantity(7.0, 'squareroot_eV')
+        #lil_gamma.ito('squareroot_keV')
+        self.assertAlmostEqual(lil_gamma.to('squareroot_keV'), self.ureg.Quantity(7.0/math.sqrt(1000), 'squareroot_keV'))
         self.assertAlmostEqual((lil_gamma*lil_gamma).to('eV'), self.ureg.Quantity(49.0, 'eV'))
 
     def test_arb_units(self):

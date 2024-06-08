@@ -24,6 +24,6 @@ with open(DICTPATH + os.sep + 'exfor_units.csv', mode='r') as csvfile:
 # Set up our unit registry in Pint
 exfor_unit_registry = pint.UnitRegistry(autoconvert_offset_to_baseunit = True)
 exfor_unit_registry.load_definitions(DICTPATH + os.sep + 'exfor-pint-definitions.txt')
-exfor_unit_registry.enable_contexts('exfor', 'boltzmann')
+exfor_unit_registry.enable_contexts('boltzmann')
 
 

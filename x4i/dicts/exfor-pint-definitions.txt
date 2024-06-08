@@ -8,7 +8,7 @@ projectile            = [number_projectiles] = _
 product               = [number_products] = _
 nuclear_mass_number   = [number_nucleons] = _
 squareroot_eV         = [squareroot_energy] = _
-squareroot_keV        = [squareroot_energy] = _
+squareroot_keV        = squareroot_eV / 31.622776601683793 = _
 _10e9kelvin           = 1e9 * kelvin = T9
 nuclei                = [number_nuclei] = _
 atoms                 = [number_atoms] = _
@@ -16,11 +16,5 @@ reaction              = [number_reactions] = _
 _100reaction          = 100 * reactions = _
 decay                 = [number_decays] = _
 _100decay             = 100 * decays = _
-no_dim                = [no_dim] = _
 arb_unit              = [arb_units] = _
 _100projectile        = 100 * projectiles = _
-
-@context exfor = x4
-    [squareroot_energy] -> [energy]: value**2
-    [energy] -> [squareroot_energy]: sqrt(value)
-@end
