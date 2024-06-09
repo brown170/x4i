@@ -233,11 +233,11 @@ class X4DataSetNew(X4BibMetaData):
 
     def to_markdown(self, showindex=False, **kw):
         """Simple markedown formatted version of the dataframe, uses to_tabulate()"""
-        self.to_tabulate(self, showindex=showindex, headers="keys", tablefmt='markdown', units='sbs_paren', **kw) 
+        return self.to_tabulate(showindex=showindex, headers="keys", tablefmt='markdown', units='sbs_paren', **kw) 
 
     def to_json(self, **kw):
         """Thin wrapper around pandas's to_json()"""
-        self.data.to_json(**kw)  
+        return self.data.to_json(**kw)  
 
     def to_tabulate(self, showindex=False, headers="keys", tablefmt='psql', units=None, **kw):
         """
