@@ -181,7 +181,6 @@ class TestX4NewDataSet(TestCaseWithTableTests):
             '     13.09           0.05           588              148']))
         #self.assertEqual(new_set.to_json(), '')  # FIXME
         
-
     def test_easy_but_with_some_metadata(self):
         entry = '21971'
         subent = '21971003'
@@ -277,21 +276,25 @@ class TestX4NewDataSet(TestCaseWithTableTests):
         #self.assertEqual(new_set.getSimplified(), "")
         #self.assertTrue(False)
 
-    @unittest.skip
     def test_with_common(self):
         entry = 'O1732'
         subent = 'O1732002'
         new_set = exfor_dataset.X4DataSetNew(
             data=self.other[entry][subent]['DATA'], 
             common=self.other[entry][subent]['COMMON'])
-        print(new_set.labels)
-        print(new_set.units)
-        print(new_set.data)
         self.assertEqual(new_set.numrows(), 6)
         self.assertEqual(new_set.numcols(), 5)
         self.assertEqual(len(new_set), 6)
         self.assertEqual(new_set.data.shape, (6, 5))
-        self.assertTrue(False)
+        self.assertEqual(new_set.to_markdown(), '\n'.join([
+            '  MOM (GeV/c)    COS ()    DATA (nb/sr)    ERR-S (nb/sr)    ERR-SYS (nb/sr)',
+            "-------------  --------  --------------  ---------------  -----------------",
+            "         2.39      0.45        0.94538          0.173479          0.0573248",
+            "         2.39      0.55        0.735296         0.155972          0.044586",
+            "         2.39      0.65        0.52362          0.128915          0.0318471",
+            "         2.39      0.75        0.568183         0.122549          0.0342357",
+            "         2.39      0.85        0.997901         0.125732          0.0613057",
+            "         2.39      0.95        1.89235          0.143239          0.116242"]))
 
     @unittest.skip
     def test_with_pointer(self):

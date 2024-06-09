@@ -168,7 +168,10 @@ class X4DataSetNew(X4BibMetaData):
             self.__units = common.units + data.units
             common_df = dataframe_from_datasection(common)
             data_df = dataframe_from_datasection(data)
-            raise NotImplementedError("adding common")
+            #print(common_df.pint.dequantify())
+            #print(data_df.pint.dequantify())
+            self.__data = common_df.join(data_df, how='cross')
+            #raise NotImplementedError("adding common")
         else:
             self.__data = dataframe_from_datasection(data)
             self.__labels = data.labels
