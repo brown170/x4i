@@ -245,7 +245,7 @@ class X4DataSetNew(X4BibMetaData):
         headers: controls header display, passed through to tabulate if units are None, otherwise
                  we try to maintain tabulate rules, namely: 
                 - "keys": will generate from column keys, but adding units per units keyword
-                - "firstrow": will generate from first row of data, but adding units per units keyword
+                - "firstrow": will generate from first row of data, but adding units per units keyword (basically same as "keys")
                 - list of strings: use the given strings as labels, but adding units per units keyword
         tablefmt: controls table format, passed through to tabulate.  Some table formats do not like stacked units
                   (markdown for instance), we leave that to the user to experiment what works best
@@ -256,7 +256,23 @@ class X4DataSetNew(X4BibMetaData):
                "stacked_paren" - show units vertically stacked under the column label, but in parenthesis
         **kw: any other keywords tabulate might like are just passed though
         """
-
+        column_labels = self.data.columns.tolist()
+        if units is None:
+            headers = column_labels
+        else:
+            if type(headers) in [tuple, list]: 
+                column_labels = headers # going to save the user-specified headers & rebuild the list                
+            if "_paren" in units:
+                column_units = ["("+str(x.units)+")" for x in self.data.dtypes.tolist()] 
+            else:
+                column_units = [str(x.units) for x in self.data.dtypes.tolist()]
+            headers = []
+            if "stacked" in units:
+                for i in range(len(column_labels)):
+                    headers.append(column_labels[i]+'\n'+column_units[i])
+            else:
+                for i in range(len(column_labels)):
+                    headers.append(column_labels[i]+' '+column_units[i])
         return tabulate.tabulate(self.data.pint.dequantify(), showindex=showindex, headers=headers, tablefmt=tablefmt, **kw)
 
     def numcols(self):
