@@ -62,6 +62,7 @@ import copy
 import pint 
 import pint_pandas
 import pandas
+import tabulate
 from .exfor_column_parsing import *
 from .exfor_exceptions import *
 from .exfor_reactions import X4ReactionCombination
@@ -86,12 +87,12 @@ class X4DataSetNew(X4BibMetaData):
 
     def __init__(self, meta=None, common=None, reaction=None, monitor=None, data=None, pointer=None):
         """
-        meta, 
-        common is a COMMON section 
-        reaction=None, 
-        monitor=None, 
-        data is a DATA section, 
-        pointer=None
+        meta: x4i common meta data collection
+        common: EXFOR COMMON section 
+        reaction: REACTION instance, defaults to None 
+        monitor: REACTION instance for any monitor reaction, defaults to None 
+        data:  EXFOR DATA section
+        pointer: ugh, the EXFOR pointer for the dataset, defaults to None
         """
         # Initialize merged meta data, a needlessly complicated process
         X4BibMetaData.__init__(self, author="None", institute="None", title="None", pubType="None", year="None")
@@ -102,21 +103,59 @@ class X4DataSetNew(X4BibMetaData):
                 for k in m.__slots__:
                     if not getattr(m, k) in [None, "None"]:
                         setattr(self, k, getattr(m, k))
+
+        # Intialize important operational flags
+        self.__simplified = False
+        self.__pointer = pointer  # To deal with EXFOR's strange pointer implementation
+
         # Initializing the reaction is easy!
-        self.reaction = reaction
-        self.monitor = monitor
-        # Initializing the data is less so...
-        self.labels = []
-        self.units = []
-        self.data = None
-        self.simplified = False
+        self.__reaction = reaction
+        self.__monitor = monitor
         if reaction is None:
-            self.coupled = False
+            self.__coupled = False
         else:
-            self.coupled = isinstance(reaction[0], X4ReactionCombination)
+            self.__coupled = isinstance(reaction[0], X4ReactionCombination)
+
+        # Initializing the data is less so...
+        self.__labels = []  # what EXFOR uses for labels, and may not be what underlying dataframe will ultimately use
+        self.__units = []   # what EXFOR uses for units, we will mapt these to pint units in the pandas dataframe
+        self.__data = None  # this will be a pint-powered pandas dataframe
+        self.__simplified = False
         if data is not None:
             self.setData(data, common, pointer)
 
+    @property
+    def reaction(self):
+        return self.__reaction
+
+    @property
+    def monitor(self):
+        return self.__monitor
+    
+    @property
+    def coupled(self):
+        return self.__coupled
+    
+    @property
+    def pointer(self):
+        return self.__pointer
+
+    @property
+    def labels(self):
+        return self.__labels
+
+    @property
+    def units(self):
+        return self.__units
+    
+    @property
+    def data(self):
+        return self.__data
+    
+    @property
+    def simplified(self):
+        return self.__simplified
+    
     def setData(self, data, common=None, pointer=None):
         """
         This should set up the data, labels and units such that all columns in all COMMON sections are in self
@@ -125,15 +164,15 @@ class X4DataSetNew(X4BibMetaData):
         if pointer is not None:
             raise NotImplementedError("add pointers")
         if common is not None:
-            self.labels = common.labels + data.labels
-            self.units = common.units + data.units
+            self.__labels = common.labels + data.labels
+            self.__units = common.units + data.units
             common_df = dataframe_from_datasection(common)
             data_df = dataframe_from_datasection(data)
             raise NotImplementedError("adding common")
         else:
-            self.data = dataframe_from_datasection(data)
-            self.labels = data.labels
-            self.units = data.units
+            self.__data = dataframe_from_datasection(data)
+            self.__labels = data.labels
+            self.__units = data.units
 
     def strHeader(self):
         out = self.xmgraceHeader()
@@ -156,7 +195,7 @@ class X4DataSetNew(X4BibMetaData):
         return result
 
     def __str__(self):
-        body = str(self.data.pint.dequantify())
+        body = self.to_tabulate(tablefmt='plain', units='stacked')
         splbody = body.split('\n')
         return '\n'.join(
             [
@@ -166,15 +205,14 @@ class X4DataSetNew(X4BibMetaData):
             ] + ['         '+x for x in splbody[2:]])
 
     def __repr__(self):
-        # print(type((self.data.pint.dequantify())))  # returns a dataframe
-        return self.reprHeader() + repr(self.data.pint.dequantify())
+        return self.reprHeader() + self.to_tabulate(tablefmt='plain', units='stacked')
 
     def __len__(self):
         return len(self.data)
 
     def sort(self, **kw):
         """In place sort, see Python documentation for list().sort()"""
-        raise NotImplementedError()
+        raise NotImplementedError("Do we still need this?")
 
     def getSimplified(self, parserMap=None, columnNames=None, makeAllColumns=False, failIfMissingErrors=False):
         """Returns a simplified version of self.
@@ -187,10 +225,39 @@ class X4DataSetNew(X4BibMetaData):
         raise NotImplementedError()
 
     def append(self, other):
-        raise NotImplementedError()
+        raise NotImplementedError("Do we still need this?")
 
-    def csv(self, f):
-        raise NotImplementedError()
+    def to_csv(self, f, **kw):
+        """Thin wrapper around pandas's to_csv()"""
+        self.data.to_csv(f, **kw)
+
+    def to_markdown(self, showindex=False, **kw):
+        """Simple markedown formatted version of the dataframe, uses to_tabulate()"""
+        self.to_tabulate(self, showindex=showindex, headers="keys", tablefmt='markdown', units='sbs_paren', **kw) 
+
+    def to_json(self, **kw):
+        """Thin wrapper around pandas's to_json()"""
+        self.data.to_json(**kw)  
+
+    def to_tabulate(self, showindex=False, headers="keys", tablefmt='psql', units=None, **kw):
+        """
+        showindex: controls whether to show the pandas index column(s), passed through to tabulate
+        headers: controls header display, passed through to tabulate if units are None, otherwise
+                 we try to maintain tabulate rules, namely: 
+                - "keys": will generate from column keys, but adding units per units keyword
+                - "firstrow": will generate from first row of data, but adding units per units keyword
+                - list of strings: use the given strings as labels, but adding units per units keyword
+        tablefmt: controls table format, passed through to tabulate.  Some table formats do not like stacked units
+                  (markdown for instance), we leave that to the user to experiment what works best
+        units: None - do not show units row in header
+               "sbs" - show units side-by-side with column label
+               "stacked" - show units vertically stacked under the column label
+               "sbs_paren" - show units side-by-side with column label, but in parenthesis
+               "stacked_paren" - show units vertically stacked under the column label, but in parenthesis
+        **kw: any other keywords tabulate might like are just passed though
+        """
+
+        return tabulate.tabulate(self.data.pint.dequantify(), showindex=showindex, headers=headers, tablefmt=tablefmt, **kw)
 
     def numcols(self):
         return self.data.shape[1]

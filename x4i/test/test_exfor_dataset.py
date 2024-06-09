@@ -98,6 +98,35 @@ class TestX4NewDataSet(TestCaseWithTableTests):
         #self.assertEqual(new_set.sort(), "")
         #self.assertEqual(new_set.append(), "")
 
+    def test_easy_outputs(self):
+        entry = '21971'
+        subent = '21971003'
+        new_set = exfor_dataset.X4DataSetNew(data=self.frehaut[entry][subent]['DATA'])
+        print(new_set.data.columns)
+        print(dir(new_set.data.columns))
+        self.assertEqual(new_set.to_tabulate(), ''' +-----------------+---------------------+------------------+----------------------+
+|   ('EN', 'MeV') |   ('EN-ERR', 'MeV') |   ('DATA', 'mb') |   ('DATA-ERR', 'mb') |
+|-----------------+---------------------+------------------+----------------------|
+|            6.49 |               0.085 |               24 |                   63 |
+|            7.01 |               0.08  |               49 |                   50 |
+|            7.52 |               0.075 |               54 |                   58 |
+|            8.03 |               0.075 |              177 |                   70 |
+|            8.54 |               0.07  |              275 |                   54 |
+|            9.04 |               0.065 |              249 |                   41 |
+|            9.55 |               0.065 |              354 |                   56 |
+|           10.06 |               0.06  |              415 |                   39 |
+|           10.56 |               0.06  |              411 |                   70 |
+|           11.07 |               0.055 |              356 |                   79 |
+|           11.57 |               0.055 |              418 |                   49 |
+|           12.08 |               0.055 |              455 |                   76 |
+|           12.58 |               0.05  |              318 |                  132 |
+|           13.09 |               0.05  |              588 |                  148 |
++-----------------+---------------------+------------------+----------------------+''')
+        #new_set.to_csv(f)
+        #new_set.to_markdown(f)
+        #new_set.to_json(f)
+        
+
     def test_easy_but_with_some_metadata(self):
         entry = '21971'
         subent = '21971003'
