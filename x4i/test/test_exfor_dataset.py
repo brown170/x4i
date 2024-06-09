@@ -304,39 +304,6 @@ class TestX4NewDataSet(TestCaseWithTableTests):
     def test_with_pointer_and_common(self):
         pass
 
-    @unittest.skip
-    def test_all(self):
-        print(self.ds.keys())
-        for entry in self.ds.keys():
-            print(22*'=')
-            print(self.ds[entry].keys())
-            print([ (entry,'COMMON' in self.ds[entry][entry+'001']) for x in self.ds ])
-            common = None
-            for subent in self.ds[entry].keys():
-                if not 'DATA' in self.ds[entry][subent]:
-                    if 'COMMON' in self.ds[entry][subent]:
-                        common = self.ds[entry][subent]['COMMON']
-                        print("THIS GUY HAS A COMMON")
-                else:
-                    print("SUBENT %s" % subent)
-                    new_set = exfor_dataset.X4DataSetNew(data=self.ds[entry][subent]['DATA'], common=common)
-                    print(new_set.labels)
-                    print(new_set.units)
-                    print(new_set.data)
-                    print(type(new_set.data))
-                    print(new_set.data.EN.values)
-                    print("size:", new_set.data.size)
-                    print("shape:", new_set.data.shape)
-                    print("length:", len(new_set.data))
-                    print(new_set.data.EN.pint.to('keV').values)
-            print()
-        #print(old_set.labels)
-        #print(old_set.units)
-        #print(old_set.data)
-        #new_set = exfor_dataset.X4DataSetNew(data=old_set.data)
-        #self.assertListEqual(old_set.labels, new_set.labels)
-        self.assertTrue(False)
-
 
 class TestX4DataSet(TestCaseWithTableTests):
 
