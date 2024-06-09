@@ -105,6 +105,7 @@ class TestX4NewDataSet(TestCaseWithTableTests):
         # Check these guys work correctly since the tabulate based scheme relies on them
         self.assertListEqual([str(x.units) for x in new_set.data.dtypes.tolist()], ['MeV', 'MeV', 'mb', 'mb'])
         self.assertListEqual(new_set.data.columns.tolist(), ['EN', 'EN-ERR', 'DATA', 'DATA-ERR'])
+        # Now check the formatting routines
         self.assertEqual(new_set.to_tabulate(units='stacked'), '\n'.join([
             '+-------+----------+--------+------------+',
             '|    EN |   EN-ERR |   DATA |   DATA-ERR |',
@@ -163,7 +164,7 @@ class TestX4NewDataSet(TestCaseWithTableTests):
             '     12.08           0.055          455               76',
             '     12.58           0.05           318              132',
             '     13.09           0.05           588              148']))
-        #new_set.to_json(f)
+        self.assertEqual(new_set.to_json(), '')
         
 
     def test_easy_but_with_some_metadata(self):
