@@ -94,7 +94,6 @@ class TestX4NewDataSet(TestCaseWithTableTests):
                 10560.0, 11070.0, 11570.0, 12080.0,
                 12580.0, 13090.0])
         self.assertEqual(str(new_set["EN", 1]), '7.01 MeV')
-        #self.assertEqual(new_set.csv())
         #self.assertEqual(new_set.sort(), "")
         #self.assertEqual(new_set.append(), "")
 
@@ -146,7 +145,23 @@ class TestX4NewDataSet(TestCaseWithTableTests):
             '|      12.58 |          0.05  |         318 |             132 |',
             '|      13.09 |          0.05  |         588 |             148 |', 
             '+------------+----------------+-------------+-----------------+']))
-        #new_set.to_csv(f)
+        self.assertEqual(new_set.to_csv(None), '\n'.join([
+            ",EN,EN-ERR,DATA,DATA-ERR",
+            '0,6.49 MeV,0.085 MeV,24.0 mb,63.0 mb',
+            '1,7.01 MeV,0.08 MeV,49.0 mb,50.0 mb',
+            '2,7.52 MeV,0.075 MeV,54.0 mb,58.0 mb',
+            '3,8.03 MeV,0.075 MeV,177.0 mb,70.0 mb',
+            '4,8.54 MeV,0.07 MeV,275.0 mb,54.0 mb',
+            '5,9.04 MeV,0.065 MeV,249.0 mb,41.0 mb',
+            '6,9.55 MeV,0.065 MeV,354.0 mb,56.0 mb',
+            '7,10.06 MeV,0.06 MeV,415.0 mb,39.0 mb',
+            '8,10.56 MeV,0.06 MeV,411.0 mb,70.0 mb',
+            '9,11.07 MeV,0.055 MeV,356.0 mb,79.0 mb',
+            '10,11.57 MeV,0.055 MeV,418.0 mb,49.0 mb',
+            '11,12.08 MeV,0.055 MeV,455.0 mb,76.0 mb',
+            '12,12.58 MeV,0.05 MeV,318.0 mb,132.0 mb',
+            '13,13.09 MeV,0.05 MeV,588.0 mb,148.0 mb',
+            '']))
         self.assertEqual(new_set.to_markdown(), '\n'.join([
             '  EN (MeV)    EN-ERR (MeV)    DATA (mb)    DATA-ERR (mb)',
             '----------  --------------  -----------  ---------------',

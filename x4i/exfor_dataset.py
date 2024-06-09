@@ -227,9 +227,18 @@ class X4DataSetNew(X4BibMetaData):
     def append(self, other):
         raise NotImplementedError("Do we still need this?")
 
-    def to_csv(self, f, **kw):
-        """Thin wrapper around pandas's to_csv()"""
-        self.data.to_csv(f, **kw)
+    def to_csv(self, path_or_buf, **kw):
+        """
+        Thin wrapper around pandas's to_csv()
+
+        path_or_buf: str, path object, file-like object, or None, default None
+
+            String, path object (implementing os.PathLike[str]), or file-like object implementing a write() function. 
+            If None, the result is returned as a string. If a non-binary file object is passed, it should be opened 
+            with newline='', disabling universal newlines. If a binary file object is passed, mode might need to 
+            contain a 'b'.
+        """
+        return self.data.to_csv(path_or_buf, **kw)
 
     def to_markdown(self, showindex=False, **kw):
         """Simple markedown formatted version of the dataframe, uses to_tabulate()"""
