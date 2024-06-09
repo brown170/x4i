@@ -105,8 +105,6 @@ class TestX4NewDataSet(TestCaseWithTableTests):
         # Check these guys work correctly since the tabulate based scheme relies on them
         self.assertListEqual([str(x.units) for x in new_set.data.dtypes.tolist()], ['MeV', 'MeV', 'mb', 'mb'])
         self.assertListEqual(new_set.data.columns.tolist(), ['EN', 'EN-ERR', 'DATA', 'DATA-ERR'])
-        #print(new_set.to_tabulate(units='stacked'))
-        self.maxDiff=None
         self.assertEqual(new_set.to_tabulate(units='stacked'), '\n'.join([
             '+-------+----------+--------+------------+',
             '|    EN |   EN-ERR |   DATA |   DATA-ERR |',
@@ -127,6 +125,26 @@ class TestX4NewDataSet(TestCaseWithTableTests):
             '| 12.58 |    0.05  |    318 |        132 |',
             '| 13.09 |    0.05  |    588 |        148 |', 
             '+-------+----------+--------+------------+']))
+        self.maxDiff = None
+        self.assertEqual(new_set.to_tabulate(units='sbs_paren'), '\n'.join([
+            '+------------+----------------+-------------+-----------------+',
+            '|   EN (MeV) |   EN-ERR (MeV) |   DATA (mb) |   DATA-ERR (mb) |',
+            '|------------+----------------+-------------+-----------------|',
+            '|       6.49 |          0.085 |          24 |              63 |',
+            '|       7.01 |          0.08  |          49 |              50 |',
+            '|       7.52 |          0.075 |          54 |              58 |',
+            '|       8.03 |          0.075 |         177 |              70 |',
+            '|       8.54 |          0.07  |         275 |              54 |',
+            '|       9.04 |          0.065 |         249 |              41 |',
+            '|       9.55 |          0.065 |         354 |              56 |',
+            '|      10.06 |          0.06  |         415 |              39 |',
+            '|      10.56 |          0.06  |         411 |              70 |',
+            '|      11.07 |          0.055 |         356 |              79 |',
+            '|      11.57 |          0.055 |         418 |              49 |',
+            '|      12.08 |          0.055 |         455 |              76 |',
+            '|      12.58 |          0.05  |         318 |             132 |',
+            '|      13.09 |          0.05  |         588 |             148 |', 
+            '+------------+----------------+-------------+-----------------+']))
         #new_set.to_csv(f)
         #new_set.to_markdown(f)
         #new_set.to_json(f)
