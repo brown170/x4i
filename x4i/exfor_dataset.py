@@ -117,8 +117,8 @@ class X4DataSetNew(X4BibMetaData):
             self.__coupled = isinstance(reaction[0], X4ReactionCombination)
 
         # Initializing the data is less so...
-        self.__labels = []  # what EXFOR uses for labels, and may not be what underlying dataframe will ultimately use
-        self.__units = []   # what EXFOR uses for units, we will mapt these to pint units in the pandas dataframe
+        self.__labels = []  # what EXFOR uses for labels, and may not be what underlying dataframe will ultimately use (DO WE NEED THIS?)
+        self.__units = []   # what EXFOR uses for units, we will mapt these to pint units in the pandas dataframe (DO WE NEED THIS?)
         self.__data = None  # this will be a pint-powered pandas dataframe
         self.__simplified = False
         if data is not None:
