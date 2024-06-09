@@ -178,8 +178,6 @@ class X4DataSetNew(X4BibMetaData):
             self.__data = self.__data.join(dataframe_from_datasection(data), how='cross')
             self.__labels += data.labels
             self.__units += data.units
-            
-            
         else:
             self.__data = dataframe_from_datasection(data)
             self.__labels = data.labels
