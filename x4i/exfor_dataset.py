@@ -164,14 +164,22 @@ class X4DataSetNew(X4BibMetaData):
         if pointer is not None:
             raise NotImplementedError("add pointers")
         if common is not None:
-            self.__labels = common.labels + data.labels
-            self.__units = common.units + data.units
-            common_df = dataframe_from_datasection(common)
-            data_df = dataframe_from_datasection(data)
-            #print(common_df.pint.dequantify())
-            #print(data_df.pint.dequantify())
-            self.__data = common_df.join(data_df, how='cross')
-            #raise NotImplementedError("adding common")
+            self.__labels = []
+            self.__units = []
+            self.__data = None
+            for one_common in common:
+                self.__labels += one_common.labels
+                self.__units += one_common.units
+                common_df = dataframe_from_datasection(one_common)
+                if self.__data is None:
+                    self.__data = common_df
+                else:
+                    self.__data = self.__data.join(common_df, how='cross')
+            self.__data = self.__data.join(dataframe_from_datasection(data), how='cross')
+            self.__labels += data.labels
+            self.__units += data.units
+            
+            
         else:
             self.__data = dataframe_from_datasection(data)
             self.__labels = data.labels

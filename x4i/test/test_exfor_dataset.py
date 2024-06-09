@@ -281,7 +281,7 @@ class TestX4NewDataSet(TestCaseWithTableTests):
         subent = 'O1732002'
         new_set = exfor_dataset.X4DataSetNew(
             data=self.other[entry][subent]['DATA'], 
-            common=self.other[entry][subent]['COMMON'])
+            common=[self.other[entry][subent]['COMMON']])
         self.assertEqual(new_set.numrows(), 6)
         self.assertEqual(new_set.numcols(), 5)
         self.assertEqual(len(new_set), 6)
