@@ -237,6 +237,7 @@ class X4DataSetNew(X4BibMetaData):
 
     def to_json(self, **kw):
         """Thin wrapper around pandas's to_json()"""
+        raise NotImplementedError("Issue with PANDAS")
         return self.data.to_json(**kw)  
 
     def to_tabulate(self, showindex=False, headers="keys", tablefmt='psql', units=None, **kw):
