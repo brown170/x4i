@@ -179,13 +179,13 @@ class TestX4NewDataSet(TestCaseWithTableTests):
             '     12.08           0.055          455               76',
             '     12.58           0.05           318              132',
             '     13.09           0.05           588              148']))
-        #self.assertEqual(new_set.to_json(), '')
+        #self.assertEqual(new_set.to_json(), '')  # FIXME
         
 
     def test_easy_but_with_some_metadata(self):
         entry = '21971'
         subent = '21971003'
-        print(self.frehaut[entry][subent]['BIB']['REACTION'].reactions[' '][0])
+        #print(self.frehaut[entry][subent]['BIB']['REACTION'].reactions[' '][0])
         new_set = exfor_dataset.X4DataSetNew(
             data=self.frehaut[entry][subent]['DATA'], 
             reaction=self.frehaut[entry][subent]['BIB']['REACTION'].reactions[' '], 
@@ -226,8 +226,30 @@ class TestX4NewDataSet(TestCaseWithTableTests):
                 'Subent:    ???????? ',
                 'Reaction:  (94-PU-239(N,2N)94-PU-238,SIG)',
                 '']))
-        self.maxDiff = None
-        #self.assertEqual(str(new_set), "")
+        self.assertEqual(str(new_set), "\n".join([
+            "#  Authors:   N, o, n, e",
+            "#  Title:     None",
+            "#  Year:      None",
+            "#  Institute: None",
+            "#  Reference: None",
+            "#  Subent:    ????????",
+            "#  Reaction:  Cross section for 239Pu(n,2n)238Pu ",
+            "#           EN    EN-ERR    DATA    DATA-ERR",
+            "#          MeV       MeV      mb          mb",
+            "          6.49     0.085      24          63",
+            "          7.01     0.08       49          50",
+            "          7.52     0.075      54          58",
+            "          8.03     0.075     177          70",
+            "          8.54     0.07      275          54",
+            "          9.04     0.065     249          41",
+            "          9.55     0.065     354          56",
+            "         10.06     0.06      415          39",
+            "         10.56     0.06      411          70",
+            "         11.07     0.055     356          79",
+            "         11.57     0.055     418          49",
+            "         12.08     0.055     455          76",
+            "         12.58     0.05      318         132",
+            "         13.09     0.05      588         148",]))
         self.assertEqual(repr(new_set), '\n'.join([
             'Authors:   N, o, n, e',
             'Title:     None', 
