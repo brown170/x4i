@@ -57,7 +57,7 @@ import x4i.exfor_exceptions as exfor_exceptions
 import os
 
 
-def x4EntryFactory(enum, subentsList=None, rawEntry=False, dataPath=DATAPATH):
+def x4EntryFactory(enum, subentsList=None, rawEntry=False, dataPath=DATAPATH, filePath=None):
     """
     This function takes an EXFOR ENTRY number (enum), retrieves the corresponding file
     from disk, and constructs a valid X4Entry.  The rawEntry=True flag returns optionally
@@ -67,7 +67,9 @@ def x4EntryFactory(enum, subentsList=None, rawEntry=False, dataPath=DATAPATH):
         raise ValueError("A valid EXFOR ENTRY is a string with exactly 5 characters")
     result = []  # the entry, split into subentries
     try:
-        with open_for_reading_universal_newline_flag(os.sep.join([dataPath, 'db', enum[:3], enum + '.x4'])) as entryfile:
+        if filePath is None:
+            filePath = os.sep.join([dataPath, 'db', enum[:3], enum + '.x4'])
+        with open_for_reading_universal_newline_flag(filePath) as entryfile:
             entry =entryfile.readlines()
     except IOError:
         raise IOError("Rebuild your index with setup-exfor-db.py, x4i could not find entry %s" % enum)

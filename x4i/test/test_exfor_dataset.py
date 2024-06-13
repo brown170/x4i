@@ -66,18 +66,14 @@ db = exfor_manager.X4DBManagerPlainFS(datapath=testDBPath, database=testIndexFil
 class TestX4NewDataSet(TestCaseWithTableTests):
 
     def setUp(self):
-        self.frehaut = {}
-        for k,v in db.retrieve(ENTRY='21971', rawEntry=True).items():
-            self.frehaut[k]=exfor_entry.X4Entry(v)
-
-        self.other = {}
-        for k,v in db.retrieve(ENTRY='O1732', rawEntry=True).items():
-            self.other[k]=exfor_entry.X4Entry(v)
-
+        self.frehaut = exfor_entry.x4EntryFactory('21971', dataPath=testDBPath)
+        self.other = exfor_entry.x4EntryFactory('O1732', dataPath=testDBPath)
+        self.idunno = exfor_entry.x4EntryFactory('12898', filePath=__path__[0] + os.sep + '12898.x4')
+        
     def test_easy(self):
         entry = '21971'
         subent = '21971003'
-        new_set = exfor_dataset.X4DataSetNew(data=self.frehaut[entry][subent]['DATA'])
+        new_set = exfor_dataset.X4DataSetNew(data=self.frehaut[subent]['DATA'])
         self.assertEqual(new_set.numrows(), 14)
         self.assertEqual(new_set.numcols(), 4)
         self.assertEqual(len(new_set), 14)
@@ -100,7 +96,7 @@ class TestX4NewDataSet(TestCaseWithTableTests):
     def test_easy_outputs(self):
         entry = '21971'
         subent = '21971003'
-        new_set = exfor_dataset.X4DataSetNew(data=self.frehaut[entry][subent]['DATA'])
+        new_set = exfor_dataset.X4DataSetNew(data=self.frehaut[subent]['DATA'])
         # Check these guys work correctly since the tabulate based scheme relies on them
         self.assertListEqual([str(x.units) for x in new_set.data.dtypes.tolist()], ['MeV', 'MeV', 'mb', 'mb'])
         self.assertListEqual(new_set.data.columns.tolist(), ['EN', 'EN-ERR', 'DATA', 'DATA-ERR'])
@@ -186,8 +182,8 @@ class TestX4NewDataSet(TestCaseWithTableTests):
         subent = '21971003'
         #print(self.frehaut[entry][subent]['BIB']['REACTION'].reactions[' '][0])
         new_set = exfor_dataset.X4DataSetNew(
-            data=self.frehaut[entry][subent]['DATA'], 
-            reaction=self.frehaut[entry][subent]['BIB']['REACTION'].reactions[' '], 
+            data=self.frehaut[subent]['DATA'], 
+            reaction=self.frehaut[subent]['BIB']['REACTION'].reactions[' '], 
             monitor=None)
         self.assertEqual(new_set.numrows(), 14)
         self.assertEqual(new_set.numcols(), 4)
@@ -280,8 +276,8 @@ class TestX4NewDataSet(TestCaseWithTableTests):
         entry = 'O1732'
         subent = 'O1732002'
         new_set = exfor_dataset.X4DataSetNew(
-            data=self.other[entry][subent]['DATA'], 
-            common=[self.other[entry][subent]['COMMON']])
+            data=self.other[subent]['DATA'], 
+            common=[self.other[subent]['COMMON']])
         self.assertEqual(new_set.numrows(), 6)
         self.assertEqual(new_set.numcols(), 5)
         self.assertEqual(len(new_set), 6)
@@ -308,11 +304,14 @@ class TestX4NewDataSet(TestCaseWithTableTests):
             "         2390      0.85        0.997901         0.125732          0.0613057",
             "         2390      0.95        1.89235          0.143239          0.116242"]))
 
-    @unittest.skip
     def test_with_pointer(self):
-        pass 
+        entry = '12898'
+        subent = '12898002'
+        print(self.idunno.keys())
+        print(self.idunno['12898002'])
+        new_set = exfor_dataset.X4DataSetNew(
+            data=self.idunno[subent]['DATA'])
 
-    @unittest.skip
     def test_with_pointer_and_common(self):
         pass
 
