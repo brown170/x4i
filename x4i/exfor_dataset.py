@@ -185,14 +185,24 @@ class X4DataSetNew(X4BibMetaData):
                     self.__data = self.__data.join(common_df, how='cross')
 
         # Select out the pointer-ed columns
-        if pointer is not None: 
-            raise NotImplementedError("add pointers")
+        temp_data = dataframe_from_datasection(data)
+        drops = []
+        renames = {}
+        if pointer is not None:
+            for col in temp_data.columns:
+                if len(col) == 11 and col[-1] != ' ':  # check if column has a pointer
+                    if pointer != col[-1]: # if it isn't the right one, we drop it
+                        drops.append(col)
+                    else: # otherwise we rename it to get rid of the pointer in the label
+                        renames[col] = col[0:10].strip()
+            temp_data = temp_data.drop(columns=drops)
+            temp_data = temp_data.rename(columns=renames)
         
         # Final assembly
         if self.__data is None:
-            self.__data = dataframe_from_datasection(data)
+            self.__data = temp_data
         else:
-            self.__data = self.__data.join(dataframe_from_datasection(data), how='cross')
+            self.__data = self.__data.join(temp_data, how='cross')
         self.__labels += data.labels
         self.__units += data.units
 
