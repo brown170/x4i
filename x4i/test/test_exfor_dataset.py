@@ -311,6 +311,8 @@ class TestX4NewDataSet(TestCaseWithTableTests):
         print(self.idunno['12898002'])
         new_set = exfor_dataset.X4DataSetNew(
             data=self.idunno[subent]['DATA'])
+        print(new_set.to_markdown())
+        self.assertTrue(False)
 
     def test_with_pointer_and_common(self):
         pass

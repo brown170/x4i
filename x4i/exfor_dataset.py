@@ -91,7 +91,7 @@ class X4DataSetNew(X4BibMetaData):
         common: EXFOR COMMON section 
         reaction: REACTION instance, defaults to None 
         monitor: REACTION instance for any monitor reaction, defaults to None 
-        data:  EXFOR DATA section
+        data:  EXFOR DATA section, should be an instance of X4DataSection
         pointer: ugh, the EXFOR pointer for the dataset, defaults to None
         """
         # Initialize merged meta data, a needlessly complicated process
@@ -160,13 +160,21 @@ class X4DataSetNew(X4BibMetaData):
         """
         This should set up the data, labels and units such that all columns in all COMMON sections are in self
         and such that all columns in DATA which either have no pointer or matching pointer are in self
+
+        inputs:
+            data: DATA section, should be an instance of an X4DataSection
+            common: COMMON section, should be an instance of an X4DataSection
+            pointer: 3 possibilities
+                - None (keep everything), 
+                - ' ' (keep columns with no pointers), 
+                - a number (keep columns with no pointers and the columns matching the number specified)
         """
-        if pointer is not None:
-            raise NotImplementedError("add pointers")
+        self.__labels = []
+        self.__units = []
+        self.__data = None
+
+        # Assemble the COMMON data
         if common is not None:
-            self.__labels = []
-            self.__units = []
-            self.__data = None
             for one_common in common:
                 self.__labels += one_common.labels
                 self.__units += one_common.units
@@ -175,13 +183,18 @@ class X4DataSetNew(X4BibMetaData):
                     self.__data = common_df
                 else:
                     self.__data = self.__data.join(common_df, how='cross')
-            self.__data = self.__data.join(dataframe_from_datasection(data), how='cross')
-            self.__labels += data.labels
-            self.__units += data.units
-        else:
+
+        # Select out the pointer-ed columns
+        if pointer is not None: 
+            raise NotImplementedError("add pointers")
+        
+        # Final assembly
+        if self.__data is None:
             self.__data = dataframe_from_datasection(data)
-            self.__labels = data.labels
-            self.__units = data.units
+        else:
+            self.__data = self.__data.join(dataframe_from_datasection(data), how='cross')
+        self.__labels += data.labels
+        self.__units += data.units
 
     def strHeader(self):
         out = self.xmgraceHeader()
@@ -226,10 +239,10 @@ class X4DataSetNew(X4BibMetaData):
     def getSimplified(self, parserMap=None, columnNames=None, makeAllColumns=False, failIfMissingErrors=False):
         """Returns a simplified version of self.
         inputs:
-            parserMap            = { 'column name 1':parserList1, 'column name 2':parserList2, ... }
-            columnNames          = [ 'column name 1', 'column name 2', ... ] #put them in the order *you* want
-            makeAllColumns       will make uncertainty columns even if no uncertainties are given on a particular column
-            failIfMissingErrors  fail (raising exception) if missing an error column
+            parserMap:           { 'column name 1':parserList1, 'column name 2':parserList2, ... }
+            columnNames:         [ 'column name 1', 'column name 2', ... ] #put them in the order *you* want
+            makeAllColumns:      will make uncertainty columns even if no uncertainties are given on a particular column
+            failIfMissingErrors: fail (raising exception) if missing an error column
         """        
         raise NotImplementedError()
 
