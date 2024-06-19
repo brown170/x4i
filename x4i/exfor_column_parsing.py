@@ -87,7 +87,7 @@ class X4ColumnProcessor:
                     return self.data[label]
             except:
                 pass
-        return self.get_dummy_column()
+        raise KeyError("none of %s found" % str(labels))
 
     def get_uncertainty_helper(self, labels, value_column, as_list=True):
         for label in labels:

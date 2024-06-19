@@ -272,13 +272,13 @@ class X4DataSet(X4BibMetaData):
             - reorders columns per user request (columnNames).  This is more interesting if "makeAllColumns" is enabled, otherwise 
               you just get back the simplified data columns
         """
-        result = copy.copy(self)
+        results = copy.copy(self)
         
         # Check if we are done already
         if self.simplified:
-            return result
+            return results
         if parserMap is None:
-            return result
+            return results
 
         # Check that columnNames in sync with parserMap
         if columnNames is not None:
@@ -289,19 +289,25 @@ class X4DataSet(X4BibMetaData):
         # Build new DataSeries
         _columns = {}
         for _label in parserMap:
-            parserMap[_label].set_data(self.data)
-            _columns[_label] = pandas.Series(
-                parserMap[_label].get_values(), 
-                dtype="pint[%s]" % parserMap[_label].get_unit())
-            _columns["d(%s)" % _label] = pandas.Series(
-                parserMap[_label].get_uncertainties(),
-                dtype="pint[%s]" % parserMap[_label].get_unit())
+            for parser in parserMap[_label]:
+                try: # FIXME: how do I know which parsing scheme is the right one?
+                    parser.set_data(self.data)
+                    _columns[_label] = pandas.Series(
+                        parser.get_values(), 
+                        dtype="pint[%s]" % parserMap[_label].get_unit())
+                    _columns["d(%s)" % _label] = pandas.Series(
+                        parser.get_uncertainties(),
+                        dtype="pint[%s]" % parserMap[_label].get_unit())
+                except:
+                    pass
+        for col in _columns:
+            results.data[col] = _columns[col]
 
         # Convert all units to our favs
         for col in results.data.columns:
             for unit in ['MeV', 'b', 'sr', 'rad', 'fm', 'b/sr']:
                 try:
-                    result.data[col] = result.data[col].pint.to(unit)
+                    results.data[col] = results.data[col].pint.to(unit)
                 except:
                     pass
 
@@ -310,11 +316,11 @@ class X4DataSet(X4BibMetaData):
             # How to sort columns in pandas:
             # If:      df.columns.tolist() = ['0', '1', '2', '3', 'mean']
             # Do this: df = df[['mean', '0', '1', '2', '3']]
-            result = result[columnNames]
+            results = results[columnNames]
         
         # All done
         result.simplified = True
-        return result
+        return results
 
     def append(self, other):
         raise NotImplementedError("Do we still need this?")
