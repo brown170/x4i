@@ -253,8 +253,19 @@ class X4DataSetNew(X4BibMetaData):
             columnNames:         [ 'column name 1', 'column name 2', ... ] #put them in the order *you* want
             makeAllColumns:      will make uncertainty columns even if no uncertainties are given on a particular column
             failIfMissingErrors: fail (raising exception) if missing an error column
+
+        What this routine does:
+            - simplifies the dataframe according to the parserMap.  Typically this creates columns "X", "Y", "dX", "dY" where
+              the X and Y column names are determined by the parserMap.  The parserMap is the secret sauce of this whole operation.
+            - converts all units in the simplified columns to rational "base" units for nuclear work, 
+              e.g. MeV, b, sr, rad, fm
+            - reorders columns per user request (columnNames).  This is more interesting if "makeAllColumns" is enabled, otherwise 
+              you just get back the simplified data columns
         """        
         raise NotImplementedError()
+        # How to sort columns in pandas:
+        # If:      df.columns.tolist() = ['0', '1', '2', '3', 'mean']
+        # Do this: df = df[['mean', '0', '1', '2', '3']]
 
     def append(self, other):
         raise NotImplementedError("Do we still need this?")
