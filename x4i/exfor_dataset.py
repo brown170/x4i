@@ -279,7 +279,7 @@ class X4DataSet(X4BibMetaData):
     def append(self, other):
         raise NotImplementedError("Do we still need this?")
 
-    def to_csv(self, path_or_buf, index=False, **kw):
+    def to_csv(self, path_or_buf, index=False, dequantify=True, **kw):
         """
         Thin wrapper around pandas's to_csv()
 
@@ -291,7 +291,11 @@ class X4DataSet(X4BibMetaData):
             contain a 'b'.
 
         index: flag to control whether to display row labels
+        dequantify: dequantify the pint cells before output (default=True).  If you dequantify, 
+                    units appear as second row in header, otherwise they are included in each cell
         """
+        if dequantify:
+            return self.data.pint.dequantify().to_csv(path_or_buf, index=index, **kw)
         return self.data.to_csv(path_or_buf, index=index, **kw)
 
     def to_markdown(self, showindex=False, **kw):

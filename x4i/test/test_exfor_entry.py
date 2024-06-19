@@ -163,7 +163,7 @@ class TestX4Entry(TestCaseWithTableTests):
         ds[('E0783', 'E0783002', ' ')].to_csv('junk3.csv')
         with open_for_reading_universal_newline_flag('junk3.csv') as csvfile:
             self.assertEqual(csvfile.readlines(),
-                             ['EN,ANG-CM,DATA,DATA-ERR,FLAG\n', 'MEV,ADEG,NO-DIM,NO-DIM,NO-DIM\n',
+                             ['EN,ANG-CM,DATA,DATA-ERR,FLAG\n', 'MeV,deg,,,\n',
                               '56.0,30.712,-0.002211,,1.0\n', '56.0,38.727,-0.005861,0.00821,\n',
                               '56.0,46.135,0.01022,,1.0\n', '56.0,55.814,0.04098,,1.0\n',
                               '56.0,64.866,0.07998,,1.0\n', '56.0,69.415,0.1126,,1.0\n',
@@ -184,8 +184,8 @@ class TestX4Entry(TestCaseWithTableTests):
                  '#  Reference: Nuclear Instrum.and Methods in Physics Res. 217, 397 (1983)\n' \
                  '#  Subent:    E0783002\n' \
                  '#  Reaction:  Analyzing power Spin-polarization probability d/dA for 1H(d,Elastic)1H \n' \
-                 '#        EN            ANG-CM        DATA          DATA-ERR      FLAG          \n' \
-                 '#        MEV           ADEG          NO-DIM        NO-DIM        NO-DIM        \n' \
+                 '#           EN    ANG-CM       DATA  DATA-ERR    FLAG\n' \
+                 '#          MeV       deg\n' \
                  '        56.0          30.712        -0.002211     None          1.0           \n' \
                  '        56.0          38.727        -0.005861     0.00821       None          \n' \
                  '        56.0          46.135        0.01022       None          1.0           \n' \
@@ -225,7 +225,7 @@ class TestX4Entry(TestCaseWithTableTests):
         ds[('12898', '12898003', '2')].to_csv('junk4.csv')
         with open_for_reading_universal_newline_flag('junk4.csv') as junk4file:
             self.assertEqual(junk4file.readlines(), ['EN,EN-RSL-FW,ERR-S,MONIT,MONIT-ERR,DATA,ERR-T\n',
-                                                     'MEV,MEV,PER-CENT,MB,PER-CENT,MB,PER-CENT\n',
+                                                     'MeV,MeV,%,mb,%,mb,%\n',
                                                      '4.643,0.276,2.7,544.7,2.4,2.236,6.3\n',
                                                      '4.893,0.248,2.6,536.8,2.4,2.853,7.1\n',
                                                      '5.139,0.211,2.4,537.3,2.6,3.25,6.3\n',
@@ -261,26 +261,26 @@ class TestX4Entry(TestCaseWithTableTests):
                  '#  Reference: Annals of Nuclear Energy 11, 623 (1984); Progress report: ANL-NDM-85  (1984)\n' \
                  '#  Subent:    12898002\n' \
                  '#  Reaction:  (( Cross section for 51V(n,p)51Ti )/( Cross section for 238U(n,Fission) )) \n' \
-                 '#        EN            EN-RSL-FW     DATA          ERR-S         ERR-1         ERR-T         \n' \
-                 '#        MEV           MEV           NO-DIM        PER-CENT      PER-CENT      PER-CENT      \n' \
-                 '        2.856         0.095         9.075e-06     47.9          15.6          50.4          \n' \
-                 '        2.957         0.094         1.966e-05     20.6          9.2           22.6          \n' \
-                 '        3.057         0.094         2.575e-05     15.9          20.1          25.6          \n' \
-                 '        3.158         0.092         7.369e-05     6.7           15.5          16.9          \n' \
-                 '        3.258         0.09          0.0001441     4.9           11.2          12.2          \n' \
-                 '        3.359         0.087         0.0002354     3.6           8.1           8.9           \n' \
-                 '        3.459         0.087         0.000321      3.4           6.7           7.5           \n' \
-                 '        3.56          0.087         0.000413      3.2           7.8           8.4           \n' \
-                 '        3.661         0.087         0.000614      3.0           7.2           7.8           \n' \
-                 '        3.761         0.082         0.0007917     2.9           8.4           8.9           \n' \
-                 '        3.861         0.084         0.001281      2.8           5.9           6.5           \n' \
-                 '        3.861         0.084         0.001282      2.8           5.9           6.5           \n' \
-                 '        3.962         0.081         0.001348      2.8           4.9           5.6           \n' \
-                 '        4.063         0.081         0.001552      2.8           5.1           5.8           \n' \
-                 '        4.264         0.075         0.001967      2.7           6.7           7.2           \n' \
-                 '        4.464         0.076         0.002692      2.7           5.2           5.9           \n' \
-                 '        4.664         0.076         0.004136      2.8           4.7           5.5           \n' \
-                 '        4.865         0.076         0.004996      2.8           4.8           5.6           \n        '
+                 '#           EN    EN-RSL-FW       DATA    ERR-S    ERR-1    ERR-T\n' \
+                 '#          MeV          MeV                   %        %        %\n' \
+                 '         2.856        0.095  9.075e-06     47.9     15.6     50.4\n' \
+                 '         2.957        0.094  1.966e-05     20.6      9.2     22.6\n' \
+                 '         3.057        0.094  2.575e-05     15.9     20.1     25.6\n' \
+                 '         3.158        0.092  7.369e-05      6.7     15.5     16.9\n' \
+                 '         3.258        0.09   0.0001441      4.9     11.2     12.2\n' \
+                 '         3.359        0.087  0.0002354      3.6      8.1      8.9\n' \
+                 '         3.459        0.087   0.000321      3.4      6.7      7.5\n' \
+                 '         3.56         0.087   0.000413      3.2      7.8      8.4\n' \
+                 '         3.661        0.087   0.000614      3.0      7.2      7.8\n' \
+                 '         3.761        0.082  0.0007917      2.9      8.4      8.9\n' \
+                 '         3.861        0.084   0.001281      2.8      5.9      6.5\n' \
+                 '         3.861        0.084   0.001282      2.8      5.9      6.5\n' \
+                 '         3.962        0.081   0.001348      2.8      4.9      5.6\n' \
+                 '         4.063        0.081   0.001552      2.8      5.1      5.8\n' \
+                 '         4.264        0.075   0.001967      2.7      6.7      7.2\n' \
+                 '         4.464        0.076   0.002692      2.7      5.2      5.9\n' \
+                 '         4.664        0.076   0.004136      2.8      4.7      5.5\n' \
+                 '         4.865        0.076   0.004996      2.8      4.8      5.6\n        '
         #open( 'a', mode='w' ).writelines( str( ds[ ('12898', '12898002', '1') ] ) )
         #open( 'b', mode='w' ).writelines( answer )
         self.assertTablesAlmostEqual(str(ds[('12898', '12898002', '1')]), answer)

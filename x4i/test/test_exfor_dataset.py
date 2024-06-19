@@ -141,7 +141,7 @@ class TestX4NewDataSet(TestCaseWithTableTests):
             '|      12.58 |          0.05  |         318 |             132 |',
             '|      13.09 |          0.05  |         588 |             148 |', 
             '+------------+----------------+-------------+-----------------+']))
-        self.assertEqual(new_set.to_csv(None, index=True), '\n'.join([
+        self.assertEqual(new_set.to_csv(None, index=True, dequantify=False), '\n'.join([
             ",EN,EN-ERR,DATA,DATA-ERR",
             '0,6.49 MeV,0.085 MeV,24.0 mb,63.0 mb',
             '1,7.01 MeV,0.08 MeV,49.0 mb,50.0 mb',
@@ -157,6 +157,24 @@ class TestX4NewDataSet(TestCaseWithTableTests):
             '11,12.08 MeV,0.055 MeV,455.0 mb,76.0 mb',
             '12,12.58 MeV,0.05 MeV,318.0 mb,132.0 mb',
             '13,13.09 MeV,0.05 MeV,588.0 mb,148.0 mb',
+            '']))
+        self.assertEqual(new_set.to_csv(None), '\n'.join([
+            "EN,EN-ERR,DATA,DATA-ERR",
+            'MeV,MeV,mb,mb',
+            '6.49,0.085,24.0,63.0',
+            '7.01,0.08,49.0,50.0',
+            '7.52,0.075,54.0,58.0',
+            '8.03,0.075,177.0,70.0',
+            '8.54,0.07,275.0,54.0',
+            '9.04,0.065,249.0,41.0',
+            '9.55,0.065,354.0,56.0',
+            '10.06,0.06,415.0,39.0',
+            '10.56,0.06,411.0,70.0',
+            '11.07,0.055,356.0,79.0',
+            '11.57,0.055,418.0,49.0',
+            '12.08,0.055,455.0,76.0',
+            '12.58,0.05,318.0,132.0',
+            '13.09,0.05,588.0,148.0',
             '']))
         self.assertEqual(new_set.to_markdown(), '\n'.join([
             '  EN (MeV)    EN-ERR (MeV)    DATA (mb)    DATA-ERR (mb)',
