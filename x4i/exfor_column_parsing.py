@@ -397,12 +397,6 @@ class X4BarnsSqrtEColumnPair(X4ColumnProcessor):
         return [absOrNone(x) for x in ans]
 
 
-class X4CosineAngleColumnPair(X4ColumnProcessor): pass
-
-
-class X4EinCMToLabColumnPair(X4ColumnProcessor): pass
-
-
 # -----------------------------------
 # Below are lists of parsers ... insert detailed explanation here
 # -----------------------------------
@@ -420,10 +414,10 @@ incidentEnergyParserList = [
         labels_for_uncertainties=['EN' + s for s in resolutionHWSuffix]
     ),
     X4HighLowColumnPair(
-        X4ColumnParser(match_labels=['EN-MIN']),
-        X4ColumnParser(match_labels=['EN-MAX'])
+        labels_for_highs=['EN-MIN'],
+        labels_for_lows=['EN-MAX']
     ),
-    X4HighMidLowColumnPair(
+    X4HighMidLowColumnTriplet(
         X4ColumnParser(match_labels=['EN'] + baseMomKeys),
         X4ColumnParser(match_labels=['-EN-ERR']),
         X4ColumnParser(match_labels=['+EN-ERR']),
@@ -433,8 +427,8 @@ incidentEnergyParserList = [
 
 incidentMomentumParserList = [
     X4HighLowColumnPair(
-        X4ColumnParser(match_labels=['MOM-MIN']),
-        X4ColumnParser(match_labels=['MOM-MAX'])
+        labels_for_highs=['MOM-MIN'],
+        labels_for_lows=['MOM-MAX']
     ),
 ]
 
@@ -452,10 +446,10 @@ outgoingEnergyParserList = [
         labels_for_uncertainties=['E' + s for s in resolutionHWSuffix]
     ),
     X4HighLowColumnPair(
-        X4ColumnParser(match_labels=['E-MIN']),
-        X4ColumnParser(match_labels=['E-MAX'])
+        labels_for_highs=['E-MIN'],
+        labels_for_lows=['E-MAX']
     ),
-    X4HighMidLowColumnPair(
+    X4HighMidLowColumnTriplet(
         X4ColumnParser(match_labels=['E'] + baseMomKeys),
         X4ColumnParser(match_labels=['-E-ERR']),
         X4ColumnParser(match_labels=['+E-ERR']),
@@ -477,10 +471,10 @@ tempParserList = [
         labels_for_uncertainties=['KT' + s for s in resolutionHWSuffix]
     ),
     X4HighLowColumnPair(
-        X4ColumnParser(match_labels=['KT-MIN']),
-        X4ColumnParser(match_labels=['KT-MAX'])
+        labels_for_highs=['KT-MIN'],
+        labels_for_lows=['KT-MAX']
     ),
-    X4HighMidLowColumnPair(
+    X4HighMidLowColumnTriplet(
         X4ColumnParser(match_labels=['KT']),
         X4ColumnParser(match_labels=['-KT-ERR']),
         X4ColumnParser(match_labels=['+KT-ERR']),
@@ -494,15 +488,14 @@ spectrumArgumentParserList = tempParserList + incidentEnergyParserList
 
 csDataParserList = [
     X4IndependentColumnPair(
-        X4ColumnParser(match_labels=reduce(lambda x, y: x + y,
-                                           [[b + s for s in variableSuffix + frameSuffix] for b in baseDataKeys])),
-        X4ColumnParser(match_labels=[b + '-ERR' for b in baseDataKeys] + dataTotalErrorKeys),
+        labels_for_values=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix + frameSuffix] for b in baseDataKeys]),
+        labels_for_uncertainties=[b + '-ERR' for b in baseDataKeys] + dataTotalErrorKeys
     ),
     X4HighLowColumnPair(
-        X4ColumnParser(match_labels=[b + '-MIN' for b in baseDataKeys]),
-        X4ColumnParser(match_labels=[b + '-MAX' for b in baseDataKeys]),
+        labels_for_highs=[b + '-MIN' for b in baseDataKeys],
+        labels_for_lows=[b + '-MAX' for b in baseDataKeys],
     ),
-    X4HighMidLowColumnPair(
+    X4HighMidLowColumnTriplet(
         X4ColumnParser(match_labels=baseDataKeys),
         X4ColumnParser(match_labels=['-' + b + '-ERR' for b in baseDataKeys]),
         X4ColumnParser(match_labels=['+' + b + '-ERR' for b in baseDataKeys]),
@@ -512,25 +505,21 @@ csDataParserList = [
         X4ColumnParser(match_labels=dataSystematicErrorKeys),
         X4ColumnParser(match_labels=dataStatisticalErrorKeys),
     ),
-    X4BarnsSqrtEColumnPair(
-        X4ColumnParser(match_labels=['DATA']),
-        X4ColumnParser(match_labels=['DATA-ERR']),
-    ),
     X4MissingErrorColumnPair(
-        X4ColumnParser(match_labels=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix] for b in baseDataKeys])),
+        labels_for_values=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix] for b in baseDataKeys]),
     ),
 ]
 
 nubarParserList = [
     X4IndependentColumnPair(
-        X4ColumnParser(match_labels=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix] for b in baseDataKeys])),
-        X4ColumnParser(match_labels=[b + '-ERR' for b in baseDataKeys] + dataTotalErrorKeys),
+        labels_for_values=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix] for b in baseDataKeys]),
+        labels_for_uncertainties=[b + '-ERR' for b in baseDataKeys] + dataTotalErrorKeys
     ),
     X4HighLowColumnPair(
-        X4ColumnParser(match_labels=[b + '-MIN' for b in baseDataKeys]),
-        X4ColumnParser(match_labels=[b + '-MAX' for b in baseDataKeys]),
+        labels_for_highs=[b + '-MIN' for b in baseDataKeys],
+        labels_for_lows=[b + '-MAX' for b in baseDataKeys],
     ),
-    X4HighMidLowColumnPair(
+    X4HighMidLowColumnTriplet(
         X4ColumnParser(match_labels=baseDataKeys),
         X4ColumnParser(match_labels=['-' + b + '-ERR' for b in baseDataKeys]),
         X4ColumnParser(match_labels=['+' + b + '-ERR' for b in baseDataKeys]),
@@ -541,50 +530,40 @@ nubarParserList = [
         X4ColumnParser(match_labels=dataStatisticalErrorKeys),
     ),
     X4MissingErrorColumnPair(
-        X4ColumnParser(match_labels=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix] for b in baseDataKeys])),
+        labels_for_values=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix] for b in baseDataKeys]),
     ),
 ]
 
 angDistParserList = [
     X4IndependentColumnPair(
-        X4ColumnParser(match_labels=reduce(lambda x, y: x + y,
-                                           [[b + s for s in variableSuffix + frameSuffix] for b in baseDataKeys])),
-        X4ColumnParser(match_labels=[b + '-ERR' for b in baseDataKeys] + dataTotalErrorKeys),
+        labels_for_values=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix + frameSuffix] for b in baseDataKeys]),
+        labels_for_uncertainties=[b + '-ERR' for b in baseDataKeys] + dataTotalErrorKeys
     ),
     X4MissingErrorColumnPair(
-        X4ColumnParser(match_labels=reduce(lambda x, y: x + y,
-                                           [[b + s for s in variableSuffix + frameSuffix] for b in baseDataKeys])),
+        labels_for_values=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix + frameSuffix] for b in baseDataKeys]),
     ),
 ]
 
 energyDistParserList = [
     X4IndependentColumnPair(
-        X4ColumnParser(match_labels=reduce(lambda x, y: x + y,
-                                           [[b + s for s in variableSuffix + frameSuffix] for b in baseDataKeys])),
-        X4ColumnParser(match_labels=[b + '-ERR' for b in baseDataKeys] + dataTotalErrorKeys),
+        labels_for_values=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix + frameSuffix] for b in baseDataKeys]),
+        labels_for_uncertainties=[b + '-ERR' for b in baseDataKeys] + dataTotalErrorKeys
     ),
     X4MissingErrorColumnPair(
-        X4ColumnParser(match_labels=reduce(lambda x, y: x + y,
-                                           [[b + s for s in variableSuffix + frameSuffix] for b in baseDataKeys])),
+        labels_for_values=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix + frameSuffix] for b in baseDataKeys]),
     ),
 ]
 
 angleParserList = [
     X4IndependentColumnPair(
-        X4AngleColumnParser(match_labels=reduce(lambda x, y: x + y,
-                                                [[b + s for s in variableSuffix + frameSuffix] for b in baseAngleKeys])),
-        X4AngleColumnParser(match_labels=reduce(lambda x, y: x + y,
-                                                [[b + s for s in errorSuffix + resolutionHWSuffix] for b in
-                                                 baseAngleKeys]))
+        labels_for_values=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix + frameSuffix] for b in baseAngleKeys]),
+        labels_for_uncertainties=reduce(lambda x, y: x + y, [[b + s for s in errorSuffix + resolutionHWSuffix] for b in baseAngleKeys])
     ),
     X4IndependentColumnPair(
-        X4AngleColumnParser(match_labels=reduce(lambda x, y: x + y,
-                                                [[b + s for s in variableSuffix + frameSuffix] for b in baseAngleKeys])),
-        X4AngleColumnParser(
-            match_labels=reduce(lambda x, y: x + y, [[b + s for s in resolutionFWSuffix] for b in baseAngleKeys]))
+        labels_for_values=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix + frameSuffix] for b in baseAngleKeys]),
+        labels_for_uncertainties=reduce(lambda x, y: x + y, [[b + s for s in resolutionFWSuffix] for b in baseAngleKeys])
     ),
     X4MissingErrorColumnPair(
-        X4AngleColumnParser(match_labels=reduce(lambda x, y: x + y,
-                                                [[b + s for s in variableSuffix + frameSuffix] for b in baseAngleKeys])),
+        labels_for_values=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix + frameSuffix] for b in baseAngleKeys]),
     ),
 ]
