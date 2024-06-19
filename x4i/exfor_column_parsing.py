@@ -33,9 +33,6 @@
 #          (The whole column parsing architecture needs to be redone, probably with PQU's help) (David Brown <dbrown@bnl.gov>, 2014-03-04T16:44:43)
 #
 ################################################################################
-
-from __future__ import print_function, division
-
 import math
 from functools import reduce
 
@@ -64,177 +61,90 @@ dataTotalErrorKeys = ['ERR-T']
 dataSystematicErrorKeys = ['ERR']
 dataStatisticalErrorKeys = ['ERR-S']
 
-def absOrNone(x):
-    if isinstance(x, str):
-        return x
-    try:
-        ans = abs(x)
-    except TypeError:
-        ans = None
-    return ans
 
-
-def averageColumns(x, y):
-    ans = []
-    for i in range(max(len(x), len(y))):
-        if x[i] is not None:
-            if y[i] is None:
-                ans.append(x[i])
-            else:
-                ans.append(0.5 * (x[i] + y[i]))
-        else:
-            if y[i] is None:
-                ans.append(None)
-            else:
-                ans.append(y[i])
-    return ans
-
-
-def condenseColumn(x, y):
-    ans = []
-    for i in range(max(len(x), len(y))):
-        if x[i] is not None:
-            ans.append(x[i])
-        else:
-            ans.append(y[i])
-    return ans
-
-
-class X4ColumnParser:
-    def __init__(self, match_labels=None):
-        self.match_labels = match_labels
-
-    def isMatch(self, i, data):
-        result = True
-        if (i < 0) or (i >= data.numcols()):
-            return False
-        if self.match_labels is not None:
-            result = result and (data.labels[i] in self.match_labels)
-        if self.match_units is not None:
-            result = result and (data.units[i] in self.match_units)
-        return result
-
-    def firstMatch(self, data):
-        for i in range(data.numcols()):
-            if self.isMatch(i, data):
-                return i
-        return -1
-
-    def allMatches(self, data):
-        match_list = []
-        for i in range(data.numcols()):
-            if self.isMatch(i, data):
-                match_list.append(i)
-        return match_list
-
-    def getColumn(self, icol, data):
-        if not self.isMatch(icol, data):
-            return [None] * (data.numrows() + 2)
-        units = self.getConversion(data.units[icol])
-        col = [data.labels[icol], units[1]]
-        for irow in range(data.numrows()):
-            col.append(data.data[irow][icol])
-            if col[-1] is not None:
-                col[-1] = col[-1] * units[0] * self.scale_factor + self.off_set
-        return col
-
-
-class X4AngleColumnParser(X4ColumnParser):
-    def getColumn(self, icol, data):
-        # If in either radians or degrees, can handle using base class
-        if 'COS' not in data.labels[icol]:
-            return X4ColumnParser.getColumn(self, icol, data)
-        # Otherwise must undo angular cosine
-        if not self.isMatch(icol, data):
-            return [None] * (data.numrows() + 2)
-        units = self.getConversion('RAD')
-        col = [data.labels[icol], units[1]]
-        for irow in range(data.numrows()):
-            col.append(data.data[irow][icol])
-            if col[-1] is not None:
-                col[-1] = math.acos(col[-1] * self.scale_factor + self.off_set) * units[0]
-        return col
-
-
-class X4ColumnPairParser:
+class X4ColumnProcessor:
     """
     Simple Base class.  Defines init function, but you must override
     the member functions if you expect anything to work
     """
 
-    def __init__(self, column1Parser, column2Parser):
-        self.column1Parser = column1Parser
-        self.column2Parser = column2Parser
-        self.icol1 = - 1
-        self.icol2 = - 1
+    def __init__(self, **kw):
+        self.__data = None
 
-    def set_icols(self, data):
-        pass
+    @property
+    def data(self):
+        return self.__data
 
-    def isMatch(self, data):
-        return True
+    def set_data(self, data):
+        self.__data = data
 
-    def getValue(self, data):
-        return None
+    def get_column_helper(self, labels, as_list=True):
+        for label in labels:
+            try:
+                if as_list:
+                    return self.data[label].to_list()
+                else:
+                    return self.data[label]
+            except:
+                pass
+        return self.get_dummy_column()
 
-    def getError(self, data):
-        return None
+    def get_unit_helper(self, labels):
+        for label in labels:
+            try:
+                return self.data[label].pint.unit
+            except:
+                pass
+        return 'arb_unit'
 
-    def getDummyColumn(self, data):
-        return [None] * (data.numrows() + 2)
+    def get_values(self):
+        raise NotImplementedError()
+
+    def get_uncertainties(self):
+        raise NotImplementedError()
+    
+    def get_unit(self):
+        raise NotImplementedError()
+
+    def get_dummy_column(self):
+        return [None] * (self.data.numrows() + 2)
 
 
-class X4MissingErrorColumnPair(X4ColumnPairParser):
+class X4MissingErrorColumnPair(X4ColumnProcessor):
     """
-    Matches first occurrence of Column 1 (that matches your pointer, if any), ignores Column 2.
+    Matches first occurrence of column label
     """
-    def __init__(self, column1Parser, column2Parser=None):
-        X4ColumnPairParser.__init__(self, column1Parser, column2Parser)
+    def __init__(self, labels_for_values):
+        X4ColumnProcessor.__init__(self)
+        self.__labels_for_values = labels_for_values
 
-    def set_icols(self, data):
-        self.icol1 = self.column1Parser.firstMatch(data)
+    def get_values(self):
+        return self.get_column_helper(self.__labels_for_values)
 
-    def isMatch(self, data):
-        self.set_icols(data)
-        return self.icol1 >= 0
+    def get_uncertainties(self):
+        return self.get_dummy_column()
 
-    def getValue(self, data):
-        if not self.isMatch(data):
-            return self.getDummyColumn(data)
-        self.set_icols(data)
-        return self.column1Parser.getColumn(self.icol1, data)
-
-    def getError(self, data):
-        return self.getDummyColumn(data)
+    def get_unit(self):
+        return self.get_unit_helper(self.__labels_for_values)
 
 
-class X4IndependentColumnPair(X4MissingErrorColumnPair):
+class X4IndependentColumnPair(X4ColumnProcessor):
     """
     Matches first occurrences of Column 1 and 2 (that matches your pointer, if any)
     """
+    def __init__(self, labels_for_values, labels_for_uncertainties):
+        X4ColumnProcessor.__init__(self)
+        self.__labels_for_values = labels_for_values
+        self.__labels_for_uncertainties = labels_for_uncertainties
 
-    def set_icols(self, data):
-        self.icol1 = self.column1Parser.firstMatch(data)
-        self.icol2 = self.column2Parser.firstMatch(data)
+    def get_values(self):
+        return self.get_column_helper(self.__labels_for_values)
 
-    def isMatch(self, data):
-        self.set_icols(data)
-        return (self.icol1 >= 0) and (self.icol2 >= 0)
+    def get_uncertainties(self):
+        return self.get_column_helper(self.__labels_for_uncertainties)
 
-    def getError(self, data):
-        if not self.isMatch(data):
-            return self.getDummyColumn(data)
-        self.set_icols(data)
-        err = self.column2Parser.getColumn(self.icol2, data)
-        if err[1] == 'PER-CENT':
-            col = self.getValue(data)
-            err[1] = col[1]
-            for i in range(2, len(col)):
-                if col[i] is not None and err[i] is not None:
-                    err[i] = col[i] * err[i] / 100.0
-                else:
-                    err[i] = None
-        return [absOrNone(x) for x in err]
+    def get_unit(self):
+        return self.get_unit_helper(self.__labels_for_values)
 
 
 class X4ConstantPercentColumnPair(X4MissingErrorColumnPair):
@@ -243,100 +153,32 @@ class X4ConstantPercentColumnPair(X4MissingErrorColumnPair):
     Set percentError to something other than 10% for real work!
     """
 
-    def __init__(self, column1Parser):
-        X4MissingErrorColumnPair.__init__(self, column1Parser, None)
-        self.percentError = 10
+    def __init__(self, labels_for_values, common_percent_error=10):
+        X4MissingErrorColumnPair.__init__(self, labels_for_values, None)
+        self.__common_percent_error = common_percent_error
 
-    def getError(self, data):
-        if not self.isMatch(data):
-            return self.getDummyColumn(data)
-        self.set_icols(data)
-        col = self.getValue(data)
-        for i in range(2, len(col)):
-            if col[i] is not None:
-                col[i] = col[i] * self.percentError / 100.0
-        return [absOrNone(x) for x in col]
+    def get_uncertainties(self):
+        values = self.get_column_helper(self.__labels_for_values, as_list=False)
+        return (0.01 * self.__common_percent_error * values).to_list()
 
 
-class X4HighLowColumnPair(X4IndependentColumnPair):
-    def isMatch(self, data):
-        self.set_icols(data)
-        return self.icol1 >= 0 or self.icol2 >= 0
+class X4HighLowColumnPair(X4ColumnProcessor):
+    
+    def __init__(self, labels_for_highs, labels_for_lows):
+        X4ColumnProcessor.__init__(self)
+        self.__labels_for_highs = labels_for_highs
+        self.__labels_for_lows = labels_for_lows
 
-    def getValue(self, data):
-        if not self.isMatch(data):
-            return self.getDummyColumn(data)
-        self.set_icols(data)
-        if self.column1Parser is not None:
-            col1 = self.column1Parser.getColumn(self.icol1, data)
-        else:
-            col1 = self.getDummyColumn(data)
-        if self.column2Parser is not None:
-            col2 = self.column2Parser.getColumn(self.icol2, data)
-        else:
-            col2 = self.getDummyColumn(data)
-        ans = [None, None]
-        for i in [0, 1]:
-            for j in [col1[i], col2[i]]:
-                if j is not None:
-                    ans[i] = j
-        for i in range(2, data.numrows() + 2):
-            try:
-                x1 = col1[i]
-            except:
-                x1 = 0.0
-            try:
-                x2 = col2[i]
-            except:
-                x2 = 0.0
-            if x1 is None and x2 is None:
-                ans.append(None)
-            elif x1 is None and x2 is not None:
-                ans.append(0.5 * x2)
-            elif x1 is not None and x2 is None:
-                ans.append(None)  # '>'+str(x1)
-            else:
-                ans.append(0.5 * (x1 + x2))
-        return ans
+    def get_values(self):
+        return (0.5 * (self.get_column_helper(self.__labels_for_highs) + \
+                       self.get_column_helper(self.__labels_for_lows))).to_list()
 
-    def getError(self, data):
-        if not self.isMatch(data):
-            return self.getDummyColumn(data)
-        self.set_icols(data)
-        if self.column1Parser is not None:
-            col1 = self.column1Parser.getColumn(self.icol1, data)
-        else:
-            col1 = self.getDummyColumn(data)
-        if self.column2Parser is not None:
-            col2 = self.column2Parser.getColumn(self.icol2, data)
-        else:
-            col2 = self.getDummyColumn(data)
-        ans = [None, None]
-        for i in [0, 1]:
-            for j in [col1[i], col2[i]]:
-                if j is not None:
-                    ans[i] = j
-        for i in range(2, data.numrows() + 2):
-            try:
-                x1 = col1[i]
-            except:
-                x1 = 0.0
-            try:
-                x2 = col2[i]
-            except:
-                x2 = 0.0
-            if x1 is None or x2 is None:
-                ans.append(None)
-            elif x1 is None and x2 is not None:
-                ans.append(0.5 * x2)
-            elif x1 is not None and x2 is None:
-                ans.append(None)
-            else:
-                ans.append(0.5 * abs(x1 - x2))
-        return [absOrNone(x) for x in ans]
+    def get_uncertainties(self):
+         return (0.5 * (self.get_column_helper(self.__labels_for_highs) - \
+                       self.get_column_helper(self.__labels_for_lows))).abs().to_list()
 
 
-class X4HighMidLowColumnPair(X4IndependentColumnPair):
+class X4HighMidLowColumnTriplet(X4ColumnProcessor):
     def __init__(self, column1Parser, column2Parser, column3Parser):
         self.column1Parser = column1Parser  # middle
         self.column2Parser = column2Parser  # -err
@@ -435,7 +277,7 @@ class X4HighMidLowColumnPair(X4IndependentColumnPair):
         return [absOrNone(x) for x in ans]
 
 
-class X4AddErrorBarsColumnPair(X4HighMidLowColumnPair):
+class X4AddErrorBarsColumnPair(X4ColumnProcessor):
     def getValue(self, data):
         if not self.isMatch(data):
             return self.getDummyColumn(data)
@@ -487,7 +329,7 @@ class X4AddErrorBarsColumnPair(X4HighMidLowColumnPair):
         return [absOrNone(x) for x in ans]
 
 
-class X4BarnsSqrtEColumnPair(X4IndependentColumnPair):
+class X4BarnsSqrtEColumnPair(X4ColumnProcessor):
     def __init__(self, column2Parser, column3Parser):
         self.column2Parser = column2Parser  # CS
         self.column3Parser = column3Parser  # dCS
@@ -555,10 +397,10 @@ class X4BarnsSqrtEColumnPair(X4IndependentColumnPair):
         return [absOrNone(x) for x in ans]
 
 
-class X4CosineAngleColumnPair(X4IndependentColumnPair): pass
+class X4CosineAngleColumnPair(X4ColumnProcessor): pass
 
 
-class X4EinCMToLabColumnPair(X4IndependentColumnPair): pass
+class X4EinCMToLabColumnPair(X4ColumnProcessor): pass
 
 
 # -----------------------------------
@@ -566,16 +408,16 @@ class X4EinCMToLabColumnPair(X4IndependentColumnPair): pass
 # -----------------------------------
 incidentEnergyParserList = [
     X4IndependentColumnPair(
-        X4ColumnParser(match_labels=['EN' + s for s in variableSuffix]),
-        X4ColumnParser(match_labels=['EN' + s for s in errorSuffix])
+        labels_for_values=['EN' + s for s in variableSuffix],
+        labels_for_uncertainties=['EN' + s for s in errorSuffix]
     ),
     X4IndependentColumnPair(
-        X4ColumnParser(match_labels=['EN' + s for s in variableSuffix]),
-        X4ColumnParser(match_labels=['EN' + s for s in resolutionFWSuffix])
+        labels_for_values=['EN' + s for s in variableSuffix],
+        labels_for_uncertainties=['EN' + s for s in resolutionFWSuffix]
     ),
     X4IndependentColumnPair(
-        X4ColumnParser(match_labels=['EN' + s for s in variableSuffix]),
-        X4ColumnParser(match_labels=['EN' + s for s in resolutionHWSuffix])
+        labels_for_values=['EN' + s for s in variableSuffix],
+        labels_for_uncertainties=['EN' + s for s in resolutionHWSuffix]
     ),
     X4HighLowColumnPair(
         X4ColumnParser(match_labels=['EN-MIN']),
@@ -586,10 +428,7 @@ incidentEnergyParserList = [
         X4ColumnParser(match_labels=['-EN-ERR']),
         X4ColumnParser(match_labels=['+EN-ERR']),
     ),
-    X4MissingErrorColumnPair(
-        X4ColumnParser(match_labels=['EN' + s for s in variableSuffix] + baseMomKeys), 
-        None
-    ),
+    X4MissingErrorColumnPair(labels_for_values=['EN' + s for s in variableSuffix] + baseMomKeys),
 ]
 
 incidentMomentumParserList = [
@@ -601,16 +440,16 @@ incidentMomentumParserList = [
 
 outgoingEnergyParserList = [
     X4IndependentColumnPair(
-        X4ColumnParser(match_labels=['E' + s for s in variableSuffix]),
-        X4ColumnParser(match_labels=['E' + s for s in errorSuffix])
+        labels_for_values=['E' + s for s in variableSuffix],
+        labels_for_uncertainties=['E' + s for s in errorSuffix]
     ),
     X4IndependentColumnPair(
-        X4ColumnParser(match_labels=['E' + s for s in variableSuffix]),
-        X4ColumnParser(match_labels=['E' + s for s in resolutionFWSuffix])
+        labels_for_values=['E' + s for s in variableSuffix],
+        labels_for_uncertainties=['E' + s for s in resolutionFWSuffix]
     ),
     X4IndependentColumnPair(
-        X4ColumnParser(match_labels=['E' + s for s in variableSuffix]),
-        X4ColumnParser(match_labels=['E' + s for s in resolutionHWSuffix])
+        labels_for_values=['E' + s for s in variableSuffix],
+        labels_for_uncertainties=['E' + s for s in resolutionHWSuffix]
     ),
     X4HighLowColumnPair(
         X4ColumnParser(match_labels=['E-MIN']),
@@ -621,24 +460,21 @@ outgoingEnergyParserList = [
         X4ColumnParser(match_labels=['-E-ERR']),
         X4ColumnParser(match_labels=['+E-ERR']),
     ),
-    X4MissingErrorColumnPair(
-        X4ColumnParser(match_labels=['E' + s for s in variableSuffix] + baseMomKeys),
-        None,
-    ),
+    X4MissingErrorColumnPair(labels_for_values=['E' + s for s in variableSuffix] + baseMomKeys),
 ]
 
 tempParserList = [
     X4IndependentColumnPair(
-        X4ColumnParser(match_labels=['KT' + s for s in variableSuffix + shiftSuffix]),
-        X4ColumnParser(match_labels=['KT' + s for s in errorSuffix]),
+        labels_for_values=['KT' + s for s in variableSuffix + shiftSuffix],
+        labels_for_uncertainties=['KT' + s for s in errorSuffix],
     ),
     X4IndependentColumnPair(
-        X4ColumnParser(match_labels=['KT' + s for s in variableSuffix]),
-        X4ColumnParser(match_labels=['KT' + s for s in resolutionFWSuffix])
+        labels_for_values=['KT' + s for s in variableSuffix],
+        labels_for_uncertainties=['KT' + s for s in resolutionFWSuffix]
     ),
     X4IndependentColumnPair(
-        X4ColumnParser(match_labels=['KT' + s for s in variableSuffix]),
-        X4ColumnParser(match_labels=['KT' + s for s in resolutionHWSuffix])
+        labels_for_values=['KT' + s for s in variableSuffix],
+        labels_for_uncertainties=['KT' + s for s in resolutionHWSuffix]
     ),
     X4HighLowColumnPair(
         X4ColumnParser(match_labels=['KT-MIN']),
@@ -650,8 +486,7 @@ tempParserList = [
         X4ColumnParser(match_labels=['+KT-ERR']),
     ),
     X4MissingErrorColumnPair(
-        X4ColumnParser(
-            match_labels=['TEMP' + s for s in variableSuffix + shiftSuffix] + ['KT' + s for s in variableSuffix]),
+        labels_for_values=['TEMP' + s for s in variableSuffix + shiftSuffix] + ['KT' + s for s in variableSuffix]
     ),
 ]
 
@@ -753,8 +588,3 @@ angleParserList = [
                                                 [[b + s for s in variableSuffix + frameSuffix] for b in baseAngleKeys])),
     ),
 ]
-
-# print reduce( lambda x, y: x + y, [ [ b + s for s in variableSuffix + frameSuffix ] for b in baseAngleKeys ] )
-# print reduce( lambda x, y: x + y, [ [ b + s for s in errorSuffix + resolutionHWSuffix ] for b in baseAngleKeys ] )
-# print reduce( lambda x, y: x + y, [ [ b + s for s in resolutionFWSuffix ] for b in baseAngleKeys ] )
-# print angUnits + noUnits + percentUnits

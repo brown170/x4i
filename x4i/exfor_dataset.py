@@ -286,7 +286,16 @@ class X4DataSet(X4BibMetaData):
                 if p not in columnNames:
                     raise KeyError(p + ' not in columnNames')
 
-        raise NotImplementedError()
+        # Build new DataSeries
+        _columns = {}
+        for _label in parserMap:
+            parserMap[_label].set_data(self.data)
+            _columns[_label] = pandas.Series(
+                parserMap[_label].get_values(), 
+                dtype="pint[%s]" % parserMap[_label].get_unit())
+            _columns["d(%s)" % _label] = pandas.Series(
+                parserMap[_label].get_uncertainties(),
+                dtype="pint[%s]" % parserMap[_label].get_unit())
 
         # Convert all units to our favs
         for col in results.data.columns:
