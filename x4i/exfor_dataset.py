@@ -271,11 +271,41 @@ class X4DataSet(X4BibMetaData):
               e.g. MeV, b, sr, rad, fm
             - reorders columns per user request (columnNames).  This is more interesting if "makeAllColumns" is enabled, otherwise 
               you just get back the simplified data columns
-        """        
+        """
+        result = copy.copy(self)
+        
+        # Check if we are done already
+        if self.simplified:
+            return result
+        if parserMap is None:
+            return result
+
+        # Check that columnNames in sync with parserMap
+        if columnNames is not None:
+            for p in parserMap:
+                if p not in columnNames:
+                    raise KeyError(p + ' not in columnNames')
+
         raise NotImplementedError()
-        # How to sort columns in pandas:
-        # If:      df.columns.tolist() = ['0', '1', '2', '3', 'mean']
-        # Do this: df = df[['mean', '0', '1', '2', '3']]
+
+        # Convert all units to our favs
+        for col in results.data.columns:
+            for unit in ['MeV', 'b', 'sr', 'rad', 'fm', 'b/sr']:
+                try:
+                    result.data[col] = result.data[col].pint.to(unit)
+                except:
+                    pass
+
+        # Sort the columns
+        if columnNames is not None:
+            # How to sort columns in pandas:
+            # If:      df.columns.tolist() = ['0', '1', '2', '3', 'mean']
+            # Do this: df = df[['mean', '0', '1', '2', '3']]
+            result = result[columnNames]
+        
+        # All done
+        result.simplified = True
+        return result
 
     def append(self, other):
         raise NotImplementedError("Do we still need this?")
