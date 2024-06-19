@@ -73,7 +73,7 @@ class TestX4NewDataSet(TestCaseWithTableTests):
     def test_easy(self):
         entry = '21971'
         subent = '21971003'
-        new_set = exfor_dataset.X4DataSetNew(data=self.frehaut[subent]['DATA'])
+        new_set = exfor_dataset.X4DataSet(data=self.frehaut[subent]['DATA'])
         self.assertEqual(new_set.numrows(), 14)
         self.assertEqual(new_set.numcols(), 4)
         self.assertEqual(len(new_set), 14)
@@ -96,7 +96,7 @@ class TestX4NewDataSet(TestCaseWithTableTests):
     def test_easy_outputs(self):
         entry = '21971'
         subent = '21971003'
-        new_set = exfor_dataset.X4DataSetNew(data=self.frehaut[subent]['DATA'])
+        new_set = exfor_dataset.X4DataSet(data=self.frehaut[subent]['DATA'])
         # Check these guys work correctly since the tabulate based scheme relies on them
         self.assertListEqual([str(x.units) for x in new_set.data.dtypes.tolist()], ['MeV', 'MeV', 'mb', 'mb'])
         self.assertListEqual(new_set.data.columns.tolist(), ['EN', 'EN-ERR', 'DATA', 'DATA-ERR'])
@@ -141,7 +141,7 @@ class TestX4NewDataSet(TestCaseWithTableTests):
             '|      12.58 |          0.05  |         318 |             132 |',
             '|      13.09 |          0.05  |         588 |             148 |', 
             '+------------+----------------+-------------+-----------------+']))
-        self.assertEqual(new_set.to_csv(None), '\n'.join([
+        self.assertEqual(new_set.to_csv(None, index=True), '\n'.join([
             ",EN,EN-ERR,DATA,DATA-ERR",
             '0,6.49 MeV,0.085 MeV,24.0 mb,63.0 mb',
             '1,7.01 MeV,0.08 MeV,49.0 mb,50.0 mb',
@@ -181,7 +181,7 @@ class TestX4NewDataSet(TestCaseWithTableTests):
         entry = '21971'
         subent = '21971003'
         #print(self.frehaut[entry][subent]['BIB']['REACTION'].reactions[' '][0])
-        new_set = exfor_dataset.X4DataSetNew(
+        new_set = exfor_dataset.X4DataSet(
             data=self.frehaut[subent]['DATA'], 
             reaction=self.frehaut[subent]['BIB']['REACTION'].reactions[' '], 
             monitor=None)
@@ -275,7 +275,7 @@ class TestX4NewDataSet(TestCaseWithTableTests):
     def test_with_common(self):
         entry = 'O1732'
         subent = 'O1732002'
-        new_set = exfor_dataset.X4DataSetNew(
+        new_set = exfor_dataset.X4DataSet(
             data=self.other[subent]['DATA'], 
             common=[self.other[subent]['COMMON']])
         self.assertEqual(new_set.numrows(), 6)
@@ -307,7 +307,7 @@ class TestX4NewDataSet(TestCaseWithTableTests):
     def test_with_pointer(self):
         entry = '12898'
         subent = '12898002'
-        new_set = exfor_dataset.X4DataSetNew(
+        new_set = exfor_dataset.X4DataSet(
             data=self.idunno[subent]['DATA'], 
             pointer='2')
         self.assertEqual(new_set.to_markdown(), '\n'.join([
@@ -336,11 +336,11 @@ class TestX4NewDataSet(TestCaseWithTableTests):
     def test_with_pointer_and_common(self):
         entry = '12898'
         subent = '12898002'
-        new_set = exfor_dataset.X4DataSetNew(
+        new_set = exfor_dataset.X4DataSet(
             data=self.idunno[subent]['DATA'], 
             common=[self.other['O1732002']['COMMON']],  # fake common
             pointer='2')
-        print(new_set.to_markdown())
+        # print(new_set.to_markdown())
         self.assertEqual(new_set.to_markdown(), '\n'.join([
             '  MOM (GeV/c)    EN (MeV)    EN-RSL-FW (MeV)    ERR-S (%)    MONIT (mb)    MONIT-ERR (%)    DATA (mb)    ERR-T (%)',
             '-------------  ----------  -----------------  -----------  ------------  ---------------  -----------  -----------',
@@ -365,7 +365,8 @@ class TestX4NewDataSet(TestCaseWithTableTests):
         ]))
 
 
-class TestX4DataSet(TestCaseWithTableTests):
+@unittest.skip
+class TestX4DataSetOld(TestCaseWithTableTests):
 
     def setUp(self):
         l = db.retrieve(quantity='SIG', target='PU-239', reaction='N,2N', rawEntry=True)
@@ -374,7 +375,7 @@ class TestX4DataSet(TestCaseWithTableTests):
             self.ds.update(exfor_entry.X4Entry(l[k]).getSimplifiedDataSets(True))
 
     def test_append(self):
-        d = exfor_dataset.X4DataSet()
+        d = exfor_dataset.X4DataSetOld()
         keys = list(self.ds.keys())
         keys.sort()
         keys.reverse()

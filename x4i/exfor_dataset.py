@@ -83,7 +83,7 @@ def dataframe_from_datasection(_data):
         return pandas.DataFrame(_columns)
 
 
-class X4DataSetNew(X4BibMetaData):
+class X4DataSet(X4BibMetaData):
 
     def __init__(self, meta=None, common=None, reaction=None, monitor=None, data=None, pointer=None):
         """
@@ -176,6 +176,8 @@ class X4DataSetNew(X4BibMetaData):
         # Assemble the COMMON data
         if common is not None:
             for one_common in common:
+                if one_common is None: 
+                    continue
                 self.__labels += one_common.labels
                 self.__units += one_common.units
                 common_df = dataframe_from_datasection(one_common)
@@ -256,7 +258,14 @@ class X4DataSetNew(X4BibMetaData):
 
         What this routine does:
             - simplifies the dataframe according to the parserMap.  Typically this creates columns "X", "Y", "dX", "dY" where
-              the X and Y column names are determined by the parserMap.  The parserMap is the secret sauce of this whole operation.
+              the X and Y column names are determined by the parserMap.  The parserMap is the secret sauce of this whole 
+              operation.
+            - when computing "dX" or "dY", the code attempts to guess the uncertainties assuming symmetric uncertainties 
+              about the mean.  This means the following:
+                - we make a half hearted attempt to combine all related uncertainties in quadrature 
+                - we present "Min/Max" values as symmetric uncertainties about the average (Max+Min)/2, whether or not this it makes sense
+                - full widths get halved
+                - percent uncertainty is turned to absolute
             - converts all units in the simplified columns to rational "base" units for nuclear work, 
               e.g. MeV, b, sr, rad, fm
             - reorders columns per user request (columnNames).  This is more interesting if "makeAllColumns" is enabled, otherwise 
@@ -270,7 +279,7 @@ class X4DataSetNew(X4BibMetaData):
     def append(self, other):
         raise NotImplementedError("Do we still need this?")
 
-    def to_csv(self, path_or_buf, **kw):
+    def to_csv(self, path_or_buf, index=False, **kw):
         """
         Thin wrapper around pandas's to_csv()
 
@@ -280,8 +289,10 @@ class X4DataSetNew(X4BibMetaData):
             If None, the result is returned as a string. If a non-binary file object is passed, it should be opened 
             with newline='', disabling universal newlines. If a binary file object is passed, mode might need to 
             contain a 'b'.
+
+        index: flag to control whether to display row labels
         """
-        return self.data.to_csv(path_or_buf, **kw)
+        return self.data.to_csv(path_or_buf, index=index, **kw)
 
     def to_markdown(self, showindex=False, **kw):
         """Simple markedown formatted version of the dataframe, uses to_tabulate()"""
@@ -340,7 +351,7 @@ class X4DataSetNew(X4BibMetaData):
         return self.data[k[0]][k[1]]
    
 
-class X4DataSet(X4BibMetaData):
+class X4DataSetOld(X4BibMetaData):
 
     def __init__(self, meta=None, common=None, reaction=None, monitor=None, data=None, pointer=None):
         # Initialize merged meta data, a needlessly complicated process

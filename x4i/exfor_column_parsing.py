@@ -39,30 +39,6 @@ from __future__ import print_function, division
 import math
 from functools import reduce
 
-energyUnitConversionFactors = {'GEV': 1.0e+3, 'MEV': 1.0, 'KEV': 1.0e-3, 'EV': 1.0e-6, 'MILLI-EV': 1.0e-9, 'MeV': 1.0,
-                               'K': 8.621738e-11}
-crossSectionUnitConversionFactors = {'B': 1.0, 'MB': 1.0e-3, 'MICRO-B': 1.0e-6, 'barns': 1.0}
-angularDistUnitConversionFactors = {'B/SR': 1.0, 'MB/SR': 1.0e-3, 'MICRO-B/SR': 1.0e-6, 'barns/SR': 1.0}
-sqrtEnCrossSectUnitConversionFactors = {'B*RT-EV': 1.0, 'MB*RT-EV': 1.0e-3}
-momUnitConversionFactors = {'GEV/C': 1.0, 'MEV/C': 1.0e-3}
-angleUnitConversionFactors = {'ADEG': 1.0, 'SR': 180.0 / math.pi, 'RAD': 180.0 / math.pi}
-noUnitConversionFactors = {'NO-DIM': 1.0, 'ARB-UNITS': 1.0, 'no-dim': 1.0}
-nubarUnitConversionFactors = {'PRT/FIS': 1.0}
-energyDistUnitConversionFactors = {'1/GEV': 1.0e-3, '1/MEV': 1.0, '1/KEV': 1.0e+3, '1/EV': 1.0e+6, '1/MILLI-EV': 1.0e+9,
-                                   '1/MeV': 1.0}
-
-energyUnits = list(energyUnitConversionFactors.keys())
-tempUnits = list(energyUnitConversionFactors.keys())
-crossSectionUnits = list(crossSectionUnitConversionFactors.keys())
-momUnits = list(momUnitConversionFactors.keys())
-percentUnits = ['PER-CENT']
-sqrtEnCrossSectUnits = list(sqrtEnCrossSectUnitConversionFactors.keys())
-noUnits = list(noUnitConversionFactors.keys())
-angUnits = list(angleUnitConversionFactors.keys())
-angDistUnits = list(angularDistUnitConversionFactors.keys())
-nubarUnits = list(nubarUnitConversionFactors.keys())
-energyDistUnits = list(energyDistUnitConversionFactors.keys())
-
 baseIncidentEnergyKeys = ['EN']
 baseOutgoingEnergyKeys = ['E']
 baseMomKeys = ['MOM']
@@ -125,11 +101,8 @@ def condenseColumn(x, y):
 
 
 class X4ColumnParser:
-    def __init__(self, match_labels=None, match_units=None, scale_factor=1.0, off_set=0.0):
+    def __init__(self, match_labels=None):
         self.match_labels = match_labels
-        self.match_units = match_units
-        self.scale_factor = scale_factor
-        self.off_set = off_set
 
     def isMatch(self, i, data):
         result = True
@@ -153,32 +126,6 @@ class X4ColumnParser:
             if self.isMatch(i, data):
                 match_list.append(i)
         return match_list
-
-    def getConversion(self, units):
-        """
-        Looks up the conversion factors to go from quoted units to canonical "MeV' 'barns' 'no-dim'
-        @type units: string
-        @param units: non-canonical units string
-        @rtype: float
-        @return: conversion factor
-        """
-        unit_map_of_maps = {
-            'MeV': energyUnitConversionFactors,
-            '1/MeV': energyDistUnitConversionFactors,
-            'barns': crossSectionUnitConversionFactors,
-            'degrees': angleUnitConversionFactors,
-            'B*RT-EV': sqrtEnCrossSectUnitConversionFactors,
-            'barns/ster': angularDistUnitConversionFactors,
-            'GeV/c': momUnitConversionFactors,
-            'ptcls/fis': nubarUnitConversionFactors,
-            'no-dim': noUnitConversionFactors
-            }
-        if not isinstance(units, str):
-            raise TypeError
-        for unit_map in unit_map_of_maps.items():
-            if units in unit_map[1]:
-                return unit_map[1][units], unit_map[0]
-        return 1.0, units
 
     def getColumn(self, icol, data):
         if not self.isMatch(icol, data):
@@ -619,101 +566,92 @@ class X4EinCMToLabColumnPair(X4IndependentColumnPair): pass
 # -----------------------------------
 incidentEnergyParserList = [
     X4IndependentColumnPair(
-        X4ColumnParser(match_labels=['EN' + s for s in variableSuffix], match_units=energyUnits),
-        X4ColumnParser(match_labels=['EN' + s for s in errorSuffix], match_units=energyUnits + percentUnits)
+        X4ColumnParser(match_labels=['EN' + s for s in variableSuffix]),
+        X4ColumnParser(match_labels=['EN' + s for s in errorSuffix])
     ),
     X4IndependentColumnPair(
-        X4ColumnParser(match_labels=['EN' + s for s in variableSuffix], match_units=energyUnits),
-        X4ColumnParser(match_labels=['EN' + s for s in resolutionFWSuffix], match_units=energyUnits + percentUnits,
-                       scale_factor=0.5)
+        X4ColumnParser(match_labels=['EN' + s for s in variableSuffix]),
+        X4ColumnParser(match_labels=['EN' + s for s in resolutionFWSuffix])
     ),
     X4IndependentColumnPair(
-        X4ColumnParser(match_labels=['EN' + s for s in variableSuffix], match_units=energyUnits),
-        X4ColumnParser(match_labels=['EN' + s for s in resolutionHWSuffix], match_units=energyUnits + percentUnits)
+        X4ColumnParser(match_labels=['EN' + s for s in variableSuffix]),
+        X4ColumnParser(match_labels=['EN' + s for s in resolutionHWSuffix])
     ),
     X4HighLowColumnPair(
-        X4ColumnParser(match_labels=['EN-MIN'], match_units=energyUnits),
-        X4ColumnParser(match_labels=['EN-MAX'], match_units=energyUnits)
+        X4ColumnParser(match_labels=['EN-MIN']),
+        X4ColumnParser(match_labels=['EN-MAX'])
     ),
     X4HighMidLowColumnPair(
-        X4ColumnParser(match_labels=['EN'] + baseMomKeys, match_units=energyUnits),
-        X4ColumnParser(match_labels=['-EN-ERR'], match_units=energyUnits),
-        X4ColumnParser(match_labels=['+EN-ERR'], match_units=energyUnits),
+        X4ColumnParser(match_labels=['EN'] + baseMomKeys),
+        X4ColumnParser(match_labels=['-EN-ERR']),
+        X4ColumnParser(match_labels=['+EN-ERR']),
     ),
     X4MissingErrorColumnPair(
-        X4ColumnParser(match_labels=['EN' + s for s in variableSuffix] + baseMomKeys,
-                       match_units=energyUnits + momUnits),
-        None,
+        X4ColumnParser(match_labels=['EN' + s for s in variableSuffix] + baseMomKeys), 
+        None
     ),
 ]
 
 incidentMomentumParserList = [
     X4HighLowColumnPair(
-        X4ColumnParser(match_labels=['MOM-MIN'], match_units=momUnits),
-        X4ColumnParser(match_labels=['MOM-MAX'], match_units=momUnits)
+        X4ColumnParser(match_labels=['MOM-MIN']),
+        X4ColumnParser(match_labels=['MOM-MAX'])
     ),
 ]
 
 outgoingEnergyParserList = [
     X4IndependentColumnPair(
-        X4ColumnParser(match_labels=['E' + s for s in variableSuffix], match_units=energyUnits),
-        X4ColumnParser(match_labels=['E' + s for s in errorSuffix], match_units=energyUnits + percentUnits)
+        X4ColumnParser(match_labels=['E' + s for s in variableSuffix]),
+        X4ColumnParser(match_labels=['E' + s for s in errorSuffix])
     ),
     X4IndependentColumnPair(
-        X4ColumnParser(match_labels=['E' + s for s in variableSuffix], match_units=energyUnits),
-        X4ColumnParser(match_labels=['E' + s for s in resolutionFWSuffix], match_units=energyUnits + percentUnits,
-                       scale_factor=0.5)
+        X4ColumnParser(match_labels=['E' + s for s in variableSuffix]),
+        X4ColumnParser(match_labels=['E' + s for s in resolutionFWSuffix])
     ),
     X4IndependentColumnPair(
-        X4ColumnParser(match_labels=['E' + s for s in variableSuffix], match_units=energyUnits),
-        X4ColumnParser(match_labels=['E' + s for s in resolutionHWSuffix], match_units=energyUnits + percentUnits)
+        X4ColumnParser(match_labels=['E' + s for s in variableSuffix]),
+        X4ColumnParser(match_labels=['E' + s for s in resolutionHWSuffix])
     ),
     X4HighLowColumnPair(
-        X4ColumnParser(match_labels=['E-MIN'], match_units=energyUnits),
-        X4ColumnParser(match_labels=['E-MAX'], match_units=energyUnits)
+        X4ColumnParser(match_labels=['E-MIN']),
+        X4ColumnParser(match_labels=['E-MAX'])
     ),
     X4HighMidLowColumnPair(
-        X4ColumnParser(match_labels=['E'] + baseMomKeys, match_units=energyUnits),
-        X4ColumnParser(match_labels=['-E-ERR'], match_units=energyUnits),
-        X4ColumnParser(match_labels=['+E-ERR'], match_units=energyUnits),
+        X4ColumnParser(match_labels=['E'] + baseMomKeys),
+        X4ColumnParser(match_labels=['-E-ERR']),
+        X4ColumnParser(match_labels=['+E-ERR']),
     ),
     X4MissingErrorColumnPair(
-        X4ColumnParser(match_labels=['E' + s for s in variableSuffix] + baseMomKeys,
-                       match_units=energyUnits + momUnits),
+        X4ColumnParser(match_labels=['E' + s for s in variableSuffix] + baseMomKeys),
         None,
     ),
 ]
 
 tempParserList = [
     X4IndependentColumnPair(
-        X4ColumnParser(match_labels=['KT' + s for s in variableSuffix + shiftSuffix],
-                       match_units=energyUnits + tempUnits),
-        X4ColumnParser(match_labels=['KT' + s for s in errorSuffix],
-                       match_units=energyUnits + tempUnits + percentUnits),
+        X4ColumnParser(match_labels=['KT' + s for s in variableSuffix + shiftSuffix]),
+        X4ColumnParser(match_labels=['KT' + s for s in errorSuffix]),
     ),
     X4IndependentColumnPair(
-        X4ColumnParser(match_labels=['KT' + s for s in variableSuffix], match_units=energyUnits + tempUnits),
-        X4ColumnParser(match_labels=['KT' + s for s in resolutionFWSuffix],
-                       match_units=energyUnits + tempUnits + percentUnits, scale_factor=0.5)
+        X4ColumnParser(match_labels=['KT' + s for s in variableSuffix]),
+        X4ColumnParser(match_labels=['KT' + s for s in resolutionFWSuffix])
     ),
     X4IndependentColumnPair(
-        X4ColumnParser(match_labels=['KT' + s for s in variableSuffix], match_units=energyUnits + tempUnits),
-        X4ColumnParser(match_labels=['KT' + s for s in resolutionHWSuffix],
-                       match_units=energyUnits + tempUnits + percentUnits)
+        X4ColumnParser(match_labels=['KT' + s for s in variableSuffix]),
+        X4ColumnParser(match_labels=['KT' + s for s in resolutionHWSuffix])
     ),
     X4HighLowColumnPair(
-        X4ColumnParser(match_labels=['KT-MIN'], match_units=energyUnits + tempUnits),
-        X4ColumnParser(match_labels=['KT-MAX'], match_units=energyUnits + tempUnits)
+        X4ColumnParser(match_labels=['KT-MIN']),
+        X4ColumnParser(match_labels=['KT-MAX'])
     ),
     X4HighMidLowColumnPair(
-        X4ColumnParser(match_labels=['KT'], match_units=energyUnits + tempUnits),
-        X4ColumnParser(match_labels=['-KT-ERR'], match_units=energyUnits + tempUnits),
-        X4ColumnParser(match_labels=['+KT-ERR'], match_units=energyUnits + tempUnits),
+        X4ColumnParser(match_labels=['KT']),
+        X4ColumnParser(match_labels=['-KT-ERR']),
+        X4ColumnParser(match_labels=['+KT-ERR']),
     ),
     X4MissingErrorColumnPair(
         X4ColumnParser(
-            match_labels=['TEMP' + s for s in variableSuffix + shiftSuffix] + ['KT' + s for s in variableSuffix],
-            match_units=energyUnits + tempUnits),
+            match_labels=['TEMP' + s for s in variableSuffix + shiftSuffix] + ['KT' + s for s in variableSuffix]),
     ),
 ]
 
@@ -722,113 +660,97 @@ spectrumArgumentParserList = tempParserList + incidentEnergyParserList
 csDataParserList = [
     X4IndependentColumnPair(
         X4ColumnParser(match_labels=reduce(lambda x, y: x + y,
-                                           [[b + s for s in variableSuffix + frameSuffix] for b in baseDataKeys]),
-                       match_units=crossSectionUnits + noUnits),
-        X4ColumnParser(match_labels=[b + '-ERR' for b in baseDataKeys] + dataTotalErrorKeys,
-                       match_units=crossSectionUnits + noUnits + percentUnits),
+                                           [[b + s for s in variableSuffix + frameSuffix] for b in baseDataKeys])),
+        X4ColumnParser(match_labels=[b + '-ERR' for b in baseDataKeys] + dataTotalErrorKeys),
     ),
     X4HighLowColumnPair(
-        X4ColumnParser(match_labels=[b + '-MIN' for b in baseDataKeys], match_units=crossSectionUnits + noUnits),
-        X4ColumnParser(match_labels=[b + '-MAX' for b in baseDataKeys], match_units=crossSectionUnits + noUnits),
+        X4ColumnParser(match_labels=[b + '-MIN' for b in baseDataKeys]),
+        X4ColumnParser(match_labels=[b + '-MAX' for b in baseDataKeys]),
     ),
     X4HighMidLowColumnPair(
-        X4ColumnParser(match_labels=baseDataKeys, match_units=crossSectionUnits + noUnits),
-        X4ColumnParser(match_labels=['-' + b + '-ERR' for b in baseDataKeys], match_units=crossSectionUnits + noUnits),
-        X4ColumnParser(match_labels=['+' + b + '-ERR' for b in baseDataKeys], match_units=crossSectionUnits + noUnits),
+        X4ColumnParser(match_labels=baseDataKeys),
+        X4ColumnParser(match_labels=['-' + b + '-ERR' for b in baseDataKeys]),
+        X4ColumnParser(match_labels=['+' + b + '-ERR' for b in baseDataKeys]),
     ),
     X4AddErrorBarsColumnPair(
-        X4ColumnParser(match_labels=baseDataKeys, match_units=crossSectionUnits + noUnits),
-        X4ColumnParser(match_labels=dataSystematicErrorKeys, match_units=crossSectionUnits + noUnits + percentUnits),
-        X4ColumnParser(match_labels=dataStatisticalErrorKeys, match_units=crossSectionUnits + noUnits + percentUnits),
+        X4ColumnParser(match_labels=baseDataKeys),
+        X4ColumnParser(match_labels=dataSystematicErrorKeys),
+        X4ColumnParser(match_labels=dataStatisticalErrorKeys),
     ),
     X4BarnsSqrtEColumnPair(
-        X4ColumnParser(match_labels=['DATA'], match_units=sqrtEnCrossSectUnits),
-        X4ColumnParser(match_labels=['DATA-ERR'], match_units=sqrtEnCrossSectUnits),
+        X4ColumnParser(match_labels=['DATA']),
+        X4ColumnParser(match_labels=['DATA-ERR']),
     ),
     X4MissingErrorColumnPair(
-        X4ColumnParser(match_labels=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix] for b in baseDataKeys]),
-                       match_units=crossSectionUnits + noUnits),
+        X4ColumnParser(match_labels=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix] for b in baseDataKeys])),
     ),
 ]
 
 nubarParserList = [
     X4IndependentColumnPair(
-        X4ColumnParser(match_labels=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix] for b in baseDataKeys]),
-                       match_units=nubarUnits + noUnits),
-        X4ColumnParser(match_labels=[b + '-ERR' for b in baseDataKeys] + dataTotalErrorKeys,
-                       match_units=nubarUnits + noUnits + percentUnits),
+        X4ColumnParser(match_labels=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix] for b in baseDataKeys])),
+        X4ColumnParser(match_labels=[b + '-ERR' for b in baseDataKeys] + dataTotalErrorKeys),
     ),
     X4HighLowColumnPair(
-        X4ColumnParser(match_labels=[b + '-MIN' for b in baseDataKeys], match_units=nubarUnits + noUnits),
-        X4ColumnParser(match_labels=[b + '-MAX' for b in baseDataKeys], match_units=nubarUnits + noUnits),
+        X4ColumnParser(match_labels=[b + '-MIN' for b in baseDataKeys]),
+        X4ColumnParser(match_labels=[b + '-MAX' for b in baseDataKeys]),
     ),
     X4HighMidLowColumnPair(
-        X4ColumnParser(match_labels=baseDataKeys, match_units=nubarUnits + noUnits),
-        X4ColumnParser(match_labels=['-' + b + '-ERR' for b in baseDataKeys], match_units=nubarUnits + noUnits),
-        X4ColumnParser(match_labels=['+' + b + '-ERR' for b in baseDataKeys], match_units=nubarUnits + noUnits),
+        X4ColumnParser(match_labels=baseDataKeys),
+        X4ColumnParser(match_labels=['-' + b + '-ERR' for b in baseDataKeys]),
+        X4ColumnParser(match_labels=['+' + b + '-ERR' for b in baseDataKeys]),
     ),
     X4AddErrorBarsColumnPair(
-        X4ColumnParser(match_labels=baseDataKeys, match_units=nubarUnits + noUnits),
-        X4ColumnParser(match_labels=dataSystematicErrorKeys, match_units=nubarUnits + noUnits + percentUnits),
-        X4ColumnParser(match_labels=dataStatisticalErrorKeys, match_units=nubarUnits + noUnits + percentUnits),
+        X4ColumnParser(match_labels=baseDataKeys),
+        X4ColumnParser(match_labels=dataSystematicErrorKeys),
+        X4ColumnParser(match_labels=dataStatisticalErrorKeys),
     ),
     X4MissingErrorColumnPair(
-        X4ColumnParser(match_labels=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix] for b in baseDataKeys]),
-                       match_units=nubarUnits + noUnits),
+        X4ColumnParser(match_labels=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix] for b in baseDataKeys])),
     ),
 ]
 
 angDistParserList = [
     X4IndependentColumnPair(
         X4ColumnParser(match_labels=reduce(lambda x, y: x + y,
-                                           [[b + s for s in variableSuffix + frameSuffix] for b in baseDataKeys]),
-                       match_units=angDistUnits + noUnits),
-        X4ColumnParser(match_labels=[b + '-ERR' for b in baseDataKeys] + dataTotalErrorKeys,
-                       match_units=angDistUnits + noUnits + percentUnits),
+                                           [[b + s for s in variableSuffix + frameSuffix] for b in baseDataKeys])),
+        X4ColumnParser(match_labels=[b + '-ERR' for b in baseDataKeys] + dataTotalErrorKeys),
     ),
     X4MissingErrorColumnPair(
         X4ColumnParser(match_labels=reduce(lambda x, y: x + y,
-                                           [[b + s for s in variableSuffix + frameSuffix] for b in baseDataKeys]),
-                       match_units=angDistUnits + noUnits),
+                                           [[b + s for s in variableSuffix + frameSuffix] for b in baseDataKeys])),
     ),
 ]
 
 energyDistParserList = [
     X4IndependentColumnPair(
         X4ColumnParser(match_labels=reduce(lambda x, y: x + y,
-                                           [[b + s for s in variableSuffix + frameSuffix] for b in baseDataKeys]),
-                       match_units=energyDistUnits + noUnits),
-        X4ColumnParser(match_labels=[b + '-ERR' for b in baseDataKeys] + dataTotalErrorKeys,
-                       match_units=energyDistUnits + noUnits + percentUnits),
+                                           [[b + s for s in variableSuffix + frameSuffix] for b in baseDataKeys])),
+        X4ColumnParser(match_labels=[b + '-ERR' for b in baseDataKeys] + dataTotalErrorKeys),
     ),
     X4MissingErrorColumnPair(
         X4ColumnParser(match_labels=reduce(lambda x, y: x + y,
-                                           [[b + s for s in variableSuffix + frameSuffix] for b in baseDataKeys]),
-                       match_units=energyDistUnits + noUnits),
+                                           [[b + s for s in variableSuffix + frameSuffix] for b in baseDataKeys])),
     ),
 ]
 
 angleParserList = [
     X4IndependentColumnPair(
         X4AngleColumnParser(match_labels=reduce(lambda x, y: x + y,
-                                                [[b + s for s in variableSuffix + frameSuffix] for b in baseAngleKeys]),
-                            match_units=angUnits + noUnits),
+                                                [[b + s for s in variableSuffix + frameSuffix] for b in baseAngleKeys])),
         X4AngleColumnParser(match_labels=reduce(lambda x, y: x + y,
                                                 [[b + s for s in errorSuffix + resolutionHWSuffix] for b in
-                                                 baseAngleKeys]), match_units=angUnits + noUnits + percentUnits)
+                                                 baseAngleKeys]))
     ),
     X4IndependentColumnPair(
         X4AngleColumnParser(match_labels=reduce(lambda x, y: x + y,
-                                                [[b + s for s in variableSuffix + frameSuffix] for b in baseAngleKeys]),
-                            match_units=angUnits + noUnits),
+                                                [[b + s for s in variableSuffix + frameSuffix] for b in baseAngleKeys])),
         X4AngleColumnParser(
-            match_labels=reduce(lambda x, y: x + y, [[b + s for s in resolutionFWSuffix] for b in baseAngleKeys]),
-            match_units=angUnits + noUnits + percentUnits, scale_factor=0.5)
+            match_labels=reduce(lambda x, y: x + y, [[b + s for s in resolutionFWSuffix] for b in baseAngleKeys]))
     ),
     X4MissingErrorColumnPair(
         X4AngleColumnParser(match_labels=reduce(lambda x, y: x + y,
-                                                [[b + s for s in variableSuffix + frameSuffix] for b in baseAngleKeys]),
-                            match_units=angUnits + noUnits),
+                                                [[b + s for s in variableSuffix + frameSuffix] for b in baseAngleKeys])),
     ),
 ]
 

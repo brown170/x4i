@@ -160,7 +160,7 @@ class TestX4Entry(TestCaseWithTableTests):
         ds = exfor_entry.X4Entry(self.entry).getDataSets()
         self.assertEqual(dict([(k, v.legend()) for (k, v) in ds.items()]),
                          {('E0783', 'E0783002', ' '): '(1983) K.Hatanaka, N.Matsuoka, et al.'})
-        ds[('E0783', 'E0783002', ' ')].csv('junk3.csv')
+        ds[('E0783', 'E0783002', ' ')].to_csv('junk3.csv')
         with open_for_reading_universal_newline_flag('junk3.csv') as csvfile:
             self.assertEqual(csvfile.readlines(),
                              ['EN,ANG-CM,DATA,DATA-ERR,FLAG\n', 'MEV,ADEG,NO-DIM,NO-DIM,NO-DIM\n',
@@ -222,7 +222,7 @@ class TestX4Entry(TestCaseWithTableTests):
                           ('12898', '12898002', '2'): '(1984) D.L.Smith, J.W.Meadows, et al.',
                           ('12898', '12898002', '1'): '(1984) D.L.Smith, J.W.Meadows, et al.',
                           ('12898', '12898003', '1'): '(1984) D.L.Smith, J.W.Meadows, et al.'})
-        ds[('12898', '12898003', '2')].csv('junk4.csv')
+        ds[('12898', '12898003', '2')].to_csv('junk4.csv')
         with open_for_reading_universal_newline_flag('junk4.csv') as junk4file:
             self.assertEqual(junk4file.readlines(), ['EN,EN-RSL-FW,ERR-S,MONIT,MONIT-ERR,DATA,ERR-T\n',
                                                      'MEV,MEV,PER-CENT,MB,PER-CENT,MB,PER-CENT\n',
@@ -292,7 +292,7 @@ class TestX4Entry(TestCaseWithTableTests):
                           ('12898', '12898002', '2'): '(1984) D.L.Smith, J.W.Meadows, et al.',
                           ('12898', '12898002', '1'): '(1984) D.L.Smith, J.W.Meadows, et al.',
                           ('12898', '12898003', '1'): '(1984) D.L.Smith, J.W.Meadows, et al.'})
-        ds[('12898', '12898003', '2')].csv('junk5.csv')
+        ds[('12898', '12898003', '2')].to_csv('junk5.csv')
         with open_for_reading_universal_newline_flag('junk5.csv') as csvfile:
             left = csvfile.readlines()
             right = ['Energy,Data,d(Energy),d(Data)\n',
