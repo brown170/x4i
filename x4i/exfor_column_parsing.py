@@ -89,6 +89,19 @@ class X4ColumnProcessor:
                 pass
         return self.get_dummy_column()
 
+    def get_uncertainty_helper(self, labels, value_column, as_list=True):
+        for label in labels:
+            try:
+                if self.data[label].pint.unit == "%":
+                    self.data[label] *= value_column
+                if as_list:
+                    return self.data[label].to_list()
+                else:
+                    return self.data[label]
+            except:
+                pass
+        return self.get_dummy_column()
+        
     def get_unit_helper(self, labels):
         for label in labels:
             try:
@@ -141,7 +154,8 @@ class X4IndependentColumnPair(X4ColumnProcessor):
         return self.get_column_helper(self.__labels_for_values)
 
     def get_uncertainties(self):
-        return self.get_column_helper(self.__labels_for_uncertainties)
+        return self.get_uncertainty_helper(self.__labels_for_uncertaintie, 
+                                           values_column=self.get_column_helper(self.__labels_for_values, as_list=False))
 
     def get_unit(self):
         return self.get_unit_helper(self.__labels_for_values)
@@ -174,7 +188,7 @@ class X4HighLowColumnPair(X4ColumnProcessor):
                        self.get_column_helper(self.__labels_for_lows))).to_list()
 
     def get_uncertainties(self):
-         return (0.5 * (self.get_column_helper(self.__labels_for_highs) - \
+        return (0.5 * (self.get_column_helper(self.__labels_for_highs) - \
                        self.get_column_helper(self.__labels_for_lows))).abs().to_list()
 
     def get_unit(self):
@@ -191,8 +205,12 @@ class X4HighMidLowColumnTriplet(X4ColumnProcessor):
         return self.get_column_helper(self.__labels_for_values)
 
     def get_uncertainties(self):
-         return (0.5 * (self.get_column_helper(self.__labels_for_highs) - \
-                        self.get_column_helper(self.__labels_for_lows))).abs().to_list()
+        highs = self.get_uncertainty_helper(self.__labels_for_highs, as_list=False,
+                                            values_column=self.get_column_helper(self.__labels_for_values, as_list=False))
+        lows = self.get_uncertainty_helper(self.__labels_for_lows, as_list=False,
+                                           values_column=self.get_column_helper(self.__labels_for_values, as_list=False))
+
+        return (0.5 * (highs-lows)).abs().to_list()
 
     def get_unit(self):
         return self.get_unit_helper(self.__labels_for_values)
