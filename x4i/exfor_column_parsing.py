@@ -177,104 +177,25 @@ class X4HighLowColumnPair(X4ColumnProcessor):
          return (0.5 * (self.get_column_helper(self.__labels_for_highs) - \
                        self.get_column_helper(self.__labels_for_lows))).abs().to_list()
 
+    def get_unit(self):
+        return self.get_unit_helper(self.__labels_for_highs)
+
 
 class X4HighMidLowColumnTriplet(X4ColumnProcessor):
-    def __init__(self, column1Parser, column2Parser, column3Parser):
-        self.column1Parser = column1Parser  # middle
-        self.column2Parser = column2Parser  # -err
-        self.column3Parser = column3Parser  # +err
-        self.icol1 = -1
-        self.icol2 = -1
-        self.icol3 = -1
+    def __init__(self, labels_for_values, labels_for_highs, labels_for_lows):
+        self.__labels_for_values = labels_for_values  # middle
+        self.__labels_for_highs = labels_for_highs  # +err
+        self.__labels_for_lows = labels_for_lows  # -err
 
-    def set_icols(self, data):
-        self.icol1 = self.column1Parser.firstMatch(data)
-        self.icol2 = self.column2Parser.firstMatch(data)
-        self.icol3 = self.column3Parser.firstMatch(data)
+    def get_values(self):
+        return self.get_column_helper(self.__labels_for_values)
 
-    def isMatch(self, data):
-        self.set_icols(data)
-        return self.icol1 >= 0 and (self.icol2 >= 0 or self.icol3 >= 0)
+    def get_uncertainties(self):
+         return (0.5 * (self.get_column_helper(self.__labels_for_highs) - \
+                        self.get_column_helper(self.__labels_for_lows))).abs().to_list()
 
-    def getValue(self, data):
-        if not self.isMatch(data):
-            return self.getDummyColumn(data)
-        self.set_icols(data)
-        if self.column1Parser is not None:
-            col1 = self.column1Parser.getColumn(self.icol1, data)
-        else:
-            col1 = self.getDummyColumn(data)
-        if self.column2Parser is not None:
-            col2 = self.column2Parser.getColumn(self.icol2, data)
-        else:
-            col2 = self.getDummyColumn(data)
-        if self.column3Parser is not None:
-            col3 = self.column3Parser.getColumn(self.icol3, data)
-        else:
-            col3 = self.getDummyColumn(data)
-        ans = [None, None]
-        for i in [0, 1]:
-            for j in [col1[i], col2[i], col3[i]]:
-                if j is not None:
-                    ans[i] = j
-        for i in range(2, data.numrows() + 2):
-            try:
-                x1 = col1[i]
-            except:
-                x1 = 0.0
-            try:
-                x2 = col2[i]
-            except:
-                x2 = 0.0
-            try:
-                x3 = col3[i]
-            except:
-                x3 = 0.0
-            if x1 is None or x2 is None or x3 is None:
-                ans.append(None)
-            else:
-                ans.append(0.5 * ((x1 - x2) + (x1 + x3)))
-        return ans
-
-    def getError(self, data):
-        if not self.isMatch(data):
-            return self.getDummyColumn(data)
-        self.set_icols(data)
-        if self.column1Parser is not None:
-            col1 = self.column1Parser.getColumn(self.icol1, data)
-        else:
-            col1 = self.getDummyColumn(data)
-        if self.column2Parser is not None:
-            col2 = self.column2Parser.getColumn(self.icol2, data)
-        else:
-            col2 = self.getDummyColumn(data)
-        if self.column3Parser is not None:
-            col3 = self.column3Parser.getColumn(self.icol3, data)
-        else:
-            col3 = self.getDummyColumn(data)
-        ans = [None, None]
-        for i in [0, 1]:
-            for j in [col1[i], col2[i], col3[i]]:
-                if j is not None:
-                    ans[i] = j
-        for i in range(2, data.numrows() + 2):
-            try:
-                x1 = col1[i]
-            except:
-                x1 = 0.0
-            try:
-                x2 = col2[i]
-            except:
-                x2 = 0.0
-            try:
-                x3 = col3[i]
-            except:
-                x3 = 0.0
-            if x1 is None or x2 is None or x3 is None:
-                ans.append(None)
-            else:
-                ans.append(abs(0.5 * ((x1 - x2) - (x1 + x3))))
-        return [absOrNone(x) for x in ans]
+    def get_unit(self):
+        return self.get_unit_helper(self.__labels_for_values)
 
 
 class X4AddErrorBarsColumnPair(X4ColumnProcessor):
@@ -329,74 +250,6 @@ class X4AddErrorBarsColumnPair(X4ColumnProcessor):
         return [absOrNone(x) for x in ans]
 
 
-class X4BarnsSqrtEColumnPair(X4ColumnProcessor):
-    def __init__(self, column2Parser, column3Parser):
-        self.column2Parser = column2Parser  # CS
-        self.column3Parser = column3Parser  # dCS
-        self.icol2 = -1
-        self.icol3 = -1
-
-    def energyColumn(self, data):
-        return reduce(condenseColumn, [i.getValue(data) for i in incidentEnergyParserList])
-
-    def set_icols(self, data):
-        self.icol2 = self.column2Parser.firstMatch(data)
-        self.icol3 = self.column3Parser.firstMatch(data)
-
-    def isMatch(self, data):
-        self.set_icols(data)
-        return self.icol2 >= 0
-
-    def getValue(self, data):
-        if not self.isMatch(data):
-            return self.getDummyColumn(data)
-        self.set_icols(data)
-        col1 = self.energyColumn(data)
-        if self.column2Parser is not None:
-            col2 = self.column2Parser.getColumn(self.icol2, data)
-        else:
-            col2 = self.getDummyColumn(data)
-        ans = [col2[0], 'barns']
-        for i in range(2, data.numrows() + 2):
-            try:
-                x1 = col1[i]
-            except:
-                x1 = 0.0
-            try:
-                x2 = col2[i]
-            except:
-                x2 = 0.0
-            if x1 is None or x2 is None:
-                ans.append(None)
-            else:
-                ans.append(x2 / math.sqrt(x1 * 1e6))
-        return ans
-
-    def getError(self, data):
-        if not self.isMatch(data): return self.getDummyColumn(data)
-        self.set_icols(data)
-        col1 = self.energyColumn(data)
-        if self.column3Parser is not None:
-            col3 = self.column3Parser.getColumn(self.icol3, data)
-        else:
-            col3 = self.getDummyColumn(data)
-        ans = [col3[0], 'barns']
-        for i in range(2, data.numrows() + 2):
-            try:
-                x1 = col1[i]
-            except:
-                x1 = None
-            try:
-                x3 = col3[i]
-            except:
-                x3 = 0.0
-            if x1 is None or x3 is None:
-                ans.append(None)
-            else:
-                ans.append(x3 / math.sqrt(x1 * 1e6))
-        return [absOrNone(x) for x in ans]
-
-
 # -----------------------------------
 # Below are lists of parsers ... insert detailed explanation here
 # -----------------------------------
@@ -418,9 +271,9 @@ incidentEnergyParserList = [
         labels_for_lows=['EN-MAX']
     ),
     X4HighMidLowColumnTriplet(
-        X4ColumnParser(match_labels=['EN'] + baseMomKeys),
-        X4ColumnParser(match_labels=['-EN-ERR']),
-        X4ColumnParser(match_labels=['+EN-ERR']),
+        labels_for_values=['EN'] + baseMomKeys,
+        labels_for_highs=['-EN-ERR'],
+        labels_for_lows=['+EN-ERR']
     ),
     X4MissingErrorColumnPair(labels_for_values=['EN' + s for s in variableSuffix] + baseMomKeys),
 ]
@@ -450,9 +303,9 @@ outgoingEnergyParserList = [
         labels_for_lows=['E-MAX']
     ),
     X4HighMidLowColumnTriplet(
-        X4ColumnParser(match_labels=['E'] + baseMomKeys),
-        X4ColumnParser(match_labels=['-E-ERR']),
-        X4ColumnParser(match_labels=['+E-ERR']),
+        labels_for_values=['E'] + baseMomKeys,
+        labels_for_highs=['-E-ERR'],
+        labels_for_lows=['+E-ERR']
     ),
     X4MissingErrorColumnPair(labels_for_values=['E' + s for s in variableSuffix] + baseMomKeys),
 ]
@@ -475,9 +328,9 @@ tempParserList = [
         labels_for_lows=['KT-MAX']
     ),
     X4HighMidLowColumnTriplet(
-        X4ColumnParser(match_labels=['KT']),
-        X4ColumnParser(match_labels=['-KT-ERR']),
-        X4ColumnParser(match_labels=['+KT-ERR']),
+        labels_for_values=['KT'],
+        labels_for_highs=['-KT-ERR'],
+        labels_for_lows=['+KT-ERR']
     ),
     X4MissingErrorColumnPair(
         labels_for_values=['TEMP' + s for s in variableSuffix + shiftSuffix] + ['KT' + s for s in variableSuffix]
@@ -496,9 +349,9 @@ csDataParserList = [
         labels_for_lows=[b + '-MAX' for b in baseDataKeys],
     ),
     X4HighMidLowColumnTriplet(
-        X4ColumnParser(match_labels=baseDataKeys),
-        X4ColumnParser(match_labels=['-' + b + '-ERR' for b in baseDataKeys]),
-        X4ColumnParser(match_labels=['+' + b + '-ERR' for b in baseDataKeys]),
+        labels_for_values=baseDataKeys,
+        labels_for_highs=['-' + b + '-ERR' for b in baseDataKeys],
+        labels_for_lows=['+' + b + '-ERR' for b in baseDataKeys]
     ),
     X4AddErrorBarsColumnPair(
         X4ColumnParser(match_labels=baseDataKeys),
@@ -520,9 +373,9 @@ nubarParserList = [
         labels_for_lows=[b + '-MAX' for b in baseDataKeys],
     ),
     X4HighMidLowColumnTriplet(
-        X4ColumnParser(match_labels=baseDataKeys),
-        X4ColumnParser(match_labels=['-' + b + '-ERR' for b in baseDataKeys]),
-        X4ColumnParser(match_labels=['+' + b + '-ERR' for b in baseDataKeys]),
+        labels_for_values=baseDataKeys,
+        labels_for_highs=['-' + b + '-ERR' for b in baseDataKeys],
+        labels_for_lows=['+' + b + '-ERR' for b in baseDataKeys]
     ),
     X4AddErrorBarsColumnPair(
         X4ColumnParser(match_labels=baseDataKeys),
