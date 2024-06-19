@@ -199,15 +199,21 @@ class X4HighMidLowColumnTriplet(X4ColumnProcessor):
 
 
 class X4AddErrorBarsColumnPair(X4ColumnProcessor):
-    def getValue(self, data):
-        if not self.isMatch(data):
-            return self.getDummyColumn(data)
-        self.set_icols(data)
-        if self.column1Parser is not None:
-            col1 = self.column1Parser.getColumn(self.icol1, data)
-        else:
-            col1 = self.getDummyColumn(data)
-        return col1
+    def __init__(self, labels_for_values, labels_for_systematic_uncertainties, labels_for_statistical_uncertainties):
+        self.__labels_for_values = labels_for_values 
+        self.__labels_for_systematic_uncertainties = labels_for_systematic_uncertainties 
+        self.__labels_for_statistical_uncertainties = labels_for_statistical_uncertainties 
+
+    def get_values(self):
+        return self.get_column_helper(self.__labels_for_values)
+
+    def get_uncertainties(self):
+        raise NotImplementedError()
+        return (0.5 * (self.get_column_helper(self.__labels_for_highs) - \
+                       self.get_column_helper(self.__labels_for_lows))).abs().to_list()
+
+    def get_unit(self):
+        return self.get_unit_helper(self.__labels_for_values)
 
     def getError(self, data):
         if not self.isMatch(data):
@@ -354,9 +360,9 @@ csDataParserList = [
         labels_for_lows=['+' + b + '-ERR' for b in baseDataKeys]
     ),
     X4AddErrorBarsColumnPair(
-        X4ColumnParser(match_labels=baseDataKeys),
-        X4ColumnParser(match_labels=dataSystematicErrorKeys),
-        X4ColumnParser(match_labels=dataStatisticalErrorKeys),
+        labels_for_values=baseDataKeys,
+        labels_for_systematic_uncertainties=dataSystematicErrorKeys,
+        labels_for_statistical_uncertainties=dataStatisticalErrorKeys
     ),
     X4MissingErrorColumnPair(
         labels_for_values=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix] for b in baseDataKeys]),
@@ -370,7 +376,7 @@ nubarParserList = [
     ),
     X4HighLowColumnPair(
         labels_for_highs=[b + '-MIN' for b in baseDataKeys],
-        labels_for_lows=[b + '-MAX' for b in baseDataKeys],
+        labels_for_lows=[b + '-MAX' for b in baseDataKeys]
     ),
     X4HighMidLowColumnTriplet(
         labels_for_values=baseDataKeys,
@@ -378,9 +384,9 @@ nubarParserList = [
         labels_for_lows=['+' + b + '-ERR' for b in baseDataKeys]
     ),
     X4AddErrorBarsColumnPair(
-        X4ColumnParser(match_labels=baseDataKeys),
-        X4ColumnParser(match_labels=dataSystematicErrorKeys),
-        X4ColumnParser(match_labels=dataStatisticalErrorKeys),
+        labels_for_values=baseDataKeys,
+        labels_for_systematic_uncertainties=dataSystematicErrorKeys,
+        labels_for_statistical_uncertainties=dataStatisticalErrorKeys
     ),
     X4MissingErrorColumnPair(
         labels_for_values=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix] for b in baseDataKeys]),
