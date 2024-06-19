@@ -71,6 +71,7 @@ from .exfor_utilities import unique, COMMENTSTRING
 from .exfor_units import *
 
 
+pint_pandas.PintType.ureg = exfor_unit_registry
 pint_pandas.PintType.ureg.default_format = "P~"  # by default, display units in non-silly ways
 
 

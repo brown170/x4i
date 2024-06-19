@@ -142,8 +142,8 @@ class TestTheWorks(TestCaseWithTableTests):
                                      '#  Reference: Nuclear Instrum.and Methods in Physics Res. 217, 397 (1983)\n'
                                      '#  Subent:    E0783002\n'
                                      '#  Reaction:  Analyzing power Spin-polarization probability d/dA for 1H(d,Elastic)1H \n'
-                                     '#        EN            ANG-CM        DATA          DATA-ERR      FLAG          \n'
-                                     '#        MEV           ADEG          NO-DIM        NO-DIM        NO-DIM        \n'
+                                     '#           EN    ANG-CM       DATA  DATA-ERR    FLAG\n'
+                                     '#          MeV       deg\n'
                                      '        56.0          30.712        -0.002211     None          1.0           \n'
                                      '        56.0          38.727        -0.005861     0.00821       None          \n'
                                      '        56.0          46.135        0.01022       None          1.0           \n'
@@ -185,7 +185,7 @@ class TestTheWorks(TestCaseWithTableTests):
 #  Reaction:  Cross section for 239Pu(n,2n)238Pu
 #  Monitor(s): ((79-AU-197(N,2N)79-AU-196,SIG), 'Flux monitor. Neutron energy determined using 54Fe(n,p) reaction.', None)
 #        Energy        Data          d(Data)
-#        MeV           barns         barns
+#        MeV           b         b
         13.8          0.228         0.006384
         14.0          0.219         0.007884
         14.8          0.214         0.002996'''.strip())
@@ -199,7 +199,7 @@ class TestTheWorks(TestCaseWithTableTests):
 #  Subent:    21971003
 #  Reaction:  Cross section for 239Pu(n,2n)238Pu
 #        Energy        Data          d(Energy)     d(Data)
-#        MeV           barns         MeV           barns
+#        MeV           b         MeV           b
         6.49          0.024         0.085         0.063
         7.01          0.049         0.08          0.05
         7.52          0.054         0.075         0.058
@@ -226,7 +226,7 @@ class TestTheWorks(TestCaseWithTableTests):
 #  Reaction:  Cross section for 239Pu(n,2n)238Pu
 #  Monitor(s): ((94-PU-239(N,F),SIG), '1917MB+-8PERCENT  AT 6.5MEV 2030MB+-8.5PERCENT AT 7.1MEV 2213MB+-9PERCENT   AT 8.0MEV 2252MB+-9.5PERCENT AT 9.0MEV', None)
 #        Energy        Data          d(Data)
-#        MeV           barns         barns
+#        MeV           b         b
         6.5           0.419         0.053
         7.1           0.451         0.06
         8.0           0.49          0.057
@@ -242,7 +242,7 @@ class TestTheWorks(TestCaseWithTableTests):
 #  Subent:    14129002
 #  Reaction:  Cross section for 239Pu(n,2n)238Pu
 #        Energy        Data          d(Energy)     d(Data)
-#        MeV           barns         MeV           barns
+#        MeV           b         MeV           b
         6.481         0.1009        0.2239        0.03081
         6.942         0.1261        0.1894        0.02015
         7.49          0.1525        0.2412        0.01422
@@ -270,7 +270,7 @@ class TestTheWorks(TestCaseWithTableTests):
                                      '#  Reaction:  Differential c/s with respect to angle for 27Al(n,Elastic)27Al \n'
                                      '#  Frame:     Lab\n'
                                      '#        EN            EN-RSL        ANG-RSL       COS           DATA          DATA-ERR      \n'
-                                     '#        MEV           MEV           ADEG          NO-DIM        MB/SR         MB/SR         \n'
+                                     '#        MeV           MeV           deg                  mb/sr         mb/sr         \n'
                                      '        5.0           0.1           10.0          0.866         290.0         30.0          \n'
                                      '        5.0           0.1           10.0          0.766         212.0         10.0          \n'
                                      '        5.0           0.1           10.0          0.643         140.0         10.0          \n'
