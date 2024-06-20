@@ -160,12 +160,22 @@ class X4IndependentColumnPair(X4ColumnProcessor):
     def get_values(self):
         return self.get_column_helper(self.__labels_for_values)
 
-    def get_uncertainties(self):
+    def get_uncertainties(self, as_list=True):
         return self.get_uncertainty_helper(labels=self.__labels_for_uncertainties, 
-                                           value_column=self.get_column_helper(self.__labels_for_values, as_list=False))
+                                           value_column=self.get_column_helper(self.__labels_for_values, as_list=False), 
+                                           as_list=as_list)
 
     def get_unit(self):
         return self.get_unit_helper(self.__labels_for_values)
+
+
+class X4IndependentColumnPair_ResolutionFW(X4IndependentColumnPair):
+    def get_uncertainties(self):
+        return (X4IndependentColumnPair.get_uncertainties(self, as_list=False)/2.0).to_list()
+
+
+class X4IndependentColumnPair_ResolutionHW(X4IndependentColumnPair):
+    pass # already has correct scaling for uncertainties
 
 
 class X4ConstantPercentColumnPair(X4MissingErrorColumnPair):
@@ -226,7 +236,6 @@ class X4HighMidLowColumnTriplet(X4ColumnProcessor):
                                             values_column=self.get_column_helper(self.__labels_for_values, as_list=False))
         lows = self.get_uncertainty_helper(self.__labels_for_lows, as_list=False,
                                            values_column=self.get_column_helper(self.__labels_for_values, as_list=False))
-
         return (0.5 * (highs-lows)).abs().to_list()
 
     def get_unit(self):
@@ -303,11 +312,11 @@ incidentEnergyParserList = [
         labels_for_values=['EN' + s for s in variableSuffix],
         labels_for_uncertainties=['EN' + s for s in errorSuffix]
     ),
-    X4IndependentColumnPair(
+    X4IndependentColumnPair_ResolutionFW(
         labels_for_values=['EN' + s for s in variableSuffix],
         labels_for_uncertainties=['EN' + s for s in resolutionFWSuffix]
     ),
-    X4IndependentColumnPair(
+    X4IndependentColumnPair_ResolutionHW(
         labels_for_values=['EN' + s for s in variableSuffix],
         labels_for_uncertainties=['EN' + s for s in resolutionHWSuffix]
     ),

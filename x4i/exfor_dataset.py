@@ -329,17 +329,12 @@ class X4DataSet(X4BibMetaData):
                 uncertainties = best_parser.get_uncertainties()
                 if uncertainties is not None:
                     _columns["d(%s)" % _label] = pandas.Series(uncertainties, dtype="pint[%s]" % best_parser.get_unit())
-                
-            # We are done if we have real values 
-            #if values is not None:
-            #    if failIfMissingErrors and uncertainties is None:
-            #        raise Exception("No uncertainties")
-            #    break
 
         # Save the data in the results
         for col in _columns:
             results.data[col] = _columns[col]
         
+        # Make all the columns if required
         if makeAllColumns:
             pass 
 
@@ -351,9 +346,11 @@ class X4DataSet(X4BibMetaData):
                 except:
                     pass
 
-        # Sort the columns
+        # Sort the columns & make sure we have all the ones required
         if columnNames is not None:
-            temp_columnNames = [c for c in columnNames if c in results.data]
+            temp_columnNames = [c for c in columnNames if c in results.data]                        
+            if failIfMissingErrors and columnNames != temp_columnNames:
+                raise Exception("No uncertainties on one or more columns")
             # How to sort columns in pandas:
             # If:      df.columns.tolist() = ['0', '1', '2', '3', 'mean']
             # Do this: df = df[['mean', '0', '1', '2', '3']]
@@ -682,7 +679,8 @@ class X4CrossSectionDataSet(X4DataSet):
         X4DataSet.__init__(self, meta, common, reaction, monitor, data, pointer)
 
     def getSimplified(self, makeAllColumns=False, failIfMissingErrors=False):
-        return X4DataSet.getSimplified(self, parserMap={'Energy': incidentEnergyParserList, 'Data': csDataParserList},
+        return X4DataSet.getSimplified(self, 
+                                       parserMap={'Energy': incidentEnergyParserList, 'Data': csDataParserList},
                                        columnNames=['Energy', 'Data', 'd(Energy)', 'd(Data)'], 
                                        makeAllColumns=makeAllColumns,
                                        failIfMissingErrors=failIfMissingErrors)
@@ -693,8 +691,10 @@ class X4NubarDataSet(X4DataSet):
         X4DataSet.__init__(self, meta, common, reaction, monitor, data, pointer)
 
     def getSimplified(self, makeAllColumns=False, failIfMissingErrors=False):
-        return X4DataSet.getSimplified(self, parserMap={'Energy': incidentEnergyParserList, 'Data': nubarParserList},
-                                       columnNames=['Energy', 'Data', 'd(Energy)', 'd(Data)'], makeAllColumns=makeAllColumns,
+        return X4DataSet.getSimplified(self, 
+                                       parserMap={'Energy': incidentEnergyParserList, 'Data': nubarParserList},
+                                       columnNames=['Energy', 'Data', 'd(Energy)', 'd(Data)'], 
+                                       makeAllColumns=makeAllColumns,
                                        failIfMissingErrors=failIfMissingErrors)
 
 
@@ -704,8 +704,10 @@ class X4SpectrumAveCrossSectionDataSet(X4DataSet):
         self.spectrum = None
 
     def getSimplified(self, makeAllColumns=False, failIfMissingErrors=False):
-        return X4DataSet.getSimplified(self, parserMap={'Energy': spectrumArgumentParserList, 'Data': csDataParserList},
-                                       columnNames=['Energy', 'Data', 'd(Energy)', 'd(Data)'], makeAllColumns=makeAllColumns,
+        return X4DataSet.getSimplified(self, 
+                                       parserMap={'Energy': spectrumArgumentParserList, 'Data': csDataParserList},
+                                       columnNames=['Energy', 'Data', 'd(Energy)', 'd(Data)'], 
+                                       makeAllColumns=makeAllColumns,
                                        failIfMissingErrors=failIfMissingErrors)
 
 
@@ -740,9 +742,12 @@ class X4AngularDistributionDataSet(X4DataSet):
         return out
 
     def getSimplified(self, makeAllColumns=False, failIfMissingErrors=False):
-        return X4DataSet.getSimplified(self, parserMap={'Energy': incidentEnergyParserList, 'Angle': angleParserList,
-                                                        'Data': angDistParserList},
-                                       columnNames=['Energy', 'Angle', 'Data', 'd(Energy)', 'd(Angle)', 'd(Data)'], makeAllColumns=makeAllColumns,
+        return X4DataSet.getSimplified(self, 
+                                       parserMap={'Energy': incidentEnergyParserList, 
+                                                  'Angle': angleParserList,
+                                                  'Data': angDistParserList},
+                                       columnNames=['Energy', 'Angle', 'Data', 'd(Energy)', 'd(Angle)', 'd(Data)'], 
+                                       makeAllColumns=makeAllColumns,
                                        failIfMissingErrors=failIfMissingErrors)
 
 
@@ -762,8 +767,10 @@ class X4EnergyDistributionDataSet(X4DataSet):
 
     def getSimplified(self, makeAllColumns=False, failIfMissingErrors=False):
         return X4DataSet.getSimplified(self,
-                                       parserMap={'Energy': incidentEnergyParserList, "E'": outgoingEnergyParserList,
-                                                  'Data': energyDistParserList}, columnNames=['Energy', "E'", 'Data'],
+                                       parserMap={'Energy': incidentEnergyParserList, 
+                                                  "Eout": outgoingEnergyParserList,
+                                                  'Data': energyDistParserList}, 
+                                       columnNames=['Energy', "Eout", 'Data', 'd(Energy)', "d(Eout)", 'd(Data)'],
                                        makeAllColumns=makeAllColumns, failIfMissingErrors=failIfMissingErrors)
 
 
