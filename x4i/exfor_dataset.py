@@ -319,6 +319,7 @@ class X4DataSet(X4BibMetaData):
                         raise Exception("No uncertainties")
                     break
 
+        # Save the data in the results
         for col in _columns:
             results.data[col] = _columns[col]
         
@@ -676,7 +677,7 @@ class X4NubarDataSet(X4DataSet):
 
     def getSimplified(self, makeAllColumns=False, failIfMissingErrors=False):
         return X4DataSet.getSimplified(self, parserMap={'Energy': incidentEnergyParserList, 'Data': nubarParserList},
-                                       columnNames=['Energy', 'Data'], makeAllColumns=makeAllColumns,
+                                       columnNames=['Energy', 'Data', 'd(Energy)', 'd(Data)'], makeAllColumns=makeAllColumns,
                                        failIfMissingErrors=failIfMissingErrors)
 
 
@@ -687,7 +688,7 @@ class X4SpectrumAveCrossSectionDataSet(X4DataSet):
 
     def getSimplified(self, makeAllColumns=False, failIfMissingErrors=False):
         return X4DataSet.getSimplified(self, parserMap={'Energy': spectrumArgumentParserList, 'Data': csDataParserList},
-                                       columnNames=['Energy', 'Data'], makeAllColumns=makeAllColumns,
+                                       columnNames=['Energy', 'Data', 'd(Energy)', 'd(Data)'], makeAllColumns=makeAllColumns,
                                        failIfMissingErrors=failIfMissingErrors)
 
 
@@ -724,7 +725,7 @@ class X4AngularDistributionDataSet(X4DataSet):
     def getSimplified(self, makeAllColumns=False, failIfMissingErrors=False):
         return X4DataSet.getSimplified(self, parserMap={'Energy': incidentEnergyParserList, 'Angle': angleParserList,
                                                         'Data': angDistParserList},
-                                       columnNames=['Energy', 'Angle', 'Data'], makeAllColumns=makeAllColumns,
+                                       columnNames=['Energy', 'Angle', 'Data', 'd(Energy)', 'd(Angle)', 'd(Data)'], makeAllColumns=makeAllColumns,
                                        failIfMissingErrors=failIfMissingErrors)
 
 

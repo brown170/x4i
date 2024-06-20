@@ -1056,8 +1056,8 @@ class TestTheWorks(TestCaseWithTableTests):
 #  Reference: Atomkernenergie 26, 76 (1975)
 #  Subent:    20576003
 #  Reaction:  Relative data Diff. fiss. neutron multiplicity d/dE(n) for 239Pu(n,Fission) Reference quantity not given
-#        EN            EN-RSL        E             E-RSL         DATA          DATA-ERR      ERR-1
-#        KEV           KEV           MEV           MEV           ARB-UNITS     ARB-UNITS     PER-CENT
+#           EN    EN-RSL      E    E-RSL        DATA    DATA-ERR  ERR-1
+#          keV       keV    MeV      MeV    arb_unit    arb_unit  %
         215.0         32.0          0.28          0.01          66.8          2.5           2.0
         215.0         32.0          0.31          0.01          70.2          2.4           2.0
         215.0         32.0          0.34          0.01          65.1          2.2           2.0
@@ -1250,8 +1250,8 @@ class TestTheWorks(TestCaseWithTableTests):
 #  Reference: Atomkernenergie 26, 76 (1975)
 #  Subent:    20576003
 #  Reaction:  Relative data Diff. fiss. neutron multiplicity d/dE(n) for 239Pu(n,Fission) Reference quantity not given
-#        EN            EN-RSL        E             E-RSL         DATA          DATA-ERR      ERR-1
-#        KEV           KEV           MEV           MEV           ARB-UNITS     ARB-UNITS     PER-CENT
+#           EN    EN-RSL      E    E-RSL        DATA    DATA-ERR  ERR-1
+#          keV       keV    MeV      MeV    arb_unit    arb_unit  %
         215.0         32.0          0.28          0.01          66.8          2.5           2.0
         215.0         32.0          0.31          0.01          70.2          2.4           2.0
         215.0         32.0          0.34          0.01          65.1          2.2           2.0

@@ -294,7 +294,7 @@ class TestX4Entry(TestCaseWithTableTests):
         with open_for_reading_universal_newline_flag('junk5.csv') as csvfile:
             left = csvfile.readlines()
             right = ['Energy,Data,d(Energy),d(Data)\n',
-                     'MeV,barns,MeV,barns\n', '4.643,0.002236,0.138,0.000140868\n',
+                     'MeV,b/sr,MeV,b/sr\n', '4.643,0.002236,0.138,0.000140868\n',
                      '4.893,0.002853,0.124,0.000202563\n', '5.139,0.00325,0.1055,0.00020475\n',
                      '5.374,0.003642,0.097,0.000222162\n', '5.6,0.004243,0.09,0.000280038\n',
                      '5.819,0.005041,0.087,0.000322624\n', '5.822,0.005228,0.0835,0.000334592\n',
