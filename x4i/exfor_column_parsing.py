@@ -35,6 +35,7 @@
 ################################################################################
 import math
 from functools import reduce
+from .exfor_units import exfor_unit_registry
 
 baseIncidentEnergyKeys = ['EN']
 baseOutgoingEnergyKeys = ['E']
@@ -80,26 +81,33 @@ class X4ColumnProcessor:
 
     def get_column_helper(self, labels, as_list=True):
         for label in labels:
-            try:
+            if label in self.data:
+            #try:
+                #print(self.data[label])
                 if as_list:
                     return self.data[label].to_list()
                 else:
                     return self.data[label]
-            except:
-                pass
-        raise KeyError("none of %s found" % str(labels))
+            #except:
+            #    pass
+        #raise KeyError("none of %s found" % str(labels))
 
     def get_uncertainty_helper(self, labels, value_column, as_list=True):
+        #print(labels)
+        #print(value_column)
+        #print(self.data.columns)
         for label in labels:
-            try:
-                if self.data[label].pint.unit == "%":
+            if label in self.data:
+            #try:
+                #print("here unit", self.data[label].pint.units)
+                if self.data[label].pint.units == exfor_unit_registry.percent:
                     self.data[label] *= value_column
                 if as_list:
                     return self.data[label].to_list()
                 else:
                     return self.data[label]
-            except:
-                pass
+            #except:
+            #    pass
         
     def get_unit_helper(self, labels):
         for label in labels:
@@ -145,13 +153,15 @@ class X4IndependentColumnPair(X4ColumnProcessor):
         X4ColumnProcessor.__init__(self)
         self.__labels_for_values = labels_for_values
         self.__labels_for_uncertainties = labels_for_uncertainties
+        #print(self.__labels_for_values, self.__labels_for_uncertainties)
 
     def get_values(self):
         return self.get_column_helper(self.__labels_for_values)
 
     def get_uncertainties(self):
-        return self.get_uncertainty_helper(self.__labels_for_uncertainties, 
-                                           values_column=self.get_column_helper(self.__labels_for_values, as_list=False))
+        #print('inside here')
+        return self.get_uncertainty_helper(labels=self.__labels_for_uncertainties, 
+                                           value_column=self.get_column_helper(self.__labels_for_values, as_list=False))
 
     def get_unit(self):
         return self.get_unit_helper(self.__labels_for_values)
