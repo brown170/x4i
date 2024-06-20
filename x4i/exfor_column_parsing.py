@@ -103,11 +103,8 @@ class X4ColumnProcessor:
         
     def get_unit_helper(self, labels):
         for label in labels:
-            try:
-                return self.data[label].pint.unit
-            except:
-                pass
-        return 'arb_unit'
+            if label in self.data:
+                return self.data[label].pint.units
 
     def get_values(self):
         raise NotImplementedError()
@@ -153,7 +150,7 @@ class X4IndependentColumnPair(X4ColumnProcessor):
         return self.get_column_helper(self.__labels_for_values)
 
     def get_uncertainties(self):
-        return self.get_uncertainty_helper(self.__labels_for_uncertaintie, 
+        return self.get_uncertainty_helper(self.__labels_for_uncertainties, 
                                            values_column=self.get_column_helper(self.__labels_for_values, as_list=False))
 
     def get_unit(self):

@@ -468,6 +468,6 @@ if __name__ == "__main__":
     #
     #     unittest.main(testRunner=xmlrunner.XMLTestRunner(output='test-results'))
     # except ImportError:
-    unittest.main(argv=['first-arg-is-ignored'], exit=False)
+    unittest.main()
     print()
     print()

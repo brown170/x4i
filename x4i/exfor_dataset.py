@@ -290,9 +290,12 @@ class X4DataSet(X4BibMetaData):
         # FIXME: Confused how to do failIfMissingErrors and makeAllColumns
         _columns = {}
         for _label in parserMap:
+            print(_label)
             for parser in parserMap[_label]:
+                if True:
                 #try: # FIXME: how do I know which parsing scheme is the right one?
                     parser.set_data(self.data)
+                    print(parser.get_unit())
                     _columns[_label] = pandas.Series(
                         parser.get_values(), 
                         dtype="pint[%s]" % parser.get_unit())
