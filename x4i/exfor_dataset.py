@@ -153,9 +153,17 @@ class X4DataSet(X4BibMetaData):
     def data(self):
         return self.__data
     
+    @data.setter
+    def data(self, _data):
+        self.__data = _data
+
     @property
     def simplified(self):
         return self.__simplified
+
+    @simplified.setter
+    def simplified(self, flag):
+        self.__simplified = flag
     
     def setData(self, data, common=None, pointer=None):
         """
@@ -291,29 +299,32 @@ class X4DataSet(X4BibMetaData):
         _columns = {}
         for _label in parserMap:
             for parser in parserMap[_label]:
-                #print(_label)
-                #try: # FIXME: how do I know which parsing scheme is the right one?
                 parser.set_data(self.data)
                 
+                # Extract values
                 values = parser.get_values()
                 if values is None:
                     continue
                 _columns[_label] = pandas.Series(
                     values, dtype="pint[%s]" % parser.get_unit())
                 
-                #print("here")
+                # Attempt to extract uncertainties
                 uncertainties = parser.get_uncertainties()
-                #print('unc', uncertainties)
                 if uncertainties is not None:
                     _columns["d(%s)" % _label] = pandas.Series(
                         uncertainties, dtype="pint[%s]" % parser.get_unit())
                 
+                # We are done if we have real values
                 if values is not None:
+                    if failIfMissingErrors and uncertainties is None:
+                        raise Exception("No uncertainties")
                     break
 
-            #print(_columns)
         for col in _columns:
             results.data[col] = _columns[col]
+        
+        if makeAllColumns:
+            pass 
 
         # Convert all units to our favs
         for col in results.data.columns:
@@ -328,10 +339,10 @@ class X4DataSet(X4BibMetaData):
             # How to sort columns in pandas:
             # If:      df.columns.tolist() = ['0', '1', '2', '3', 'mean']
             # Do this: df = df[['mean', '0', '1', '2', '3']]
-            results = results[columnNames]
+            results.data = results.data[columnNames]
         
         # All done
-        result.simplified = True
+        results.simplified = True
         return results
 
     def append(self, other):
