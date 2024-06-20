@@ -257,7 +257,7 @@ class X4DataSet(X4BibMetaData):
         """In place sort, see Python documentation for list().sort()"""
         raise NotImplementedError("Do we still need this?")
 
-    def getSimplified(self, parserMap=None, columnNames=None, makeAllColumns=False, failIfMissingErrors=False, preferredUnits=['MeV', 'b', 'sr', 'rad', 'fm', 'b/sr']):
+    def getSimplified(self, parserMap=None, columnNames=None, makeAllColumns=False, failIfMissingErrors=False, preferredUnits=['MeV', 'b', 'sr', 'deg', 'fm', 'b/sr']):
         """Returns a simplified version of self.
         inputs:
             parserMap:           { 'column name 1':parserList1, 'column name 2':parserList2, ... }

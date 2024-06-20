@@ -284,6 +284,7 @@ class TestX4Entry(TestCaseWithTableTests):
         self.assertTablesAlmostEqual(str(ds[('12898', '12898002', '1')]), answer)
 
     def test_getDataSets_2_cross_section_translation(self):
+        self.maxDiff=None
         ds = exfor_entry.X4Entry(self.entry_2).getSimplifiedDataSets()
         self.assertEqual(dict([(k, v.legend()) for (k, v) in ds.items()]),
                          {('12898', '12898003', '2'): '(1984) D.L.Smith, J.W.Meadows, et al.',
@@ -323,8 +324,8 @@ class TestX4Entry(TestCaseWithTableTests):
                  '#  Reference: Annals of Nuclear Energy 11, 623 (1984); Progress report: ANL-NDM-85  (1984)\n' \
                  '#  Subent:    12898002\n' \
                  '#  Reaction:  (( Cross section for 51V(n,p)51Ti )/( Cross section for 238U(n,Fission) )) \n' \
-                 '#        Energy        Data          d(Energy)     d(Data)       \n' \
-                 '#        MeV           no-dim        MeV           no-dim        \n' \
+                 '#          Energy         Data    d(Energy)      d(Data)\n' \
+                 '#             MeV                       MeV\n' \
                  '        2.856         9.075e-06     0.0475        4.5738e-06    \n' \
                  '        2.957         1.966e-05     0.047         4.44316e-06   \n' \
                  '        3.057         2.575e-05     0.047         6.592e-06     \n' \

@@ -44,7 +44,8 @@ baseTempKeys = ['KT']
 baseMonitorKeys = ['MONIT']
 baseDataKeys = ['DATA', 'RATIO']
 baseMiscKeys = ['MISC']
-baseAngleKeys = ['COS', 'ANG']
+baseAngleKeys = ['ANG']
+baseCosineAngleKeys = ['COS']
 
 resolutionFWSuffix = ['-RES', '-RSL', '-RSL-FW']
 resolutionHWSuffix = ['-RSL-HW']
@@ -467,11 +468,27 @@ energyDistParserList = [
 angleParserList = [
     X4IndependentColumnPair(
         labels_for_values=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix + frameSuffix] for b in baseAngleKeys]),
-        labels_for_uncertainties=reduce(lambda x, y: x + y, [[b + s for s in errorSuffix + resolutionHWSuffix] for b in baseAngleKeys])
+        labels_for_uncertainties=reduce(lambda x, y: x + y, [[b + s for s in errorSuffix] for b in baseAngleKeys])
     ),
-    X4IndependentColumnPair(
+    X4IndependentColumnPair_ResolutionHW(
+        labels_for_values=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix + frameSuffix] for b in baseAngleKeys]),
+        labels_for_uncertainties=reduce(lambda x, y: x + y, [[b + s for s in resolutionHWSuffix] for b in baseAngleKeys])
+    ),
+    X4IndependentColumnPair_ResolutionFW(
         labels_for_values=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix + frameSuffix] for b in baseAngleKeys]),
         labels_for_uncertainties=reduce(lambda x, y: x + y, [[b + s for s in resolutionFWSuffix] for b in baseAngleKeys])
+    ),
+    X4IndependentColumnPair(
+        labels_for_values=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix + frameSuffix] for b in baseCosineAngleKeys]),
+        labels_for_uncertainties=reduce(lambda x, y: x + y, [[b + s for s in errorSuffix + resolutionHWSuffix] for b in baseCosineAngleKeys])
+    ),
+    X4IndependentColumnPair_ResolutionHW(
+        labels_for_values=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix + frameSuffix] for b in baseCosineAngleKeys]),
+        labels_for_uncertainties=reduce(lambda x, y: x + y, [[b + s for s in errorSuffix + resolutionHWSuffix] for b in baseCosineAngleKeys])
+    ),
+    X4IndependentColumnPair_ResolutionFW(
+        labels_for_values=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix + frameSuffix] for b in baseCosineAngleKeys]),
+        labels_for_uncertainties=reduce(lambda x, y: x + y, [[b + s for s in resolutionFWSuffix] for b in baseCosineAngleKeys])
     ),
     X4MissingErrorColumnPair(
         labels_for_values=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix + frameSuffix] for b in baseAngleKeys]),

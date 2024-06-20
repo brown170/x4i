@@ -269,8 +269,8 @@ class TestTheWorks(TestCaseWithTableTests):
                                      '#  Reference: Physical Review 109, 2105 (1958)\n#  Subent:    11321004\n'
                                      '#  Reaction:  Differential c/s with respect to angle for 27Al(n,Elastic)27Al \n'
                                      '#  Frame:     Lab\n'
-                                     '#        EN            EN-RSL        ANG-RSL       COS           DATA          DATA-ERR      \n'
-                                     '#        MeV           MeV           deg                  mb/sr         mb/sr         \n'
+                                     '#           EN    EN-RSL    ANG-RSL     COS     DATA    DATA-ERR\n'
+                                     '#          MeV       MeV        deg            mb/sr       mb/sr\n'
                                      '        5.0           0.1           10.0          0.866         290.0         30.0          \n'
                                      '        5.0           0.1           10.0          0.766         212.0         10.0          \n'
                                      '        5.0           0.1           10.0          0.643         140.0         10.0          \n'
@@ -286,6 +286,7 @@ class TestTheWorks(TestCaseWithTableTests):
                                      '        5.0           0.1           10.0          -0.866        25.0          4.0           \n        ')
         simple = ds[('11321', '11321004', ' ')].getSimplified()
         # open( 'b', mode = 'w' ).writelines( str( simple ) )
+        self.maxDiff = None
         self.assertTablesAlmostEqual(str(simple),
                                      '#  Authors:   R.W.Hill\n'
                                      '#  Title:     Angular Distributions Of Elastic Scattering Of 5-Mev Neutrons.\n'
@@ -293,8 +294,8 @@ class TestTheWorks(TestCaseWithTableTests):
                                      '#  Reference: Physical Review 109, 2105 (1958)\n#  Subent:    11321004\n'
                                      '#  Reaction:  Differential c/s with respect to angle for 27Al(n,Elastic)27Al \n'
                                      '#  Frame:     Lab\n'
-                                     '#        Energy        Angle         Data          d(Energy)     d(Angle)      d(Data)       \n'
-                                     '#        MeV           degrees       barns/ster    MeV           degrees       barns/ster    \n'
+                                     '#          Energy      Angle    Data    d(Energy)    d(Angle)    d(Data)\n'
+                                     '#             MeV        deg    b/sr          MeV         deg       b/sr\n'
                                      '        5.0           30.0029109312 0.29          0.05          5.0           0.03          \n'
                                      '        5.0           40.0039613369 0.212         0.05          5.0           0.01          \n'
                                      '        5.0           49.9841125607 0.14          0.05          5.0           0.01          \n'
