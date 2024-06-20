@@ -82,32 +82,20 @@ class X4ColumnProcessor:
     def get_column_helper(self, labels, as_list=True):
         for label in labels:
             if label in self.data:
-            #try:
-                #print(self.data[label])
                 if as_list:
                     return self.data[label].to_list()
                 else:
                     return self.data[label]
-            #except:
-            #    pass
-        #raise KeyError("none of %s found" % str(labels))
 
     def get_uncertainty_helper(self, labels, value_column, as_list=True):
-        #print(labels)
-        #print(value_column)
-        #print(self.data.columns)
         for label in labels:
             if label in self.data:
-            #try:
-                #print("here unit", self.data[label].pint.units)
                 if self.data[label].pint.units == exfor_unit_registry.percent:
                     self.data[label] *= value_column
                 if as_list:
                     return self.data[label].to_list()
                 else:
                     return self.data[label]
-            #except:
-            #    pass
         
     def get_unit_helper(self, labels):
         for label in labels:
@@ -153,13 +141,11 @@ class X4IndependentColumnPair(X4ColumnProcessor):
         X4ColumnProcessor.__init__(self)
         self.__labels_for_values = labels_for_values
         self.__labels_for_uncertainties = labels_for_uncertainties
-        #print(self.__labels_for_values, self.__labels_for_uncertainties)
 
     def get_values(self):
         return self.get_column_helper(self.__labels_for_values)
 
     def get_uncertainties(self):
-        #print('inside here')
         return self.get_uncertainty_helper(labels=self.__labels_for_uncertainties, 
                                            value_column=self.get_column_helper(self.__labels_for_values, as_list=False))
 

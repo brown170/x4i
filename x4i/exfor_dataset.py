@@ -257,7 +257,7 @@ class X4DataSet(X4BibMetaData):
         """In place sort, see Python documentation for list().sort()"""
         raise NotImplementedError("Do we still need this?")
 
-    def getSimplified(self, parserMap=None, columnNames=None, makeAllColumns=False, failIfMissingErrors=False):
+    def getSimplified(self, parserMap=None, columnNames=None, makeAllColumns=False, failIfMissingErrors=False, preferredUnits=['MeV', 'b', 'sr', 'rad', 'fm', 'b/sr']):
         """Returns a simplified version of self.
         inputs:
             parserMap:           { 'column name 1':parserList1, 'column name 2':parserList2, ... }
@@ -295,7 +295,6 @@ class X4DataSet(X4BibMetaData):
                     raise KeyError(p + ' not in columnNames')
 
         # Build new DataSeries
-        # FIXME: Confused how to do failIfMissingErrors and makeAllColumns
         _columns = {}
         for _label in parserMap:
             for parser in parserMap[_label]:
@@ -328,7 +327,7 @@ class X4DataSet(X4BibMetaData):
 
         # Convert all units to our favs
         for col in results.data.columns:
-            for unit in ['MeV', 'b', 'sr', 'rad', 'fm', 'b/sr']:
+            for unit in preferredUnits:
                 try:
                     results.data[col] = results.data[col].pint.to(unit)
                 except:
@@ -336,10 +335,11 @@ class X4DataSet(X4BibMetaData):
 
         # Sort the columns
         if columnNames is not None:
+            temp_columnNames = [c for c in columnNames if c in results.data]
             # How to sort columns in pandas:
             # If:      df.columns.tolist() = ['0', '1', '2', '3', 'mean']
             # Do this: df = df[['mean', '0', '1', '2', '3']]
-            results.data = results.data[columnNames]
+            results.data = results.data[temp_columnNames]
         
         # All done
         results.simplified = True
@@ -665,7 +665,8 @@ class X4CrossSectionDataSet(X4DataSet):
 
     def getSimplified(self, makeAllColumns=False, failIfMissingErrors=False):
         return X4DataSet.getSimplified(self, parserMap={'Energy': incidentEnergyParserList, 'Data': csDataParserList},
-                                       columnNames=['Energy', 'Data'], makeAllColumns=makeAllColumns,
+                                       columnNames=['Energy', 'Data', 'd(Energy)', 'd(Data)'], 
+                                       makeAllColumns=makeAllColumns,
                                        failIfMissingErrors=failIfMissingErrors)
 
 

@@ -184,8 +184,8 @@ class TestTheWorks(TestCaseWithTableTests):
 #  Subent:    13883002
 #  Reaction:  Cross section for 239Pu(n,2n)238Pu
 #  Monitor(s): ((79-AU-197(N,2N)79-AU-196,SIG), 'Flux monitor. Neutron energy determined using 54Fe(n,p) reaction.', None)
-#        Energy        Data          d(Data)
-#        MeV           b         b
+#          Energy    Data    d(Data)
+#             MeV    b/sr       b/sr
         13.8          0.228         0.006384
         14.0          0.219         0.007884
         14.8          0.214         0.002996'''.strip())
@@ -198,8 +198,8 @@ class TestTheWorks(TestCaseWithTableTests):
 #  Reference: Conf.on Nucl.Data f.Basic a.Appl.Sci.,Santa Fe 1985 , (IB06) (1985)
 #  Subent:    21971003
 #  Reaction:  Cross section for 239Pu(n,2n)238Pu
-#        Energy        Data          d(Energy)     d(Data)
-#        MeV           b         MeV           b
+#          Energy    Data    d(Energy)    d(Data)
+#             MeV    b/sr          MeV       b/sr
         6.49          0.024         0.085         0.063
         7.01          0.049         0.08          0.05
         7.52          0.054         0.075         0.058
@@ -225,8 +225,8 @@ class TestTheWorks(TestCaseWithTableTests):
 #  Subent:    20795014
 #  Reaction:  Cross section for 239Pu(n,2n)238Pu
 #  Monitor(s): ((94-PU-239(N,F),SIG), '1917MB+-8PERCENT  AT 6.5MEV 2030MB+-8.5PERCENT AT 7.1MEV 2213MB+-9PERCENT   AT 8.0MEV 2252MB+-9.5PERCENT AT 9.0MEV', None)
-#        Energy        Data          d(Data)
-#        MeV           b         b
+#          Energy    Data    d(Data)
+#             MeV    b/sr       b/sr
         6.5           0.419         0.053
         7.1           0.451         0.06
         8.0           0.49          0.057
@@ -241,8 +241,8 @@ class TestTheWorks(TestCaseWithTableTests):
 #  Reference: Jour. of Nuclear Science and Technology Suppl. 2, (1), 620 (2002)
 #  Subent:    14129002
 #  Reaction:  Cross section for 239Pu(n,2n)238Pu
-#        Energy        Data          d(Energy)     d(Data)
-#        MeV           b         MeV           b
+#          Energy    Data    d(Energy)    d(Data)
+#             MeV    b/sr          MeV       b/sr
         6.481         0.1009        0.2239        0.03081
         6.942         0.1261        0.1894        0.02015
         7.49          0.1525        0.2412        0.01422
