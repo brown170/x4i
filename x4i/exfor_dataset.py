@@ -297,18 +297,26 @@ class X4DataSet(X4BibMetaData):
         # Build new DataSeries
         _columns = {}
         for _label in parserMap:
+            #print(_label)
+
             # load up all the parsers with the data
             for parser in parserMap[_label]:
                 parser.set_data(self.data)
+            #print("not here")
             
-            print({_p.__class__:_p.score_label_match() for _p in parserMap[_label]})
+            #print(_label, {_p.__class__:_p.score_label_match() for _p in parserMap[_label]})
+            #for _p in parserMap[_label]:
+                #print(_label, _p.__class__, _p.score_label_match())
+            #print('definitely not here')
 
             # figure out which parser is the best one for the job
             best_parser, highest_parser_score = None, 0
             for parser in reversed(parserMap[_label]):
+                #print()
                 if parser.score_label_match() >= highest_parser_score:
                     highest_parser_score = parser.score_label_match()
                     best_parser = parser
+            #print("best", _label, best_parser.__class__, best_parser.score_label_match())
 
             if best_parser is not None:
                 # Extract values

@@ -239,6 +239,10 @@ class X4AddErrorBarsColumnPair(X4ColumnProcessor):
         self.__labels_for_systematic_uncertainties = labels_for_systematic_uncertainties 
         self.__labels_for_statistical_uncertainties = labels_for_statistical_uncertainties 
 
+    def score_label_match(self):
+        raise NotImplementedError()
+        return self.score_helper(self.__labels_for_values) + 4
+
     def get_values(self):
         return self.get_column_helper(self.__labels_for_values)
 
@@ -394,11 +398,11 @@ csDataParserList = [
         labels_for_highs=['-' + b + '-ERR' for b in baseDataKeys],
         labels_for_lows=['+' + b + '-ERR' for b in baseDataKeys]
     ),
-    X4AddErrorBarsColumnPair(
-        labels_for_values=baseDataKeys,
-        labels_for_systematic_uncertainties=dataSystematicErrorKeys,
-        labels_for_statistical_uncertainties=dataStatisticalErrorKeys
-    ),
+#    X4AddErrorBarsColumnPair(
+#        labels_for_values=baseDataKeys,
+#        labels_for_systematic_uncertainties=dataSystematicErrorKeys,
+#        labels_for_statistical_uncertainties=dataStatisticalErrorKeys
+#    ),
     X4MissingErrorColumnPair(
         labels_for_values=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix] for b in baseDataKeys]),
     ),
@@ -427,6 +431,9 @@ nubarParserList = [
         labels_for_values=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix] for b in baseDataKeys]),
     ),
 ]
+
+# print(reduce(lambda x, y: x + y, [[b + s for s in variableSuffix] for b in baseDataKeys]))
+ 
 
 angDistParserList = [
     X4IndependentColumnPair(
