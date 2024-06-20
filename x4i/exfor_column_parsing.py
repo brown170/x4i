@@ -79,6 +79,15 @@ class X4ColumnProcessor:
     def set_data(self, data):
         self.__data = data
 
+    def score_label_match(self):
+        raise NotImplementedError()
+
+    def score_helper(self, labels):
+        for label in labels:
+            if label in self.data:
+                return 1
+        return 0
+
     def get_column_helper(self, labels, as_list=True):
         for label in labels:
             if label in self.data:
@@ -112,7 +121,7 @@ class X4ColumnProcessor:
         raise NotImplementedError()
 
     def get_dummy_column(self):
-        return [None] * (self.data.numrows() + 2)
+        return [None] * len(self.data)
 
 
 class X4MissingErrorColumnPair(X4ColumnProcessor):
@@ -122,6 +131,9 @@ class X4MissingErrorColumnPair(X4ColumnProcessor):
     def __init__(self, labels_for_values):
         X4ColumnProcessor.__init__(self)
         self.__labels_for_values = labels_for_values
+
+    def score_label_match(self):
+        return self.score_helper(self.__labels_for_values)
 
     def get_values(self):
         return self.get_column_helper(self.__labels_for_values)
@@ -141,6 +153,9 @@ class X4IndependentColumnPair(X4ColumnProcessor):
         X4ColumnProcessor.__init__(self)
         self.__labels_for_values = labels_for_values
         self.__labels_for_uncertainties = labels_for_uncertainties
+
+    def score_label_match(self):
+        return self.score_helper(self.__labels_for_values) + self.score_helper(self.__labels_for_uncertainties)
 
     def get_values(self):
         return self.get_column_helper(self.__labels_for_values)
@@ -162,6 +177,9 @@ class X4ConstantPercentColumnPair(X4MissingErrorColumnPair):
     def __init__(self, labels_for_values, common_percent_error=10):
         X4MissingErrorColumnPair.__init__(self, labels_for_values, None)
         self.__common_percent_error = common_percent_error
+ 
+    def score_label_match(self):
+        return self.score_helper(self.__labels_for_values) + 0.5
 
     def get_uncertainties(self):
         values = self.get_column_helper(self.__labels_for_values, as_list=False)
@@ -174,6 +192,9 @@ class X4HighLowColumnPair(X4ColumnProcessor):
         X4ColumnProcessor.__init__(self)
         self.__labels_for_highs = labels_for_highs
         self.__labels_for_lows = labels_for_lows
+
+    def score_label_match(self):
+        return self.score_helper(self.__labels_for_highs) + self.score_helper(self.__labels_for_lows)
 
     def get_values(self):
         return (0.5 * (self.get_column_helper(self.__labels_for_highs) + \
@@ -192,6 +213,10 @@ class X4HighMidLowColumnTriplet(X4ColumnProcessor):
         self.__labels_for_values = labels_for_values  # middle
         self.__labels_for_highs = labels_for_highs  # +err
         self.__labels_for_lows = labels_for_lows  # -err
+
+    def score_label_match(self):
+        return self.score_helper(self.__labels_for_values) + \
+               0.5*(self.score_helper(self.__labels_for_highs) + self.score_helper(self.__labels_for_lows))
 
     def get_values(self):
         return self.get_column_helper(self.__labels_for_values)

@@ -297,27 +297,36 @@ class X4DataSet(X4BibMetaData):
         # Build new DataSeries
         _columns = {}
         for _label in parserMap:
+            # load up all the parsers with the data
             for parser in parserMap[_label]:
                 parser.set_data(self.data)
-                
+            
+            print({_p.__class__:_p.score_label_match() for _p in parserMap[_label]})
+
+            # figure out which parser is the best one for the job
+            best_parser, highest_parser_score = None, 0
+            for parser in reversed(parserMap[_label]):
+                if parser.score_label_match() >= highest_parser_score:
+                    highest_parser_score = parser.score_label_match()
+                    best_parser = parser
+
+            if best_parser is not None:
                 # Extract values
-                values = parser.get_values()
+                values = best_parser.get_values()
                 if values is None:
                     continue
-                _columns[_label] = pandas.Series(
-                    values, dtype="pint[%s]" % parser.get_unit())
+                _columns[_label] = pandas.Series(values, dtype="pint[%s]" % best_parser.get_unit())
                 
                 # Attempt to extract uncertainties
-                uncertainties = parser.get_uncertainties()
+                uncertainties = best_parser.get_uncertainties()
                 if uncertainties is not None:
-                    _columns["d(%s)" % _label] = pandas.Series(
-                        uncertainties, dtype="pint[%s]" % parser.get_unit())
+                    _columns["d(%s)" % _label] = pandas.Series(uncertainties, dtype="pint[%s]" % best_parser.get_unit())
                 
-                # We are done if we have real values
-                if values is not None:
-                    if failIfMissingErrors and uncertainties is None:
-                        raise Exception("No uncertainties")
-                    break
+            # We are done if we have real values 
+            #if values is not None:
+            #    if failIfMissingErrors and uncertainties is None:
+            #        raise Exception("No uncertainties")
+            #    break
 
         # Save the data in the results
         for col in _columns:

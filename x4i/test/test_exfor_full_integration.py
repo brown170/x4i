@@ -320,8 +320,8 @@ class TestTheWorks(TestCaseWithTableTests):
                                      '#  Reference: Physical Review 98, 728 (1955)\n#  Subent:    11314002\n'
                                      '#  Reaction:  Differential c/s with respect to angle for 14N(n,Elastic)14N \n'
                                      '#  Frame:     Center of mass\n'
-                                     '#        EN            EN-RSL        COS-CM        DATA-CM       \n'
-                                     '#        MEV           MEV           NO-DIM        MB/SR         \n'
+                                     '#           EN    EN-RSL    COS-CM    DATA-CM\n'
+                                     '#          MeV       MeV                mb/sr\n'
                                      '        0.8           0.05          0.85          164.0         \n'
                                      '        0.8           0.05          0.65          170.0         \n'
                                      '        0.8           0.05          0.46          157.0         \n'
@@ -666,7 +666,7 @@ class TestTheWorks(TestCaseWithTableTests):
                                      '#  Reaction:  Differential c/s with respect to angle for 14N(n,Elastic)14N \n'
                                      '#  Frame:     Center of mass\n'
                                      '#        Energy        Angle         Data          d(Energy)     \n'
-                                     '#        MeV           degrees       barns/ster    MeV           \n'
+                                     '#        MeV           deg       b/sr    MeV           \n'
                                      '        0.8           31.7883306171 0.164         0.025         \n'
                                      '        0.8           49.4583981265 0.17          0.025         \n'
                                      '        0.8           62.6128924973 0.157         0.025         \n'
@@ -1001,6 +1001,7 @@ class TestTheWorks(TestCaseWithTableTests):
                                      '        2.36          147.140119621 0.103         0.01          \n        ')
 
     def test_nubar(self):
+        self.maxDiff=None
         subent = self.dbMgr.retrieve(SUBENT='12326006', rawEntry=True)
         ds = exfor_entry.X4Entry(subent['12326']).getDataSets()
         fullanswer = '#  Authors:   J.C.Hopkins, B.C.Diven\n' \
@@ -1010,14 +1011,14 @@ class TestTheWorks(TestCaseWithTableTests):
                      '#  Reference: Nuclear Physics 48, 433 (1963)\n' \
                      '#  Subent:    12326006\n' \
                      '#  Reaction:  Prompt neutron yield (nu-bar) for 239Pu(n,Fission) \n' \
-                     '#        MONIT         EN            EN-RSL        DATA          ERR-SYS       ERR-T         \n' \
-                     '#        PRT/FIS       MEV           MEV           PRT/FIS       PRT/FIS       PRT/FIS       \n' \
-                     '        3.771         0.25          0.05          2.931         0.029         0.039         \n' \
-                     '        3.771         0.42          0.11          2.957         0.03          0.046         \n' \
-                     '        3.771         0.61          0.07          2.904         0.029         0.041         \n' \
-                     '        3.771         0.9           0.08          3.004         0.03          0.041         \n' \
-                     '        3.771         3.9           0.29          3.422         0.038         0.039         \n' \
-                     '        3.771         14.5          1.0           4.942         0.076         0.119         \n' \
+                     '#                     MONIT     EN    EN-RSL                DATA             ERR-SYS               ERR-T\n' \
+                     '#          particle/fission    MeV       MeV    particle/fission    particle/fission    particle/fission\n' \
+                     '                      3.771   0.25       0.05              2.931               0.029               0.039\n' \
+                     '                      3.771   0.42       0.11              2.957                0.03               0.046\n' \
+                     '                      3.771   0.61       0.07              2.904               0.029               0.041\n' \
+                     '                      3.771   0.9        0.08              3.004                0.03               0.041\n' \
+                     '                      3.771   3.9        0.29              3.422               0.038               0.039\n' \
+                     '                      3.771   14.5       1.0               4.942               0.076               0.119\n' \
                      '        '
         #open( 'a', mode = 'w' ).writelines(fullanswer)
         #open( 'b', mode = 'w' ).writelines( str( ds[ ('12326', '12326006', ' ') ] ) )
