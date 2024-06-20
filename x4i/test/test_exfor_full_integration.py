@@ -1031,8 +1031,8 @@ class TestTheWorks(TestCaseWithTableTests):
                        '#  Reference: Nuclear Physics 48, 433 (1963)\n' \
                        '#  Subent:    12326006\n' \
                        '#  Reaction:  Prompt neutron yield (nu-bar) for 239Pu(n,Fission) \n' \
-                       '#        Energy        Data          d(Energy)     d(Data)       \n' \
-                       '#        MeV           ptcls/fis     MeV           ptcls/fis     \n' \
+                       '#          Energy                Data    d(Energy)             d(Data)\n' \
+                       '#             MeV    particle/fission          MeV    particle/fission\n' \
                        '        0.25          2.931         0.025         0.039         \n' \
                        '        0.42          2.957         0.055         0.046         \n' \
                        '        0.61          2.904         0.035         0.041         \n' \
