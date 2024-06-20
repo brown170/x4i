@@ -287,19 +287,20 @@ class X4DataSet(X4BibMetaData):
                     raise KeyError(p + ' not in columnNames')
 
         # Build new DataSeries
+        # FIXME: Confused how to do failIfMissingErrors and makeAllColumns
         _columns = {}
         for _label in parserMap:
             for parser in parserMap[_label]:
-                try: # FIXME: how do I know which parsing scheme is the right one?
+                #try: # FIXME: how do I know which parsing scheme is the right one?
                     parser.set_data(self.data)
                     _columns[_label] = pandas.Series(
                         parser.get_values(), 
-                        dtype="pint[%s]" % parserMap[_label].get_unit())
+                        dtype="pint[%s]" % parser.get_unit())
                     _columns["d(%s)" % _label] = pandas.Series(
                         parser.get_uncertainties(),
-                        dtype="pint[%s]" % parserMap[_label].get_unit())
-                except:
-                    pass
+                        dtype="pint[%s]" % parser.get_unit())
+                #except:
+                #    pass
         for col in _columns:
             results.data[col] = _columns[col]
 

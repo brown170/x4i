@@ -40,8 +40,6 @@
 #
 ################################################################################
 
-from __future__ import print_function, division
-
 import os
 import unittest
 from x4i.test.utilities import TestCaseWithTableTests
@@ -470,6 +468,6 @@ if __name__ == "__main__":
     #
     #     unittest.main(testRunner=xmlrunner.XMLTestRunner(output='test-results'))
     # except ImportError:
-    unittest.main()
+    unittest.main(argv=['first-arg-is-ignored'], exit=False)
     print()
     print()

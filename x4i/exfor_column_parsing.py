@@ -100,7 +100,6 @@ class X4ColumnProcessor:
                     return self.data[label]
             except:
                 pass
-        return self.get_dummy_column()
         
     def get_unit_helper(self, labels):
         for label in labels:
