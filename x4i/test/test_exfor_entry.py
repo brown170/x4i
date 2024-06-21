@@ -284,7 +284,6 @@ class TestX4Entry(TestCaseWithTableTests):
         self.assertTablesAlmostEqual(str(ds[('12898', '12898002', '1')]), answer)
 
     def test_getDataSets_2_cross_section_translation(self):
-        self.maxDiff=None
         ds = exfor_entry.X4Entry(self.entry_2).getDataSets()
         self.assertEqual(dict([(k, v.legend()) for (k, v) in ds.items()]),
                          {('12898', '12898003', '2'): '(1984) D.L.Smith, J.W.Meadows, et al.',

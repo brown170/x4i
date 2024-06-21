@@ -63,6 +63,7 @@ import pint
 import pint_pandas
 import pandas
 import tabulate
+import numpy as np
 from .exfor_column_parsing import *
 from .exfor_exceptions import *
 from .exfor_reactions import X4ReactionCombination
@@ -272,7 +273,7 @@ class X4DataSet(X4BibMetaData):
             columnNames:         [ 'column name 1', 'column name 2', ... ] #put them in the order *you* want
             makeAllColumns:      will make uncertainty columns even if no uncertainties are given on a particular column
             failIfMissingErrors: fail (raising exception) if missing an error column
-            unitOverride:        
+            unitOverride:        sometimes compilers make bad choices for units, we can fix them (think mislabeled ratio data)
             preferredUnits:      list of perferred units for a problem
 
         What this routine does:
@@ -309,33 +310,28 @@ class X4DataSet(X4BibMetaData):
             for col, u in unitOverride.items():
                  results.data[col] = pandas.Series(results.data[col].pint.magnitude, dtype="pint[%s]" % u)
 
-        # Convert cos(angle) => angle, sqrt(E)=>E, sqrt(T)=>T in original dataframe
-        if False:
-            raise NotImplementedError()
+        # Convert cos(angle) => angle, sqrt(E)=>E
+        for col in results.data:
+            if "COS" in col:
+                col_name = col.replace("COS", "ANG")
+                results.data[col_name] = pandas.Series(np.arccos(results.data[col].pint.magnitude), dtype="pint[rad]")
+            if results.data[col].pint.units in []:
+                raise NotImplementedError()
 
         # Build new DataSeries
         _columns = {}
         for _label in parserMap:
-            #print(_label)
 
             # load up all the parsers with the data
             for parser in parserMap[_label]:
                 parser.set_data(results.data)
-            #print("not here")
-            
-            #print(_label, {_p.__class__:_p.score_label_match() for _p in parserMap[_label]})
-            #for _p in parserMap[_label]:
-                #print(_label, _p.__class__, _p.score_label_match())
-            #print('definitely not here')
 
             # figure out which parser is the best one for the job
             best_parser, highest_parser_score = None, 0
             for parser in reversed(parserMap[_label]):
-                #print()
                 if parser.score_label_match() >= highest_parser_score:
                     highest_parser_score = parser.score_label_match()
                     best_parser = parser
-            #print("best", _label, best_parser.__class__, best_parser.score_label_match())
 
             if best_parser is not None:
                 # Extract values

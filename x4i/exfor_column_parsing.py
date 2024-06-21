@@ -267,7 +267,6 @@ class X4AddErrorBarsColumnPair(X4ColumnProcessor):
     def getError(self, data):
         if not self.isMatch(data):
             return self.getDummyColumn(data)
-        # raise UserWarning('got one')
         self.set_icols(data)
         if self.column2Parser is not None:
             col2 = self.column2Parser.getColumn(self.icol2, data)
@@ -479,21 +478,6 @@ angleParserList = [
     X4IndependentColumnPair_ResolutionFW(
         labels_for_values=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix + frameSuffix] for b in baseAngleKeys]),
         labels_for_uncertainties=reduce(lambda x, y: x + y, [[b + s for s in resolutionFWSuffix] for b in baseAngleKeys])
-    ),
-    # FIXME!!!!!
-    X4IndependentColumnPair(
-        labels_for_values=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix + frameSuffix] for b in baseCosineAngleKeys]),
-        labels_for_uncertainties=reduce(lambda x, y: x + y, [[b + s for s in errorSuffix + resolutionHWSuffix] for b in baseCosineAngleKeys])
-    ),
-    # FIXME!!!!!
-    X4IndependentColumnPair_ResolutionHW(
-        labels_for_values=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix + frameSuffix] for b in baseCosineAngleKeys]),
-        labels_for_uncertainties=reduce(lambda x, y: x + y, [[b + s for s in errorSuffix + resolutionHWSuffix] for b in baseCosineAngleKeys])
-    ),
-    # FIXME!!!!!
-    X4IndependentColumnPair_ResolutionFW(
-        labels_for_values=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix + frameSuffix] for b in baseCosineAngleKeys]),
-        labels_for_uncertainties=reduce(lambda x, y: x + y, [[b + s for s in resolutionFWSuffix] for b in baseCosineAngleKeys])
     ),
     X4MissingErrorColumnPair(
         labels_for_values=reduce(lambda x, y: x + y, [[b + s for s in variableSuffix + frameSuffix] for b in baseAngleKeys]),

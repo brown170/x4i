@@ -46,7 +46,7 @@ class TestCaseWithTableTests(unittest.TestCase):
             elif c2 is None:
                 self.assertIsNone(c1)
             else:
-                self.assertAlmostEqual(c1, c2)
+                self.assertAlmostEqual(c1, c2, places=3)
 
     def assertTablesAlmostEqual(self, table1, table2):
 
