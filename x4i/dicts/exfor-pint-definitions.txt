@@ -19,6 +19,7 @@ _100decay             = 100 * decays = _
 arb_unit              = [arb_units] = _
 _100projectile        = 100 * projectiles = _
 cosine                = [angle_cosine] = _ 
+ratio                 = [ratio_data] = _
 
 @context exfor = x4
     [energy] -> [squareroot_energy]: value * value

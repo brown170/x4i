@@ -217,10 +217,12 @@ class X4DataSet(X4BibMetaData):
         self.__labels += data.labels
         self.__units += data.units
 
-        # Fix units on all cosine columns
+        # Fix units on all special columns
         for col in self.__data:
-            if "COS" in col: 
+            if "COS" in col: # cosine columns
                 self.__data[col] = pandas.Series(self.__data[col].pint.magnitude, dtype="pint[cosine]")
+            if "RATIO" in col: # ratio data columns
+                self.__data[col] = pandas.Series(self.__data[col].pint.magnitude, dtype="pint[ratio]")
 
     def strHeader(self):
         out = self.xmgraceHeader()
@@ -262,13 +264,16 @@ class X4DataSet(X4BibMetaData):
         """In place sort, see Python documentation for list().sort()"""
         raise NotImplementedError("Do we still need this?")
 
-    def getSimplified(self, parserMap=None, columnNames=None, makeAllColumns=False, failIfMissingErrors=False, preferredUnits=['MeV', 'b', 'sr', 'deg', 'fm', 'b/sr']):
+    def getSimplified(self, parserMap=None, columnNames=None, makeAllColumns=False, failIfMissingErrors=False, 
+                      unitOverride=None, preferredUnits=['MeV', 'b', 'sr', 'deg', 'fm', 'b/sr']):
         """Returns a simplified version of self.
         inputs:
             parserMap:           { 'column name 1':parserList1, 'column name 2':parserList2, ... }
             columnNames:         [ 'column name 1', 'column name 2', ... ] #put them in the order *you* want
             makeAllColumns:      will make uncertainty columns even if no uncertainties are given on a particular column
             failIfMissingErrors: fail (raising exception) if missing an error column
+            unitOverride:        
+            preferredUnits:      list of perferred units for a problem
 
         What this routine does:
             - simplifies the dataframe according to the parserMap.  Typically this creates columns "X", "Y", "dX", "dY" where
@@ -299,6 +304,11 @@ class X4DataSet(X4BibMetaData):
                 if p not in columnNames:
                     raise KeyError(p + ' not in columnNames')
 
+        # Override the units assumed by EXFOR's compilers
+        if unitOverride is not None:
+            for col, u in unitOverride.items():
+                 results.data[col] = pandas.Series(results.data[col].pint.magnitude, dtype="pint[%s]" % u)
+
         # Convert cos(angle) => angle, sqrt(E)=>E, sqrt(T)=>T in original dataframe
         if False:
             raise NotImplementedError()
@@ -310,7 +320,7 @@ class X4DataSet(X4BibMetaData):
 
             # load up all the parsers with the data
             for parser in parserMap[_label]:
-                parser.set_data(self.data)
+                parser.set_data(results.data)
             #print("not here")
             
             #print(_label, {_p.__class__:_p.score_label_match() for _p in parserMap[_label]})
@@ -687,10 +697,11 @@ class X4CrossSectionDataSet(X4DataSet):
     def __init__(self, meta=None, common=None, reaction=None, monitor=None, data=None, pointer=None):
         X4DataSet.__init__(self, meta, common, reaction, monitor, data, pointer)
 
-    def getSimplified(self, makeAllColumns=False, failIfMissingErrors=False):
+    def getSimplified(self, unitOverride=None, makeAllColumns=False, failIfMissingErrors=False):
         return X4DataSet.getSimplified(self, 
                                        parserMap={'Energy': incidentEnergyParserList, 'Data': csDataParserList},
                                        columnNames=['Energy', 'Data', 'd(Energy)', 'd(Data)'], 
+                                       unitOverride=unitOverride,
                                        makeAllColumns=makeAllColumns,
                                        failIfMissingErrors=failIfMissingErrors)
 
@@ -699,10 +710,11 @@ class X4NubarDataSet(X4DataSet):
     def __init__(self, meta=None, common=None, reaction=None, monitor=None, data=None, pointer=None):
         X4DataSet.__init__(self, meta, common, reaction, monitor, data, pointer)
 
-    def getSimplified(self, makeAllColumns=False, failIfMissingErrors=False):
+    def getSimplified(self, unitOverride=None, makeAllColumns=False, failIfMissingErrors=False):
         return X4DataSet.getSimplified(self, 
                                        parserMap={'Energy': incidentEnergyParserList, 'Data': nubarParserList},
                                        columnNames=['Energy', 'Data', 'd(Energy)', 'd(Data)'], 
+                                       unitOverride=unitOverride,
                                        makeAllColumns=makeAllColumns,
                                        failIfMissingErrors=failIfMissingErrors)
 
@@ -712,10 +724,11 @@ class X4SpectrumAveCrossSectionDataSet(X4DataSet):
         X4DataSet.__init__(self, meta, common, reaction, monitor, data, pointer)
         self.spectrum = None
 
-    def getSimplified(self, makeAllColumns=False, failIfMissingErrors=False):
+    def getSimplified(self, unitOverride=None, makeAllColumns=False, failIfMissingErrors=False):
         return X4DataSet.getSimplified(self, 
                                        parserMap={'Energy': spectrumArgumentParserList, 'Data': csDataParserList},
                                        columnNames=['Energy', 'Data', 'd(Energy)', 'd(Data)'], 
+                                       unitOverride=unitOverride,
                                        makeAllColumns=makeAllColumns,
                                        failIfMissingErrors=failIfMissingErrors)
 
@@ -724,16 +737,19 @@ class X4ResonanceIntCrossSectionDataSet(X4DataSet):
     def __init__(self, meta=None, common=None, reaction=None, monitor=None, data=None, pointer=None):
         X4DataSet.__init__(self, meta, common, reaction, monitor, data, pointer)
 
-    def getSimplified(self, makeAllColumns=False, failIfMissingErrors=False):
-        return X4DataSet.getSimplified(self, parserMap={'Data': csDataParserList}, columnNames=['Data'],
-                                       makeAllColumns=makeAllColumns, failIfMissingErrors=failIfMissingErrors)
+    def getSimplified(self, unitOverride=None, makeAllColumns=False, failIfMissingErrors=False):
+        return X4DataSet.getSimplified(self, 
+                                       parserMap={'Data': csDataParserList}, columnNames=['Data'],
+                                       unitOverride=unitOverride,
+                                       makeAllColumns=makeAllColumns, 
+                                       failIfMissingErrors=failIfMissingErrors)
 
 
 class X4AnalyzingPowerDataSet(X4DataSet):
     def __init__(self, meta=None, common=None, reaction=None, monitor=None, data=None, pointer=None):
         X4DataSet.__init__(self, meta, common, reaction, monitor, data, pointer)
 
-    def getSimplified(self, makeAllColumns=False, failIfMissingErrors=False): return copy.copy(self)
+    def getSimplified(self, unitOverride=None, makeAllColumns=False, failIfMissingErrors=False): return copy.copy(self)
 
 
 class X4AngularDistributionDataSet(X4DataSet):
@@ -750,12 +766,13 @@ class X4AngularDistributionDataSet(X4DataSet):
         out += '\n' + COMMENTSTRING + '  Frame:     ' + self.referenceFrame
         return out
 
-    def getSimplified(self, makeAllColumns=False, failIfMissingErrors=False):
+    def getSimplified(self, unitOverride=None, makeAllColumns=False, failIfMissingErrors=False):
         return X4DataSet.getSimplified(self, 
                                        parserMap={'Energy': incidentEnergyParserList, 
                                                   'Angle': angleParserList,
                                                   'Data': angDistParserList},
                                        columnNames=['Energy', 'Angle', 'Data', 'd(Energy)', 'd(Angle)', 'd(Data)'], 
+                                       unitOverride=unitOverride,
                                        makeAllColumns=makeAllColumns,
                                        failIfMissingErrors=failIfMissingErrors)
 
@@ -774,20 +791,22 @@ class X4EnergyDistributionDataSet(X4DataSet):
         out += '\n' + COMMENTSTRING + '  Frame:     ' + self.referenceFrame
         return out
 
-    def getSimplified(self, makeAllColumns=False, failIfMissingErrors=False):
+    def getSimplified(self, unitOverride=None, makeAllColumns=False, failIfMissingErrors=False):
         return X4DataSet.getSimplified(self,
                                        parserMap={'Energy': incidentEnergyParserList, 
                                                   "Eout": outgoingEnergyParserList,
                                                   'Data': energyDistParserList}, 
                                        columnNames=['Energy', "Eout", 'Data', 'd(Energy)', "d(Eout)", 'd(Data)'],
-                                       makeAllColumns=makeAllColumns, failIfMissingErrors=failIfMissingErrors)
+                                       unitOverride=unitOverride,
+                                       makeAllColumns=makeAllColumns, 
+                                       failIfMissingErrors=failIfMissingErrors)
 
 
 class X4EnergyAngleDistDataSet(X4DataSet):
     def __init__(self, meta=None, common=None, reaction=None, monitor=None, data=None, pointer=None):
         X4DataSet.__init__(self, meta, common, reaction, monitor, data, pointer)
 
-    def getSimplified(self, makeAllColumns=False, failIfMissingErrors=False): raise NotImplementedError()
+    def getSimplified(self, unitOverride=None, makeAllColumns=False, failIfMissingErrors=False): raise NotImplementedError()
 
 
 def X4DataSetFactory(quant, meta=None, common=None, reaction=None, monitor=None, data=None, pointer=None):
