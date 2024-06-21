@@ -217,6 +217,11 @@ class X4DataSet(X4BibMetaData):
         self.__labels += data.labels
         self.__units += data.units
 
+        # Fix units on all cosine columns
+        for col in self.__data:
+            if "COS" in col: 
+                self.__data[col] = pandas.Series(self.__data[col].pint.magnitude, dtype="pint[cosine]")
+
     def strHeader(self):
         out = self.xmgraceHeader()
         try:
@@ -282,7 +287,7 @@ class X4DataSet(X4BibMetaData):
         """
         results = copy.copy(self)
         
-        # Check if we are done already
+        # Check if we don't have to do anything
         if self.simplified:
             return results
         if parserMap is None:
@@ -293,6 +298,10 @@ class X4DataSet(X4BibMetaData):
             for p in parserMap:
                 if p not in columnNames:
                     raise KeyError(p + ' not in columnNames')
+
+        # Convert cos(angle) => angle, sqrt(E)=>E, sqrt(T)=>T in original dataframe
+        if False:
+            raise NotImplementedError()
 
         # Build new DataSeries
         _columns = {}
@@ -336,7 +345,7 @@ class X4DataSet(X4BibMetaData):
         
         # Make all the columns if required
         if makeAllColumns:
-            pass 
+            raise NotImplementedError() 
 
         # Convert all units to our favs
         for col in results.data.columns:
