@@ -315,7 +315,7 @@ class X4DataSet(X4BibMetaData):
             if "COS" in col:
                 col_name = col.replace("COS", "ANG")
                 results.data[col_name] = pandas.Series(np.arccos(results.data[col].pint.magnitude), dtype="pint[rad]")
-            if results.data[col].pint.units in []:
+            if "squareroot_eV" in str(results.data[col].pint.units) or "squareroot_keV" in str(results.data[col].pint.units):
                 raise NotImplementedError()
 
         # Build new DataSeries
