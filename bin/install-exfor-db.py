@@ -45,6 +45,7 @@ import tempfile
 import shutil
 import urllib.request
 import json
+from x4i.exfor_paths import DATAPATH
 
 
 EXFORSOURCES = {
@@ -60,12 +61,14 @@ EXFORSOURCES = {
         "url": "https://www-nds.iaea.org/nrdc/exfor-master/entry/entry.zip",
 	    "mode": "zip",
 	    "relative_data_path": "entry/"}}
+DEFAULTEXFORSOURCE = 'NRDC-git'
 
 #	- commit_hash = ...get the hash...
 #	- sha = ...get the hash...
 #	- downloaded = ...get the datetime...
 
 __doc__ = """
+Install EXFOR data files from one of the varients of the EXFOR Master file or in development NRDC EXFOR git projects.
 """
 
 
@@ -77,51 +80,58 @@ def parse_args():
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('-v', dest='verbose', default=False, action='store_true', help="Enable verbose output.")
-    parser.add_argument('-o', dest='outFile', default="out.csv", help="Save to this file")
-    parser.add_argument('--rxn', choices=[x.name for x in list(ienums.Reaction)], default='capture',
-                        help='Reaction to retrieve (Default: capture)')
-    parser.add_argument('--format', choices=['csv', 'tex', 'png', 'json', 'html'], default='csv',
-                        help="Output format (Default: csv)")
-    parser.add_argument('--skipBeta', action='store_true', default=False,
-                        help="Skip the pre-computed beta version of ENDF")
-    parser.add_argument('--inter', dest='interJSON', default=None, type=str,
-                        help='Output file from inter.py, in JSON format (Default: None)')
-    parser.add_argument('iso', type=str, help='Isotope name in GNDS format (Examples: U235, Br, Al26_m1)')
+    parser.add_argument('--source', choices=EXFORSOURCES.keys(), default=DEFAULTEXFORSOURCE,
+                        help="Output format (Default: %s)" % DEFAULTEXFORSOURCE)
+    parser.add_argument("--db", default=DATAPATH+os.sep+"db", help="Location of local EXFOR data files")
     return parser.parse_args()
+
+
+# ------------------------------------------------------------------------------
+#                            .... UTILITIES ....
+# ------------------------------------------------------------------------------
+def archive_metadata(_datapath, _metadata):
+    raise NotImplementedError()
+    with open("x4i/data/database_info.json") as jsonfile:
+        jsondata = json.load(jsonfile)
+        EXFORZIP = jsondata["zipfile"]
+        EXFORURL = jsondata["url"] + EXFORZIP
+
+def remove_old_db(_db):
+    raise NotImplementedError() 
+
+def rebuild_index(_datapath, _db):
+    raise NotImplementedError() 
+    subprocess.run(["bin/setup-exfor-db.py"])
 
 
 # ------------------------------------------------------------------------------
 #                            .... MAIN ....
 # ------------------------------------------------------------------------------
 if __name__ == "__main__":
-    # Command line parsing
     args = parse_args()
+    metadata = {}
+    metadata.update(EXFORSOURCES[args.source])
+    remove_old_db(args.db)
 
-    EXFORZIP=None #"X4-2021-03-08.zip"
-    EXFORURL=None #"https://www-nds.iaea.org/exfor-master/x4toc4/%s"%EXFORZIP
-
-
-    with open("x4i/data/database_info.json") as jsonfile:
-        jsondata = json.load(jsonfile)
-        EXFORZIP = jsondata["zipfile"]
-        EXFORURL = jsondata["url"] + EXFORZIP
-
-    try:
-        with urllib.request.urlopen(urllib.request.Request(EXFORURL, {}, {'User-Agent': "x4i"})) as response:
-            with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
-                shutil.copyfileobj(response, tmp_file)
-
-    except Exception as ex:
-        print("\n ERROR encountered while downloading the EXFOR database:\n  ", ex)
-        print(f"""\n\nAs an alternative, please manually download the database zip file from {EXFORURL},
-    place it in the x4i directory and issue the following command (this takes a while):
-
-    ./bin/setup-exfor-db.py --x4c4-master {EXFORZIP}
-
-    Once that command finishes, {EXFORZIP} can be safely deleted.""")
-
+    if args.source == "NDS-git":
+        raise NotImplementedError("NDS-git") 
+    elif args.source == "NRDC-git":
+        raise NotImplementedError("NRDC-git") 
+    elif args.source == "EXFOR-Master":
+        raise NotImplementedError("EXFOR-Master")
+        try:
+            with urllib.request.urlopen(urllib.request.Request(EXFORURL, {}, {'User-Agent': "x4i"})) as response:
+                with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+                    shutil.copyfileobj(response, tmp_file)
+                    tmp_file.close()
+                    if os.path.exists(tmp_file.name):
+                        os.remove(tmp_file.name)
+        except Exception as ex:
+            print("\n ERROR encountered while downloading the EXFOR database\n  ", ex)
     else:
-        subprocess.run(["bin/setup-exfor-db.py", "--x4c4-master", "%s"%tmp_file.name])
-        tmp_file.close()
-        if os.path.exists(tmp_file.name):
-            os.remove(tmp_file.name)
+        raise ValueError("EXFOR source %s unknown" % args.source)
+
+    archive_metadata(DATAPATH, metadata)
+    rebuild_index(DATAPATH, args.db)
+
+
