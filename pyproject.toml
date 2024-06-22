@@ -20,7 +20,7 @@ authors = [
   {name = "David A. Brown", email = "dbrown@bnl.gov"}
 ]
 maintainers = [
-  {naem = "David A. Brown", email = "dbrown@bnl.gov"}
+  {name = "David A. Brown", email = "dbrown@bnl.gov"}
 ]
 description = "x4i - The EXFOR Interface"
 readme = "README.md"
