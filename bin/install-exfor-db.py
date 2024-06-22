@@ -90,6 +90,7 @@ def parse_args():
 #                            .... UTILITIES ....
 # ------------------------------------------------------------------------------
 def archive_metadata(_datapath, _metadata):
+    return
     raise NotImplementedError()
     with open("x4i/data/database_info.json") as jsonfile:
         jsondata = json.load(jsonfile)
@@ -97,9 +98,13 @@ def archive_metadata(_datapath, _metadata):
         EXFORURL = jsondata["url"] + EXFORZIP
 
 def remove_old_db(_db):
+    print(_db)
+    return
+    shutil.rmtree()
     raise NotImplementedError() 
 
 def rebuild_index(_datapath, _db):
+    return
     raise NotImplementedError() 
     subprocess.run(["bin/setup-exfor-db.py"])
 
@@ -114,11 +119,20 @@ if __name__ == "__main__":
     remove_old_db(args.db)
 
     if args.source == "NDS-git":
-        raise NotImplementedError("NDS-git") 
+        # pull head from github repo
+        subprocess.run(["git", 'clone', '--depth', '1', EXFORSOURCES[args.source]['url']], cwd=DATAPATH)
+        # link right place to "db"
+        #os.symlink()
     elif args.source == "NRDC-git":
-        raise NotImplementedError("NRDC-git") 
+        # pull head from github repo
+        subprocess.run(["git", 'clone', '--depth', '1', EXFORSOURCES[args.source]['url']], cwd=DATAPATH)
+        # link right place to "db"
+        #os.symlink()
     elif args.source == "EXFOR-Master":
         raise NotImplementedError("EXFOR-Master")
+        # download file from NRDC page
+        # unpack page
+        # link right place to db
         try:
             with urllib.request.urlopen(urllib.request.Request(EXFORURL, {}, {'User-Agent': "x4i"})) as response:
                 with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
