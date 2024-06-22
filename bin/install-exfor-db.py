@@ -65,9 +65,6 @@ EXFORSOURCES = {
 	    "relative_data_path": "entry/"}}
 DEFAULTEXFORSOURCE = 'NRDC-git'
 
-#	- commit_hash = ...get the hash...
-#	- sha = ...get the hash...
-#	- downloaded = ...get the datetime...
 
 __doc__ = """
 Install EXFOR data files from one of the varients of the EXFOR Master file or in development NRDC EXFOR git projects.

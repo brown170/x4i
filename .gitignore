@@ -21,4 +21,6 @@ x4i/data/entry/
 x4i/data/exfor_master/
 x4i/data/*.tbl
 x4i/data/*.pickle
+x4i/data/*.json
+x4i/data/db/
 .vscode/
