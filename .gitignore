@@ -15,3 +15,10 @@ x4i.egg-info/
 x4i/*.pyc
 dist/
 MANIFEST
+venv/
+x4i/data/EXFOR-Archive/
+x4i/data/entry/
+x4i/data/exfor_master/
+x4i/data/*.tbl
+x4i/data/*.pickle
+.vscode/
