@@ -13,7 +13,7 @@ dependencies = [
     "pytest",
     "pyparsing",
     "bidict",
-    "tabulate",
+    "tabulate"
 ]
 requires-python = ">=3.0"
 authors = [
