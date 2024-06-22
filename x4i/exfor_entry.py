@@ -68,7 +68,7 @@ def x4EntryFactory(enum, subentsList=None, rawEntry=False, dataPath=DATAPATH, fi
     result = []  # the entry, split into subentries
     try:
         if filePath is None:
-            filePath = os.sep.join([dataPath, 'db', enum[:3], enum + '.x4'])
+            filePath = os.sep.join([dataPath, 'db', enum[:3], enum + '.x4'])  # FIXME: PATHS!!!
         with open_for_reading_universal_newline_flag(filePath) as entryfile:
             entry =entryfile.readlines()
     except IOError:

@@ -189,8 +189,8 @@ def buildMainIndex(verbose=False, stopOnException=False):
     # build up the table
     try:
         if verbose:
-            print(os.sep.join([fullDBPath, '*', '*.x4']))
-        for f in glob.glob(os.sep.join([fullDBPath, '*', '*.x4'])):
+            print(os.sep.join([fullDBPath, '*', '*.x4']))  # FIXME PATHS!!!
+        for f in glob.glob(os.sep.join([fullDBPath, '*', '*.x4'])):  # FIXME PATHS!!!
 
             if False:  # Then we are debugging
                 skipme = True
