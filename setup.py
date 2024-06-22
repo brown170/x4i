@@ -100,7 +100,7 @@ setup(
             os.sep.join( [ 'data', '*.pickle' ] ),
             os.sep.join( [ 'data', 'db', '*', '*.x4' ] ) ] },
     url = 'https://github.com/brown170/x4i',
-    scripts = ["bin/setup-exfor-db.py", "bin/get-entry.py"],
+    scripts = ["bin/setup-exfor-db-index.py", "bin/get-exfor-entry.py", 'bin/install-exfor-db.py'],
     license = open( 'LICENSE.txt' ).read(),
     description = 'A "simple" python interface to the EXFOR library',
     long_description = open( 'README.md' ).read(),
