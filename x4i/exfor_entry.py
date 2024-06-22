@@ -50,25 +50,28 @@
 exfor_entry module
 """
 from .exfor_utilities import COMMENTSTRING, open_for_reading_universal_newline_flag
-from .exfor_paths import DATAPATH
+from .exfor_paths import DATAPATH, exfor_file_path
 import x4i.exfor_subentry as exfor_subentry
 import x4i.exfor_dataset as exfor_dataset
 import x4i.exfor_exceptions as exfor_exceptions
 import os
 
 
-def x4EntryFactory(enum, subentsList=None, rawEntry=False, dataPath=DATAPATH, filePath=None):
+def x4EntryFactory(enum, subentsList=None, rawEntry=False, dataPath=None, filePath=None):
     """
     This function takes an EXFOR ENTRY number (enum), retrieves the corresponding file
     from disk, and constructs a valid X4Entry.  The rawEntry=True flag returns optionally
     just the unparsed list of SUBENTs, each as strings.
+
+    If filePath is given, the function will try to retrieve the named file and look for the entry enum inside.
+    If filePath is not given, it will attempt to construct the name using the exfor_file_path() function
     """
     if len(enum) != 5:
         raise ValueError("A valid EXFOR ENTRY is a string with exactly 5 characters")
     result = []  # the entry, split into subentries
     try:
         if filePath is None:
-            filePath = os.sep.join([dataPath, 'db', enum[:3], enum + '.x4'])  # FIXME: PATHS!!!
+            filePath = exfor_file_path(enum, dataPath) #os.sep.join([dataPath, 'db', enum[:3], enum + '.x4'])  # FIXME: PATHS!!!
         with open_for_reading_universal_newline_flag(filePath) as entryfile:
             entry =entryfile.readlines()
     except IOError:

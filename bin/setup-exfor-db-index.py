@@ -165,7 +165,8 @@ def buildMainIndex(verbose=False, stopOnException=False):
     import pickle
     import pprint
     import glob
-    from x4i import exfor_exceptions, pyparsing
+    import pyparsing
+    from x4i import exfor_exceptions
 
     # clean up previous runs
     if os.path.exists(fullIndexFileName):
@@ -189,8 +190,8 @@ def buildMainIndex(verbose=False, stopOnException=False):
     # build up the table
     try:
         if verbose:
-            print(os.sep.join([fullDBPath, '*', '*.x4']))  # FIXME PATHS!!!
-        for f in glob.glob(os.sep.join([fullDBPath, '*', '*.x4'])):  # FIXME PATHS!!!
+            print(exfor_file_glob(fullDBPath)) 
+        for f in glob.glob(exfor_file_glob(fullDBPath)):  
 
             if False:  # Then we are debugging
                 skipme = True

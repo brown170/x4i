@@ -52,3 +52,13 @@ fullCoupledFileName = DATAPATH + sep + coupledFileName
 fullMonitoredFileName = DATAPATH + sep + monitoredFileName
 fullReactionCountFileName = DATAPATH + sep + reactionCountFileName
 fullDBPath = DATAPATH + sep + dbPath
+
+def exfor_file_path(_enum, _dataPath=DATAPATH):
+    return sep.join([_dataPath, 'db', _enum[:3], _enum + '.x4'])
+    #return sep.join([_dataPath, 'db', _enum[:1], _enum[:3], _enum + '.x4'])
+    #return sep.join([_dataPath, 'db', _enum[:1], _enum + '.txt'])
+
+def exfor_file_glob(_dataPath=DATAPATH):
+    return sep.join([_dataPath, 'db', '*', '*.x4'])
+    #return sep.join([_dataPath, 'db', '*', '*', '*.x4'])
+    #return sep.join([_dataPath, 'db', '*', '*.txt'])

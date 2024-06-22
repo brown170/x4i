@@ -63,7 +63,7 @@ EXFORSOURCES = {
         "url": "https://www-nds.iaea.org/nrdc/exfor-master/entry/entry.zip",
 	    "mode": "zip",
 	    "relative_data_path": "entry/"}}
-DEFAULTEXFORSOURCE = 'NRDC-git'
+DEFAULTEXFORSOURCE = 'NDS-git'
 
 
 __doc__ = """
