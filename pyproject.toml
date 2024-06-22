@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "x4i"
+version = "1.0.4"
+dependencies = [
+    "numpy",
+    "pint",
+    "pandas",
+    "pint_pandas",
+    "pytest",
+    "pyparsing",
+    "bidict",
+    "tabulate",
+]
+requires-python = ">=3.0"
+authors = [
+  {name = "David A. Brown", email = "dbrown@bnl.gov"},
+]
+maintainers = [
+  {"David A. Brown", email = "dbrown@bnl.gov"}
+]
+description = "x4i - The EXFOR Interface"
+readme = "README.md"
+license = {file = "LICENSE.txt"}
+keywords = ["EXFOR", "nuclear reaction data"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Programming Language :: Python"
+]
+
+[project.urls]
+Homepage = "https://github.com/brown170/x4i"
+Documentation = "https://github.com/brown170/x4i/blob/main/doc/x4i/user-guide/x4i.pdf"
+Repository = "https://github.com/brown170/x4i.git"
+"Bug Tracker" = "https://github.com/brown170/x4i/issues"
+Changelog = "https://github.com/brown170/x4i/blob/main/CHANGES.txt"
