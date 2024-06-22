@@ -75,6 +75,7 @@
 #   36.     adding documentation, simplifying filenames (David Brown <dbrown@bnl.gov>, 2012-07-24T13:56:25)
 #   37.     add the shell interpreter so htey execute OK (David Brown <dbrown@bnl.gov>, 2012-07-24T13:16:18)
 #   38.     renaming the files and making them executable (David Brown <dbrown@bnl.gov>, 2012-07-24T13:14:24)
+#   39.     streamline file - it should only (re)build the EXFOR index
 #
 ################################################################################
 
@@ -83,7 +84,7 @@ import os
 import argparse
 import collections
 from x4i import DATAPATH, fullIndexFileName, fullErrorFileName, fullCoupledFileName, fullMonitoredFileName, \
-    fullReactionCountFileName, fullDBZipFileName, fullDBPath
+    fullReactionCountFileName, fullDBPath
 
 # ------------------------------------------------------
 # Global data
@@ -96,112 +97,8 @@ reactionCount = {}
 
 
 # ------------------------------------------------------
-#  Zipfile management
+#   Tools to actually build the database
 # ------------------------------------------------------
-
-def unpackEXFORMaster(newZipFile, verbose=False):
-    """Unpack an EXFOR master file"""
-    import shutil
-    import subprocess
-    import glob
-    import x4i.exfor_utilities
-
-    # clean up previous run(s)
-    for xPath in [fullDBPath]:
-        if os.path.exists(xPath):
-            if verbose:
-                print("Deleting old copy of " + xPath)
-            shutil.rmtree(xPath)
-
-    # move the new file in place
-    shutil.copy(newZipFile, DATAPATH)
-    newZipFile = newZipFile.split(os.sep)[-1]
-
-    # unzip
-    unpackedDir = newZipFile.replace('.zip', '')
-    fullUnpackedDir = DATAPATH + os.sep + unpackedDir
-    os.makedirs(DATAPATH + os.sep + unpackedDir)
-    if verbose:
-        subprocess.check_call(['unzip', '..' + os.sep + newZipFile], cwd=fullUnpackedDir)
-    else:
-        subprocess.check_output(['unzip', '..' + os.sep + newZipFile], cwd=fullUnpackedDir)
-
-    # repackage the file
-    backupFile = glob.glob(os.sep.join([DATAPATH, unpackedDir, '*.bck']))[0]
-    theLines = open(backupFile, mode='r').readlines()
-    for entry in x4i.exfor_utilities.chunkifyX4Request(theLines):
-        for line in entry:
-            if 'ENTRY' in line:
-                entryNum = line[17:22]
-                break
-        newX4Path = os.sep.join([fullDBPath, entryNum[0:3]])
-        if not os.path.exists(newX4Path):
-            os.makedirs(newX4Path)
-        newX4File = entryNum + '.x4'
-        open(newX4Path + os.sep + newX4File, mode='w').writelines(''.join(entry))
-
-    # cleanup
-    shutil.rmtree(fullUnpackedDir)
-
-    # make a symlink to the zipfile so everyone knows what the current one is
-    if os.path.exists(fullDBZipFileName):
-        os.remove(fullDBZipFileName)
-    os.symlink(DATAPATH + os.sep + newZipFile, fullDBZipFileName)
-
-
-def unpackX4C4Master(newZipFile, verbose=False):
-    """Unpack an x4c4 master file"""
-    import shutil
-    import subprocess
-
-    # clean up previous run(s)
-    for xPath in [fullDBPath, DATAPATH + os.sep + 'X4all']:
-        if os.path.exists(xPath):
-            if verbose:
-                print("Deleting old copy of " + xPath)
-            shutil.rmtree(xPath)
-
-    # move the new file in place
-    shutil.copy(newZipFile, DATAPATH)
-    newZipFile = newZipFile.split(os.sep)[-1]
-
-    # unpack
-    if verbose:
-        subprocess.check_call(['unzip', newZipFile], cwd=DATAPATH)
-    else:
-        subprocess.check_output(['unzip', newZipFile], cwd=DATAPATH)
-    if not os.path.exists(DATAPATH + os.sep + 'X4all'):
-        raise IOError(
-            "Cannot find file " + DATAPATH + os.sep + 'X4all' +
-            ', was the zipfile really a X4C4 master file?  Anyway, you have some cleaning to do in ' + DATAPATH)
-
-    # rename db (always comes out called "X4all")
-    if verbose:
-        print("Renaming " + DATAPATH + os.sep + 'X4all' + " to " + fullDBPath)
-    shutil.move(DATAPATH + os.sep + 'X4all', fullDBPath)
-
-    # make a symlink to the zipfile so everyone knows what the current one is
-    if os.path.exists(fullDBZipFileName):
-        os.remove(fullDBZipFileName)
-    os.symlink(DATAPATH + os.sep + newZipFile, fullDBZipFileName)
-
-
-# ------------------------------------------------------
-#   Single entry/subentry/transaction management
-# ------------------------------------------------------
-
-# Not Implemented Yet
-# use exfor_utilities.py's chunkifyX4Request() to split up a TRANS or REQUEST
-
-
-# ------------------------------------------------------
-#  Tools to manage the dictionaries
-# ------------------------------------------------------
-
-def buildDictionaryIndex(dictionaryFile, verbose=False):
-    raise NotImplementedError()
-
-
 def buildDOIIndex(doiFile, verbose=False): # creates doiXref database
     """
     Adds the DOI cross reference table to the main index.
@@ -225,11 +122,6 @@ def buildDOIIndex(doiFile, verbose=False): # creates doiXref database
     # commit & close connection to database
     connection.commit()
     cursor.close()
-
-
-# ------------------------------------------------------
-#   Tools to actually build the database
-# ------------------------------------------------------
 
 
 def buildMainIndex(verbose=False, stopOnException=False):
@@ -639,34 +531,16 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Manage the installation & update of x4i's internal copy of the EXFOR database.")
     if True:
-        parser.set_defaults(verbose=False, add_entry=None, add_subentry=None, add_trans=None, exfor_master=None)
+        parser.set_defaults(verbose=False)
         parser.add_argument("-v", action="store_true", dest='verbose', help="Enable verbose output")
         parser.add_argument("-q", action="store_false", dest='verbose', help="Disable verbose output")
 
         # ------- Control over update actions -------
-        parser.add_argument("--build-index", action="store_true", default=False,
+        parser.add_argument("--build-index", dest='build_index', action="store_true", default=True,
                             help="Just (re)builds the sqlite database indexing the EXFOR data in the project.  "
                                  "The EXFOR data must be already installed.")
-        parser.add_argument("--just-unpack", action="store_true", default=False,
-                            help="Just unpack the EXFOR data, then stop.  Do not (re)build the sqlite database index.")
-
-        # ------- Add (sub)entries -------
-        #parser.add_argument("--add-entry", metavar='FILE', type=str, default=None,
-        #                    help="Add a single entry x4i's EXFOR database, overwriting an existing one possibly.  "
-        #                         "Update the index.")
-        #parser.add_argument("--add-subentry", metavar='FILE', type=str, default=None,
-        #                    help="Add a single subentry x4i's EXFOR database, overwriting an existing one possibly.  "
-        #                         "Update the index.")
-        #parser.add_argument("--add-trans", metavar='TRANS', type=str, default=None,
-        #                    help="""Add all the (sub)entries in one IAEA EXFOR transaction and update the index.
-        #        The transactions should be zipped, otherwise use the "--add-entry" or "--add-subentry" options.
-        #        All transactions are available at:  http://www-nds.iaea.org/exfor-master/backup/?C=M;O=D""")
-
-        # ------- Remove (sub)entries -------
-        parser.add_argument("--remove-entry", metavar='ENTRY', type=str, default=None,
-                            help="Remove an entry matching this key.")
-        parser.add_argument("--remove-subentry", metavar='SUBENT', type=str, default=None,
-                            help="Remove a subentry matching this key.")
+        parser.add_argument("--no-build-index", dest='build_index', action="store_false", 
+                            help="Do not (re)builds the sqlite database indexing the EXFOR data in the project.")
 
         # ------- View/save logs -------
         parser.add_argument("--view-errors", action="store_true", default=False,
@@ -678,58 +552,16 @@ if __name__ == "__main__":
                             help="Write all the coupled data encountered when generating the index of the EXFOR files "
                                  "to this file.  This is a csv formatted file suitable for viewing in MS Excel.")
 
-        # ------- Main database loads -------
-        parser.add_argument("--x4c4-master", metavar='ZIPFILE', type=str, default=None,
-                            help="""Install the (hopefully) IAEA generated X4TOC4 zipfile [zipfile] into the project,
-                                    unpack the zipfile, then build the index.
-                                    The file is available here:  http://www-nds.iaea.org/x4toc4-master/?C=M;O=D""")
-        #parser.add_argument("--exfor-master", metavar='ZIPFILE', type=str, default=None,
-        #                    help="""Install the (hopefully) IAEA generated EXFOR Master File [a zipfile] into the
-        #                            project,  unpack the zipfile, then build the index.  The file is available here:
-        #                            http://www-nds.iaea.org/exfor-master/backup/?C=M;O=D""")
-
-        # ------- Update the EXFOR dicts. -------
-        parser.add_argument("--dict", type=str, default=None,
-                            help='Reinstall the EXFOR dictionaries using the contents from this IAEA EXFOR dictionary '
-                                 'Transaction file.')
+        # ------- Misc -------
         parser.add_argument("--doi", type=str, default=None,
                             help='Reinstall the EXFOR doi <-> entry mapping using the contents from this IAEA EXFOR '
                                  'dictionary text file.')
 
     args = parser.parse_args()
 
-    # ------- Add (sub)entries -------
-    if args.add_trans is not None:
-        raise NotImplementedError()
-    elif args.add_entry is not None:
-        raise NotImplementedError()
-    elif args.add_subentry is not None:
-        raise NotImplementedError()
-
-    # ------- Remove (sub)entries -------
-    elif args.remove_entry is not None:
-        raise NotImplementedError()
-    elif args.remove_subentry is not None:
-        raise NotImplementedError()
-
-    # ------- Main database load actions -------
-    elif args.exfor_master is not None or args.x4c4_master is not None:
-        if args.exfor_master is not None:
-            unpackEXFORMaster(args.exfor_master, verbose=args.verbose)
-        elif args.x4c4_master is not None:
-            unpackX4C4Master(args.x4c4_master, verbose=args.verbose)
-        if not args.just_unpack:
-            buildMainIndex(verbose=args.verbose)
-            buildDOIIndex(DATAPATH + os.sep + 'x4doi.txt', verbose=args.verbose)
-    elif args.build_index:
+    if args.build_index:
         buildMainIndex(verbose=args.verbose)
-        buildDOIIndex(DATAPATH + os.sep + 'x4doi.txt', verbose=args.verbose)
-
-    # ------- Update the EXFOR dicts. -------
-    elif args.dict is not None:
-        buildDictionaryIndex(args.dict, verbose=args.verbose)
-    elif args.doi is not None:
-        buildDOIIndex(args.doi, verbose=args.verbose)
+        buildDOIIndex(fullDoiFileName, verbose=args.verbose)
 
     # ------- View/save logs -------
     if args.error_log is not None:
