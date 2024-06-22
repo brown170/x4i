@@ -50,8 +50,6 @@ import datetime
 from x4i.exfor_paths import DATAPATH
 
 
-DOWNLOAD = False  # for debugging with terrible internet, skip downloading
-
 EXFORSOURCES = {
     "NDS-git": {
         "url": "https://github.com/IAEA-NDS/exfor_master.git",
@@ -86,6 +84,8 @@ def parse_args():
     parser.add_argument('-v', dest='verbose', default=False, action='store_true', help="Enable verbose output.")
     parser.add_argument('--source', choices=EXFORSOURCES.keys(), default=DEFAULTEXFORSOURCE,
                         help="Output format (Default: %s)" % DEFAULTEXFORSOURCE)
+    parser.add_argument('--skip-download', default=False, action='store_true',
+                        help="Skip downloading from data source (i.e., you already have it for some reason)")
     parser.add_argument("--db", default=DATAPATH+os.sep+"db", help="Location of local EXFOR data files")
     return parser.parse_args()
 
@@ -94,23 +94,13 @@ def parse_args():
 #                            .... UTILITIES ....
 # ------------------------------------------------------------------------------
 def archive_metadata(_datapath, _metadata):
-    return
-    raise NotImplementedError()
-    with open("x4i/data/database_info.json") as jsonfile:
-        jsondata = json.load(jsonfile)
-        EXFORZIP = jsondata["zipfile"]
-        EXFORURL = jsondata["url"] + EXFORZIP
-
-def remove_old_db(_db):
-    print(_db)
-    return
-    shutil.rmtree()
-    raise NotImplementedError() 
-
-def rebuild_index(_datapath, _db):
-    return
-    raise NotImplementedError() 
-    subprocess.run(["bin/setup-exfor-db.py"])
+    fname = DATAPATH+os.sep+"database_info.json"
+    # remove old file
+    if os.path.exists(fname):
+        os.remove(fname)
+    # save new data
+    with open(fname, mode='w') as jsonfile:
+        json.dump(_metadata, jsonfile)
 
 
 # ------------------------------------------------------------------------------
@@ -118,11 +108,15 @@ def rebuild_index(_datapath, _db):
 # ------------------------------------------------------------------------------
 if __name__ == "__main__":
     args = parse_args()
+
+    # Metadata about this data source download
     metadata = {}
     metadata.update(EXFORSOURCES[args.source])
-    remove_old_db(args.db)
 
-    if DOWNLOAD:
+    # Remove old database (link)
+    os.unlink(args.db) 
+
+    if not args.skip_download:
         if EXFORSOURCES[args.source]['mode'] == 'git':
             # pull head from github repo
             subprocess.run(["git", 'clone', '--depth', '1', EXFORSOURCES[args.source]['url']], cwd=DATAPATH)
@@ -146,9 +140,13 @@ if __name__ == "__main__":
             raise ValueError("EXFOR source %s unknown" % args.source)
 
     # link right place to "db"
-    #os.symlink(DATAPATH + os.sep + EXFORSOURCES[args.source]['relative_data_path'], args.db)
+    os.symlink(DATAPATH + os.sep + EXFORSOURCES[args.source]['relative_data_path'], args.db)
+
+    # save the metadata about this download
     metadata['downloaded'] = str(datetime.datetime.now())
     archive_metadata(DATAPATH, metadata)
-    rebuild_index(DATAPATH, args.db)
+
+    # Rebuild index
+    subprocess.run(["setup-exfor-db-index.py"])
 
 

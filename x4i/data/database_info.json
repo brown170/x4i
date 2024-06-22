@@ -1,6 +1,1 @@
-{
-  "url"       :"https://www-nds.iaea.org/exfor-master/x4toc4/",
-  "zipfile"   :"X4-2021-03-08.zip",
-  "downloaded":"Jul 19  2019",
-  "sha"       :"180276c3e1344cfde93baf7c9db24c6ff3513d42"
-}
+{"url": "https://github.com/IAEA-NDS/exfor_master.git", "mode": "git", "relative_data_path": "exfor_master/exforall/", "downloaded": "2024-06-22 15:20:46.621297"}
