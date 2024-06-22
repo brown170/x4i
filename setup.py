@@ -38,49 +38,7 @@
 ################################################################################
 
 from distutils.core import setup
-from setuptools.command.develop import develop
-from setuptools.command.install import install
 import os
-import subprocess
-import tempfile
-import shutil
-import urllib.request
-import json
-
-
-EXFORZIP=None #"X4-2021-03-08.zip"
-EXFORURL=None #"https://www-nds.iaea.org/exfor-master/x4toc4/%s"%EXFORZIP
-
-
-with open("x4i/data/database_info.json") as jsonfile:
-    jsondata = json.load(jsonfile)
-    EXFORZIP = jsondata["zipfile"]
-    EXFORURL = jsondata["url"] + EXFORZIP
-
-
-class PostDevelopCommand(develop):
-    """Post-installation for development mode."""
-    def run(self):
-        develop.run(self)
-
-
-class PostInstallCommand(install):
-    """Post-installation for installation mode."""
-    def run(self):
-        print("X4i is rebuilding the EXFOR index.\n-->THIS WILL TAKE A LONG TIME, DON'T END THE PROCESS!! Just go get a snack.")
-        install.run(self)
-
-        # Get the version of EXFOR that we've been using for a while
-        # this could be done way better with SHA hash checking, log files & stuff and
-        # be part of setup-exfor-db.py.
-        with urllib.request.urlopen(urllib.request.Request(EXFORURL, {}, {'User-Agent': "x4i"})) as response:
-            with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
-                shutil.copyfileobj(response, tmp_file)
-        subprocess.run(["bin/setup-exfor-db.py", "--x4c4-master", "%s"%tmp_file.name])
-        tmp_file.close()
-        if os.path.exists(tmp_file.name):
-            os.remove(tmp_file.name)
-
 
 setup(
     name = 'x4i',
@@ -103,9 +61,5 @@ setup(
     scripts = ["bin/setup-exfor-db-index.py", "bin/get-exfor-entry.py", 'bin/install-exfor-db.py'],
     license = open( 'LICENSE.txt' ).read(),
     description = 'A "simple" python interface to the EXFOR library',
-    long_description = open( 'README.md' ).read(),
-    cmdclass={
-        'develop': PostDevelopCommand,
-        'install': PostInstallCommand,
-    },
+    long_description = open( 'README.md' ).read()
 )
