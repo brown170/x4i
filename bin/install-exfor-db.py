@@ -45,8 +45,12 @@ import tempfile
 import shutil
 import urllib.request
 import json
+import zipfile
+import datetime
 from x4i.exfor_paths import DATAPATH
 
+
+DOWNLOAD = False  # for debugging with terrible internet, skip downloading
 
 EXFORSOURCES = {
     "NDS-git": {
@@ -118,33 +122,32 @@ if __name__ == "__main__":
     metadata.update(EXFORSOURCES[args.source])
     remove_old_db(args.db)
 
-    if args.source == "NDS-git":
-        # pull head from github repo
-        subprocess.run(["git", 'clone', '--depth', '1', EXFORSOURCES[args.source]['url']], cwd=DATAPATH)
-        # link right place to "db"
-        #os.symlink()
-    elif args.source == "NRDC-git":
-        # pull head from github repo
-        subprocess.run(["git", 'clone', '--depth', '1', EXFORSOURCES[args.source]['url']], cwd=DATAPATH)
-        # link right place to "db"
-        #os.symlink()
-    elif args.source == "EXFOR-Master":
-        raise NotImplementedError("EXFOR-Master")
-        # download file from NRDC page
-        # unpack page
-        # link right place to db
-        try:
-            with urllib.request.urlopen(urllib.request.Request(EXFORURL, {}, {'User-Agent': "x4i"})) as response:
-                with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
-                    shutil.copyfileobj(response, tmp_file)
-                    tmp_file.close()
-                    if os.path.exists(tmp_file.name):
-                        os.remove(tmp_file.name)
-        except Exception as ex:
-            print("\n ERROR encountered while downloading the EXFOR database\n  ", ex)
-    else:
-        raise ValueError("EXFOR source %s unknown" % args.source)
+    if DOWNLOAD:
+        if EXFORSOURCES[args.source]['mode'] == 'git':
+            # pull head from github repo
+            subprocess.run(["git", 'clone', '--depth', '1', EXFORSOURCES[args.source]['url']], cwd=DATAPATH)
 
+        elif EXFORSOURCES[args.source]['mode'] == 'zip':
+            with tempfile.NamedTemporaryFile(delete=False, dir=DATAPATH) as tmp_file:
+                # download file from NRDC page
+                with urllib.request.urlopen(
+                        urllib.request.Request(
+                            EXFORSOURCES[args.source]['url'], 
+                            {}, 
+                            {'User-Agent': "x4i"})) as response:
+                    shutil.copyfileobj(response, tmp_file)
+                    # unpack zipfile
+                    with zipfile.ZipFile(tmp_file) as zf:
+                        zf.extractall(path=DATAPATH)
+                # clean up
+                if os.path.exists(tmp_file.name):
+                    os.remove(tmp_file.name)
+        else:
+            raise ValueError("EXFOR source %s unknown" % args.source)
+
+    # link right place to "db"
+    #os.symlink(DATAPATH + os.sep + EXFORSOURCES[args.source]['relative_data_path'], args.db)
+    metadata['downloaded'] = str(datetime.datetime.now())
     archive_metadata(DATAPATH, metadata)
     rebuild_index(DATAPATH, args.db)
 
