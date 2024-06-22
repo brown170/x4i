@@ -144,6 +144,9 @@ if __name__ == "__main__":
     archive_metadata(DATAPATH, metadata)
 
     # Rebuild index
-    subprocess.run(["setup-exfor-db-index.py"])
+    if args.verbose:
+        subprocess.run(["setup-exfor-db-index.py", "-v"])
+    else:
+        subprocess.run(["setup-exfor-db-index.py"])
 
 

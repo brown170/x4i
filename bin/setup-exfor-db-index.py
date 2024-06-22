@@ -84,7 +84,7 @@ import os
 import argparse
 import collections
 from x4i import DATAPATH, fullIndexFileName, fullErrorFileName, fullCoupledFileName, fullMonitoredFileName, \
-    fullReactionCountFileName, fullDBPath
+    fullReactionCountFileName, fullDBPath, fullDoiFileName, exfor_file_glob
 
 # ------------------------------------------------------
 # Global data
@@ -190,8 +190,8 @@ def buildMainIndex(verbose=False, stopOnException=False):
     # build up the table
     try:
         if verbose:
-            print(exfor_file_glob(fullDBPath)) 
-        for f in glob.glob(exfor_file_glob(fullDBPath)):  
+            print(exfor_file_glob(DATAPATH)) 
+        for f in glob.glob(exfor_file_glob(DATAPATH)):  
 
             if False:  # Then we are debugging
                 skipme = True
