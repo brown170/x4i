@@ -77,15 +77,12 @@ def query(**kw):
 
 
 def raw_retrieve(**kw):
+    kw["rawEntry"]=True
     return __databaseManager.retrieve(**kw)
 
 
 def retrieve(**kw):
-    rr = {}
-    r = __databaseManager.retrieve(**kw)
-    for k, v in r.items():
-        rr[k] = exfor_entry.X4Entry(v)
-    return rr
+    return __databaseManager.retrieve(**kw)
 
 
 __all__ = [

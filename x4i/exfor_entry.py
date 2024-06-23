@@ -67,11 +67,11 @@ def x4EntryFactory(enum, subentsList=None, rawEntry=False, dataPath=None, filePa
     If filePath is not given, it will attempt to construct the name using the exfor_file_path() function
     """
     if len(enum) != 5:
-        raise ValueError("A valid EXFOR ENTRY is a string with exactly 5 characters")
+        raise ValueError("A valid EXFOR ENTRY is a string with exactly 5 characters, I have '%s'" % enum)
     result = []  # the entry, split into subentries
     try:
         if filePath is None:
-            filePath = exfor_file_path(enum, dataPath) #os.sep.join([dataPath, 'db', enum[:3], enum + '.x4'])  # FIXME: PATHS!!!
+            filePath = exfor_file_path(enum, dataPath)
         with open_for_reading_universal_newline_flag(filePath) as entryfile:
             entry =entryfile.readlines()
     except IOError:

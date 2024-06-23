@@ -50,7 +50,7 @@ def process_args():
     parser.add_argument("-q", action="store_false", dest='verbose', help="disable verbose output")
     parser.add_argument("-s", dest="subent", default=None, type=str, help="Subentry to retrieve" )
     parser.add_argument("-e", dest="ent", default=None, type=str, help="Entry to examine: prints out the SUBENTs" )
-    parser.add_argument("-f", dest="getFile", default=False, action='store_true', help="Don't use the exfor_manager.X4DBManager, just grab from the file directly.  The file name is constructed from the ENTRY you specify and resides in the main x4i database." )
+    parser.add_argument("-f", dest="file", default=None, type=str, help="Don't use the exfor_manager.X4DBManager, just grab from the file directly.  The file name is the argument of -f" )
     parser.add_argument("--raw", default=False, dest="raw", action="store_true", help="Get raw EXFOR file, don't translate" )
     parser.add_argument("--rawdata", default=False, dest="rawdata", action="store_true", help="Extract raw form of data in EXFOR data" )
     parser.add_argument("--data", default=False, dest="data", action="store_true", help="Extract simple form of data in EXFOR data" )
@@ -63,18 +63,18 @@ if __name__ == "__main__":
     args = process_args()
     if args.subent == None and args.ent == None:
         raise ValueError("No ENTRY or SUBENT specified")
-    if args.subent != None and len( args.subent ) != 8: raise ValueError( "SUBENT must have 8 characters" )
-    if args.ent != None and len( args.ent ) != 5: raise ValueError( "ENTRY must have 5 characters" )
+    if args.subent != None and len( args.subent ) != 8: 
+        raise ValueError( "SUBENT must have 8 characters" )
+    if args.ent != None and len( args.ent ) != 5: 
+        raise ValueError( "ENTRY must have 5 characters, have '%s'" % args.ent )
 
     # Get the ENTRY/SUBENTRY requested
-    if not args.getFile:
+    if not args.file:
         dbMgr = exfor_manager.X4DBManagerPlainFS( )
-        if args.ent != None:    searchResult = dbMgr.retrieve( ENTRY = args.ent )
-        else:                   searchResult = dbMgr.retrieve( SUBENT = args.subent )
+        if args.ent != None:    searchResult = dbMgr.retrieve( ENTRY = args.ent, rawEntry=args.raw )
+        else:                   searchResult = dbMgr.retrieve( SUBENT = args.subent, rawEntry=args.raw  )
     else:
-        if args.ent != None: theEntry = args.ent
-        else:                theEntry = args.subent[0:5]
-        searchResult = { theEntry : exfor_entry.x4EntryFactory( theEntry, rawEntry=args.raw ) }
+        searchResult = exfor_entry.x4EntryFactory( args.ent, filePath=args.file, rawEntry=args.raw )
         if args.subent != None: # must filter
             if args.raw: pass
             else:
@@ -82,6 +82,8 @@ if __name__ == "__main__":
                 for k in list(searchResult[ theEntry ].keys()):
                     if k.endswith( '001' ) or k == args.subent: continue
                     del( searchResult[ theEntry ][k] )
+
+    print(searchResult)
 
     # Just print out the SUBENT keys
     if args.ent != None:
