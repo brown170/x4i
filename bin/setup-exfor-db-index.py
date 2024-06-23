@@ -191,6 +191,7 @@ def buildMainIndex(verbose=False, stopOnException=False):
     try:
         if verbose:
             print(exfor_file_glob(DATAPATH)) 
+
         for f in glob.glob(exfor_file_glob(DATAPATH)):  
 
             if False:  # Then we are debugging
@@ -319,7 +320,7 @@ def processEntry(entryFileName, cursor=None, coupledReactionEntries={}, monitore
     from x4i import exfor_entry, exfor_reactions, exfor_manager
     if verbose:
         print('        ', entryFileName.split(os.sep)[-1], end=' ')
-    e = exfor_entry.x4EntryFactory(entryFileName.split(os.sep)[-1].split('.')[0])
+    e = exfor_entry.x4EntryFactory(entryFileName.split(os.sep)[-1].split('.')[0], filePath=entryFileName)
     doc_bib = e[1]['BIB']
     try:
         m = e.meta().legend()
