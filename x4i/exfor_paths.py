@@ -33,25 +33,32 @@ from os import sep, path
 
 # Common filenames
 indexFileName = 'index.tbl'
-dictionaryFileName = 'dictionaries.tbl'
-doiFileName = 'doi.tbl'
+doiFileName = 'x4doi.txt'
 errorFileName = 'error-entries.pickle'
 coupledFileName = 'coupled-entries.pickle'
 monitoredFileName = 'monitored-entries.pickle'
 reactionCountFileName = 'reaction-count.pickle'
-dbZipFileName = 'exfor-current.zip'
 dbPath = 'db'
 
 __path__ = path.split(__file__)[0]
 
 # Paths for standard usage
 DATAPATH = sep.join([__path__, 'data'])
+DICTPATH = sep.join([__path__, 'dicts'])
 fullIndexFileName = DATAPATH + sep + indexFileName
-fullDictionaryFileName = DATAPATH + sep + dictionaryFileName
 fullDoiFileName = DATAPATH + sep + doiFileName
 fullErrorFileName = DATAPATH + sep + errorFileName
 fullCoupledFileName = DATAPATH + sep + coupledFileName
 fullMonitoredFileName = DATAPATH + sep + monitoredFileName
 fullReactionCountFileName = DATAPATH + sep + reactionCountFileName
-fullDBZipFileName = DATAPATH + sep + dbZipFileName
 fullDBPath = DATAPATH + sep + dbPath
+
+def exfor_file_path(_enum, _dataPath=DATAPATH):
+    return sep.join([_dataPath, 'db', _enum[:3], _enum + '.x4'])
+    #return sep.join([_dataPath, 'db', _enum[:1], _enum[:3], _enum + '.x4'])
+    #return sep.join([_dataPath, 'db', _enum[:1], _enum + '.txt'])
+
+def exfor_file_glob(_dataPath=DATAPATH):
+    return sep.join([_dataPath, 'db', '*', '*.x4'])
+    #return sep.join([_dataPath, 'db', '*', '*', '*.x4'])
+    #return sep.join([_dataPath, 'db', '*', '*.txt'])

@@ -36,7 +36,7 @@ exfor_grammars module - Collection of pyparsing grammars for parsing Exfor objec
 __version__ = "0.0.1"
 __author__ = "David Brown <brown170@llnl.gov>"
 
-from .pyparsing import *
+from pyparsing import *
 from .exfor_dicts import *
 
 # ------------------------------------------------------
@@ -73,12 +73,12 @@ altaddop = plus | minus
 x4isomer_modifier = Word('mMgGTL', max=1) + Optional(Word(nums))
 
 x4basicparticle = Optional(Literal('X')) + eval(
-    '^'.join(['Literal( \"' + x + '\" )' for x in X4DictionaryServer()["Particles"].keys()]))
+    '^'.join(['Literal( \"' + x + '\" )' for x in get_exfor_dict("Particles").keys()]))
 x4particle = Combine(Word(alphas) + Optional(Word(nums)))
 x4element = Word(capsStar, alphas, min=1, max=2) ^ Literal("PI") ^ Literal("K0") ^ Literal("PIM") ^ Literal(
     "PIP") ^ Literal("P0")
 x4nucleus = Word(nums) + dash + x4element + dash + Word(nums) + ZeroOrMore(mathop + x4isomer_modifier)
-x4chemical_compound = eval('^'.join(['Literal( \"' + x + '\" )' for x in X4DictionaryServer()["Compounds"].keys()]))
+x4chemical_compound = eval('^'.join(['Literal( \"' + x + '\" )' for x in get_exfor_dict("Chemical compounds").keys()]))
 
 x4projectile = Group(x4nucleus) ^ x4particle ^ Literal('0')
 x4target = Group(x4chemical_compound | x4nucleus) ^ Literal("ELEM/MASS") ^ Literal("MASS") ^ Literal("ELEM")
@@ -120,8 +120,11 @@ x4code = (lpar + x4phrase + rpar) ^ (lpar + lpar + x4phrase + rpar + equals + lp
 x4codefield = Group(x4code) + ZeroOrMore(x4word)
 x4textfield = OneOrMore(Group(x4codefield))
 
+x4institute = Word(alphanums + " ", exact=7)
+x4institutefield = OneOrMore(Group(lpar + delimitedList(x4institute, ",") + rpar) + ZeroOrMore(x4word))
+
 x4authorfield = nestedExpr() + restOfLine
-x4authorlist = commaSeparatedList
+x4authorlist = common.comma_separated_list
 
 x4refcode = nestedExpr() + restOfLine
 x4refcodetautology = (lpar + nestedExpr() + OneOrMore(equals + nestedExpr()) + rpar) + restOfLine

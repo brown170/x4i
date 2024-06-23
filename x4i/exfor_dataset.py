@@ -59,17 +59,43 @@
 from __future__ import print_function, division
 
 import copy
-
+import pint 
+import pint_pandas
+import pandas
+import tabulate
+import numpy as np
 from .exfor_column_parsing import *
 from .exfor_exceptions import *
 from .exfor_reactions import X4ReactionCombination
 from .exfor_section import X4BibMetaData
 from .exfor_utilities import unique, COMMENTSTRING
+from .exfor_units import *
+
+
+pint_pandas.PintType.ureg = exfor_unit_registry
+pint_pandas.PintType.ureg.default_format = "P~"  # by default, display units in non-silly ways
+
+
+def dataframe_from_datasection(_data):
+        _columns = {}
+        for _ic, _label in enumerate(_data.labels):
+            _columns[_label] = pandas.Series(
+                [x[_ic] for x in _data.data], 
+                dtype="pint[%s]" % exfor_pint_unit_map[_data.units[_ic]])
+        return pandas.DataFrame(_columns)
 
 
 class X4DataSet(X4BibMetaData):
 
     def __init__(self, meta=None, common=None, reaction=None, monitor=None, data=None, pointer=None):
+        """
+        meta: x4i common meta data collection
+        common: EXFOR COMMON section 
+        reaction: REACTION instance, defaults to None 
+        monitor: REACTION instance for any monitor reaction, defaults to None 
+        data:  EXFOR DATA section, should be an instance of X4DataSection
+        pointer: ugh, the EXFOR pointer for the dataset, defaults to None
+        """
         # Initialize merged meta data, a needlessly complicated process
         X4BibMetaData.__init__(self, author="None", institute="None", title="None", pubType="None", year="None")
         if meta is not None:
@@ -79,66 +105,125 @@ class X4DataSet(X4BibMetaData):
                 for k in m.__slots__:
                     if not getattr(m, k) in [None, "None"]:
                         setattr(self, k, getattr(m, k))
+
+        # Intialize important operational flags
+        self.__simplified = False
+        self.__pointer = pointer  # To deal with EXFOR's strange pointer implementation
+
         # Initializing the reaction is easy!
-        self.reaction = reaction
-        self.monitor = monitor
-        # Initializing the data is less so...
-        self.labels = []
-        self.units = []
-        self.data = []
-        self.simplified = False
+        self.__reaction = reaction
+        self.__monitor = monitor
         if reaction is None:
-            self.coupled = False
+            self.__coupled = False
         else:
-            self.coupled = isinstance(reaction[0], X4ReactionCombination)
+            self.__coupled = isinstance(reaction[0], X4ReactionCombination)
+
+        # Initializing the data is less so...
+        self.__labels = []  # what EXFOR uses for labels, and may not be what underlying dataframe will ultimately use (DO WE NEED THIS?)
+        self.__units = []   # what EXFOR uses for units, we will mapt these to pint units in the pandas dataframe (DO WE NEED THIS?)
+        self.__data = None  # this will be a pint-powered pandas dataframe
+        self.__simplified = False
         if data is not None:
             self.setData(data, common, pointer)
 
+    @property
+    def reaction(self):
+        return self.__reaction
+
+    @property
+    def monitor(self):
+        return self.__monitor
+    
+    @property
+    def coupled(self):
+        return self.__coupled
+    
+    @property
+    def pointer(self):
+        return self.__pointer
+
+    @property
+    def labels(self):
+        return self.__labels
+
+    @property
+    def units(self):
+        return self.__units
+    
+    @property
+    def data(self):
+        return self.__data
+    
+    @data.setter
+    def data(self, _data):
+        self.__data = _data
+
+    @property
+    def simplified(self):
+        return self.__simplified
+
+    @simplified.setter
+    def simplified(self, flag):
+        self.__simplified = flag
+    
     def setData(self, data, common=None, pointer=None):
-        """This should set up the data, labels and units such that all columns in all COMMON sections are in self
-        and such that all columns in DATA which either have no pointer or matching pointer are in self"""
-        # Set up the column labels & units (filter on pointers here...)
-        column_offsets = []  # where current dataset's columns begin
-        column_filter = []
-        if common is None:
-            full_data = [data]
-        else:
-            full_data = common + [data]
-        for d in full_data:
-            column_offsets.append(len(self.labels))
-            if d is None:
-                continue
-            other_pointers_columns = []
-            for p in filter(lambda x: x != pointer, d.pointers.keys()): other_pointers_columns += d.pointers[p]
-            for icol in range(d.numcols):
-                if d.pointers == {} or icol not in other_pointers_columns:
-                    column_filter.append(True)
-                    self.labels.append(d.labels[icol][0:10].strip())
-                    self.units.append(d.units[icol][0:10].strip())
-                else:
-                    column_filter.append(False)
-        # add the data itself
-        for irow in range(data.numrows):
-            row = column_offsets[2] * [0]
-            icol = len(row)
-            for x in data.data[irow]:
-                if column_filter[icol]:
-                    row.append(x)
-                icol += 1
-            self.data.append(row)
-        # now add the common data, there'd better not be pointers here!
+        """
+        This should set up the data, labels and units such that all columns in all COMMON sections are in self
+        and such that all columns in DATA which either have no pointer or matching pointer are in self
+
+        inputs:
+            data: DATA section, should be an instance of an X4DataSection
+            common: COMMON section, should be an instance of an X4DataSection
+            pointer: 3 possibilities
+                - None (keep everything), 
+                - ' ' (keep columns with no pointers), 
+                - a number (keep columns with no pointers and the columns matching the number specified)
+        """
+        self.__labels = []
+        self.__units = []
+        self.__data = None
+
+        # Assemble the COMMON data
         if common is not None:
-            for c in common:
-                if c is None:
+            for one_common in common:
+                if one_common is None: 
                     continue
-                if c.numrows == 1:  # copy the rows to all rows in data
-                    for irow in range(data.numrows):
-                        for icol in range(c.numcols):
-                            self.data[irow][column_offsets[common.index(c)] + icol] = c[0, icol]
-                else:  # copy to the first numrows
-                    for irow in range(min(c.numrows, data.numrows)):
-                        for icol in range(c.numcols):
-                            self.data[irow][column_offsets[common.index(c)] + icol] = c[irow, icol]
+                self.__labels += one_common.labels
+                self.__units += one_common.units
+                common_df = dataframe_from_datasection(one_common)
+                if self.__data is None:
+                    self.__data = common_df
+                else:
+                    self.__data = self.__data.join(common_df, how='cross')
+
+        # Select out the pointer-ed columns
+        temp_data = dataframe_from_datasection(data)
+        drops = []
+        renames = {}
+        if pointer is not None:
+            for col in temp_data.columns:
+                if len(col) == 11 and col[-1] != ' ':  # check if column has a pointer
+                    if pointer != col[-1]: # if it isn't the right one, we drop it
+                        drops.append(col)
+                    else: # otherwise we rename it to get rid of the pointer in the label
+                        renames[col] = col[0:10].strip()
+            temp_data = temp_data.drop(columns=drops)
+            temp_data = temp_data.rename(columns=renames)
+        
+        # Final assembly
+        if self.__data is None:
+            self.__data = temp_data
+        else:
+            self.__data = self.__data.join(temp_data, how='cross')
+        self.__labels += data.labels
+        self.__units += data.units
+
+        # Fix units on all special columns
+        for col in self.__data:
+            if "COS" in col: # cosine columns
+                self.__data[col] = pandas.Series(self.__data[col].pint.magnitude, dtype="pint[cosine]")
+            if "RATIO" in col: # ratio data columns
+                self.__data[col] = pandas.Series(self.__data[col].pint.magnitude, dtype="pint[ratio]")
 
     def strHeader(self):
         out = self.xmgraceHeader()
@@ -161,154 +246,224 @@ class X4DataSet(X4BibMetaData):
         return result
 
     def __str__(self):
+        body = self.to_tabulate(tablefmt='plain', units='stacked')
+        splbody = body.split('\n')
         return '\n'.join(
             [
                 self.strHeader(),
-                '#        ' + ' '.join([str(i).ljust(13) for i in self.labels]) + ' ',
-                '#        ' + ' '.join([str(i).ljust(13) for i in self.units]) + ' '] +
-            ['        ' + ' '.join([str(j).ljust(13) for j in i]) + ' ' for i in self.data])
+                '#        ' + splbody[0],
+                '#        ' + splbody[1],
+            ] + ['         '+x for x in splbody[2:]])
 
     def __repr__(self):
-        ans = self.reprHeader() + "["
-        ans += "['" + "','".join(self.labels) + "']" + ",\n"
-        ans += "['" + "','".join(self.units) + "']"
-        for row in self.data:
-            ans += ",\n" + "[" + ",".join(map(str, row)) + "]"
-        ans += "]"
-        return ans
+        return self.reprHeader() + self.to_tabulate(tablefmt='plain', units='stacked')
 
     def __len__(self):
         return len(self.data)
 
     def sort(self, **kw):
         """In place sort, see Python documentation for list().sort()"""
-        self.data.sort(**kw)
+        raise NotImplementedError("Do we still need this?")
 
-    def getSimplified(self, parserMap=None, columnNames=None, makeAllColumns=False, failIfMissingErrors=False):
+    def getSimplified(self, parserMap=None, columnNames=None, makeAllColumns=False, failIfMissingErrors=False, 
+                      unitOverride=None, preferredUnits=['MeV', 'b', 'sr', 'deg', 'fm', 'b/sr']):
         """Returns a simplified version of self.
         inputs:
-            parserMap            = { 'column name 1':parserList1, 'column name 2':parserList2, ... }
-            columnNames          = [ 'column name 1', 'column name 2', ... ] #put them in the order *you* want
-            makeAllColumns       will make uncertainty columns even if no uncertainties are given on a particular column
-            failIfMissingErrors  fail (raising exception) if missing an error column
+            parserMap:           { 'column name 1':parserList1, 'column name 2':parserList2, ... }
+            columnNames:         [ 'column name 1', 'column name 2', ... ] #put them in the order *you* want
+            makeAllColumns:      will make uncertainty columns even if no uncertainties are given on a particular column
+            failIfMissingErrors: fail (raising exception) if missing an error column
+            unitOverride:        sometimes compilers make bad choices for units, we can fix them (think mislabeled ratio data)
+            preferredUnits:      list of perferred units for a problem
+
+        What this routine does:
+            - simplifies the dataframe according to the parserMap.  Typically this creates columns "X", "Y", "dX", "dY" where
+              the X and Y column names are determined by the parserMap.  The parserMap is the secret sauce of this whole 
+              operation.
+            - when computing "dX" or "dY", the code attempts to guess the uncertainties assuming symmetric uncertainties 
+              about the mean.  This means the following:
+                - we make a half hearted attempt to combine all related uncertainties in quadrature 
+                - we present "Min/Max" values as symmetric uncertainties about the average (Max+Min)/2, whether or not this it makes sense
+                - full widths get halved
+                - percent uncertainty is turned to absolute
+            - converts all units in the simplified columns to rational "base" units for nuclear work, 
+              e.g. MeV, b, sr, rad, fm
+            - reorders columns per user request (columnNames).  This is more interesting if "makeAllColumns" is enabled, otherwise 
+              you just get back the simplified data columns
         """
-        result = copy.copy(self)
+        results = copy.copy(self)
+        
+        # Check if we don't have to do anything
         if self.simplified:
-            return result
-        numrows = result.numrows()
+            return results
         if parserMap is None:
-            return result
+            return results
+
         # Check that columnNames in sync with parserMap
         if columnNames is not None:
             for p in parserMap:
                 if p not in columnNames:
                     raise KeyError(p + ' not in columnNames')
-        # Initialize things
-        vals = {}
-        errs = {}
-        no_errs = {}
-        result.data = []
-        result.labels = []
-        result.units = []
-        if columnNames is None:
-            return result
-        # initialize val, err values
-        for parser in parserMap:
-            vals[parser] = reduce(condenseColumn, [i.getValue(self) for i in parserMap[parser]])
-            errs[parser] = reduce(condenseColumn, [i.getError(self) for i in parserMap[parser]])
-            no_errs[parser] = errs[parser][2:] == [None for i in errs[parser][2:]]
-            if vals[parser][2:] == [None for i in vals[parser][2:]]:
-                raise NoValuesGivenError(parser)
-        # Put the data into the result
-        # Make the column headings & units, first
-        for column in columnNames:
-            result.labels.append(column)
-            result.units.append(vals[column][1])
-        # Now the column labels & units for the uncertainties
-        for column in columnNames:
-            if not no_errs[column] or makeAllColumns:
-                result.labels.append('d(' + column + ')')
-                if no_errs[column]:
-                    result.units.append(vals[column][1])
-                else:
-                    result.units.append(errs[column][1])
-        # Now assemble the rows & add them to result.data
-        for i in range(2, numrows + 2):
-            row = []
-            for col in columnNames:
-                row.append(vals[col][i])
-            for col in columnNames:
-                if no_errs[col]:
-                    if makeAllColumns:
-                        row.append(0.0)
-                    elif failIfMissingErrors:
-                        raise NoUncertaintyGivenError(col)
-                else:
-                    row.append(errs[col][i])
-            result.data.append(row)
-        result.simplified = True
-        return result
+
+        # Override the units assumed by EXFOR's compilers
+        if unitOverride is not None:
+            for col, u in unitOverride.items():
+                 results.data[col] = pandas.Series(results.data[col].pint.magnitude, dtype="pint[%s]" % u)
+
+        # Convert cos(angle) => angle, sqrt(E)=>E
+        for col in results.data:
+            if "COS" in col:
+                col_name = col.replace("COS", "ANG")
+                results.data[col_name] = pandas.Series(np.arccos(results.data[col].pint.magnitude), dtype="pint[rad]")
+            if "squareroot_eV" in str(results.data[col].pint.units) or "squareroot_keV" in str(results.data[col].pint.units):
+                raise NotImplementedError()
+
+        # Build new DataSeries
+        _columns = {}
+        for _label in parserMap:
+
+            # load up all the parsers with the data
+            for parser in parserMap[_label]:
+                parser.set_data(results.data)
+
+            # figure out which parser is the best one for the job
+            best_parser, highest_parser_score = None, 0
+            for parser in reversed(parserMap[_label]):
+                if parser.score_label_match() >= highest_parser_score:
+                    highest_parser_score = parser.score_label_match()
+                    best_parser = parser
+
+            if best_parser is not None:
+                # Extract values
+                values = best_parser.get_values()
+                if values is None:
+                    continue
+                _columns[_label] = pandas.Series(values, dtype="pint[%s]" % best_parser.get_unit())
+                
+                # Attempt to extract uncertainties
+                uncertainties = best_parser.get_uncertainties()
+                if uncertainties is not None:
+                    _columns["d(%s)" % _label] = pandas.Series(uncertainties, dtype="pint[%s]" % best_parser.get_unit())
+
+        # Save the data in the results
+        for col in _columns:
+            results.data[col] = _columns[col]
+        
+        # Make all the columns if required
+        if makeAllColumns:
+            raise NotImplementedError() 
+
+        # Convert all units to our favs
+        for col in results.data.columns:
+            for unit in preferredUnits:
+                try:
+                    results.data[col] = results.data[col].pint.to(unit)
+                except:
+                    pass
+
+        # Sort the columns & make sure we have all the ones required
+        if columnNames is not None:
+            temp_columnNames = [c for c in columnNames if c in results.data]                        
+            if failIfMissingErrors and columnNames != temp_columnNames:
+                raise Exception("No uncertainties on one or more columns")
+            # How to sort columns in pandas:
+            # If:      df.columns.tolist() = ['0', '1', '2', '3', 'mean']
+            # Do this: df = df[['mean', '0', '1', '2', '3']]
+            results.data = results.data[temp_columnNames]
+        
+        # All done
+        results.simplified = True
+        return results
 
     def append(self, other):
-        if self.labels == [] and self.units == [] and self.data == []:
-            self.reaction = copy.copy(other.reaction)
-            self.monitor = copy.copy(other.monitor)
-            self.labels = copy.copy(other.labels)
-            self.units = copy.copy(other.units)
-            self.data = copy.copy(other.data)
-            self.simplified = copy.copy(other.simplified)
-            return
-        if self.labels == other.labels and self.units == other.units and str(self.reaction[0]) == str(
-                other.reaction[0]):
-            for row in other.data:
-                self.data.append(copy.copy(row))
-        else:
-            why = []
-            if self.labels != other.labels:
-                why.append("Labels don't match: " + str(self.labels) + ' vs. ' + str(other.labels))
-            if self.units != other.units:
-                why.append("Units don't match: " + str(self.units) + ' vs. ' + str(other.units))
-            if self.reaction != other.reaction:
-                why.append("Reactions don't match: " + str(self.reaction[0]) + " vs. " + str(other.reaction[0]))
-            if self.monitor != other.monitor:
-                why.append("Monitors don't match: " + str(self.monitor) + " vs. " + str(other.monitor))
-            raise TypeError("Can't add datasets because " + ' and '.join(why))
-        return
+        raise NotImplementedError("Do we still need this?")
 
-    def csv(self, f):
-        import csv
-        with open(f, mode="w", newline='') as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerows([self.labels, self.units] + self.data)
+    def to_csv(self, path_or_buf, index=False, dequantify=True, **kw):
+        """
+        Thin wrapper around pandas's to_csv()
+
+        path_or_buf: str, path object, file-like object, or None, default None
+
+            String, path object (implementing os.PathLike[str]), or file-like object implementing a write() function. 
+            If None, the result is returned as a string. If a non-binary file object is passed, it should be opened 
+            with newline='', disabling universal newlines. If a binary file object is passed, mode might need to 
+            contain a 'b'.
+
+        index: flag to control whether to display row labels
+        dequantify: dequantify the pint cells before output (default=True).  If you dequantify, 
+                    units appear as second row in header, otherwise they are included in each cell
+        """
+        if dequantify:
+            return self.data.pint.dequantify().to_csv(path_or_buf, index=index, **kw)
+        return self.data.to_csv(path_or_buf, index=index, **kw)
+
+    def to_markdown(self, showindex=False, **kw):
+        """Simple markedown formatted version of the dataframe, uses to_tabulate()"""
+        return self.to_tabulate(showindex=showindex, headers="keys", tablefmt='markdown', units='sbs_paren', **kw) 
+
+    def to_json(self, **kw):
+        """Thin wrapper around pandas's to_json()"""
+        raise NotImplementedError("Issue with PANDAS")
+        return self.data.to_json(**kw)  
+
+    def to_tabulate(self, showindex=False, headers="keys", tablefmt='psql', units=None, **kw):
+        """
+        showindex: controls whether to show the pandas index column(s), passed through to tabulate
+        headers: controls header display, passed through to tabulate if units are None, otherwise
+                 we try to maintain tabulate rules, namely: 
+                - "keys": will generate from column keys, but adding units per units keyword
+                - "firstrow": will generate from first row of data, but adding units per units keyword (basically same as "keys")
+                - list of strings: use the given strings as labels, but adding units per units keyword
+        tablefmt: controls table format, passed through to tabulate.  Some table formats do not like stacked units
+                  (markdown for instance), we leave that to the user to experiment what works best
+        units: None - do not show units row in header
+               "sbs" - show units side-by-side with column label
+               "stacked" - show units vertically stacked under the column label
+               "sbs_paren" - show units side-by-side with column label, but in parenthesis
+               "stacked_paren" - show units vertically stacked under the column label, but in parenthesis
+        **kw: any other keywords tabulate might like are just passed though
+        """
+        column_labels = self.data.columns.tolist()
+        if units is None:
+            headers = column_labels
+        else:
+            if type(headers) in [tuple, list]: 
+                column_labels = headers # going to save the user-specified headers & rebuild the list                
+            if "_paren" in units:
+                column_units = ["("+str(x.units)+")" for x in self.data.dtypes.tolist()] 
+            else:
+                column_units = [str(x.units) for x in self.data.dtypes.tolist()]
+            headers = []
+            if "stacked" in units:
+                for i in range(len(column_labels)):
+                    headers.append(column_labels[i]+'\n'+column_units[i])
+            else:
+                for i in range(len(column_labels)):
+                    headers.append(column_labels[i]+' '+column_units[i])
+        return tabulate.tabulate(self.data.pint.dequantify(), showindex=showindex, headers=headers, tablefmt=tablefmt, **kw)
 
     def numcols(self):
-        return len(self.labels)
+        return self.data.shape[1]
 
     def numrows(self):
-        return len(self.data)
+        return self.data.shape[0]
 
     def __getitem__(self, k):
         if not isinstance(k,tuple) or len(k)!=2:
             raise TypeError("key must be a tuple of length 2")
-        i,j=k
-        if type(i) == str:
-            if i == 'LABELS':
-                return self.labels[j]
-            elif i == 'UNITS':
-                return self.units[j]
-            else:
-                raise KeyError('Invalid index: ' + i)
-        else:
-            return self.data[i][j]
-
+        return self.data[k[0]][k[1]]
+   
 
 class X4CrossSectionDataSet(X4DataSet):
     def __init__(self, meta=None, common=None, reaction=None, monitor=None, data=None, pointer=None):
         X4DataSet.__init__(self, meta, common, reaction, monitor, data, pointer)
 
-    def getSimplified(self, makeAllColumns=False, failIfMissingErrors=False):
-        return X4DataSet.getSimplified(self, parserMap={'Energy': incidentEnergyParserList, 'Data': csDataParserList},
-                                       columnNames=['Energy', 'Data'], makeAllColumns=makeAllColumns,
+    def getSimplified(self, unitOverride=None, makeAllColumns=False, failIfMissingErrors=False):
+        return X4DataSet.getSimplified(self, 
+                                       parserMap={'Energy': incidentEnergyParserList, 'Data': csDataParserList},
+                                       columnNames=['Energy', 'Data', 'd(Energy)', 'd(Data)'], 
+                                       unitOverride=unitOverride,
+                                       makeAllColumns=makeAllColumns,
                                        failIfMissingErrors=failIfMissingErrors)
 
 
@@ -316,9 +471,12 @@ class X4NubarDataSet(X4DataSet):
     def __init__(self, meta=None, common=None, reaction=None, monitor=None, data=None, pointer=None):
         X4DataSet.__init__(self, meta, common, reaction, monitor, data, pointer)
 
-    def getSimplified(self, makeAllColumns=False, failIfMissingErrors=False):
-        return X4DataSet.getSimplified(self, parserMap={'Energy': incidentEnergyParserList, 'Data': nubarParserList},
-                                       columnNames=['Energy', 'Data'], makeAllColumns=makeAllColumns,
+    def getSimplified(self, unitOverride=None, makeAllColumns=False, failIfMissingErrors=False):
+        return X4DataSet.getSimplified(self, 
+                                       parserMap={'Energy': incidentEnergyParserList, 'Data': nubarParserList},
+                                       columnNames=['Energy', 'Data', 'd(Energy)', 'd(Data)'], 
+                                       unitOverride=unitOverride,
+                                       makeAllColumns=makeAllColumns,
                                        failIfMissingErrors=failIfMissingErrors)
 
 
@@ -327,9 +485,12 @@ class X4SpectrumAveCrossSectionDataSet(X4DataSet):
         X4DataSet.__init__(self, meta, common, reaction, monitor, data, pointer)
         self.spectrum = None
 
-    def getSimplified(self, makeAllColumns=False, failIfMissingErrors=False):
-        return X4DataSet.getSimplified(self, parserMap={'Energy': spectrumArgumentParserList, 'Data': csDataParserList},
-                                       columnNames=['Energy', 'Data'], makeAllColumns=makeAllColumns,
+    def getSimplified(self, unitOverride=None, makeAllColumns=False, failIfMissingErrors=False):
+        return X4DataSet.getSimplified(self, 
+                                       parserMap={'Energy': spectrumArgumentParserList, 'Data': csDataParserList},
+                                       columnNames=['Energy', 'Data', 'd(Energy)', 'd(Data)'], 
+                                       unitOverride=unitOverride,
+                                       makeAllColumns=makeAllColumns,
                                        failIfMissingErrors=failIfMissingErrors)
 
 
@@ -337,16 +498,19 @@ class X4ResonanceIntCrossSectionDataSet(X4DataSet):
     def __init__(self, meta=None, common=None, reaction=None, monitor=None, data=None, pointer=None):
         X4DataSet.__init__(self, meta, common, reaction, monitor, data, pointer)
 
-    def getSimplified(self, makeAllColumns=False, failIfMissingErrors=False):
-        return X4DataSet.getSimplified(self, parserMap={'Data': csDataParserList}, columnNames=['Data'],
-                                       makeAllColumns=makeAllColumns, failIfMissingErrors=failIfMissingErrors)
+    def getSimplified(self, unitOverride=None, makeAllColumns=False, failIfMissingErrors=False):
+        return X4DataSet.getSimplified(self, 
+                                       parserMap={'Data': csDataParserList}, columnNames=['Data'],
+                                       unitOverride=unitOverride,
+                                       makeAllColumns=makeAllColumns, 
+                                       failIfMissingErrors=failIfMissingErrors)
 
 
 class X4AnalyzingPowerDataSet(X4DataSet):
     def __init__(self, meta=None, common=None, reaction=None, monitor=None, data=None, pointer=None):
         X4DataSet.__init__(self, meta, common, reaction, monitor, data, pointer)
 
-    def getSimplified(self, makeAllColumns=False, failIfMissingErrors=False): return copy.copy(self)
+    def getSimplified(self, unitOverride=None, makeAllColumns=False, failIfMissingErrors=False): return copy.copy(self)
 
 
 class X4AngularDistributionDataSet(X4DataSet):
@@ -363,10 +527,14 @@ class X4AngularDistributionDataSet(X4DataSet):
         out += '\n' + COMMENTSTRING + '  Frame:     ' + self.referenceFrame
         return out
 
-    def getSimplified(self, makeAllColumns=False, failIfMissingErrors=False):
-        return X4DataSet.getSimplified(self, parserMap={'Energy': incidentEnergyParserList, 'Angle': angleParserList,
-                                                        'Data': angDistParserList},
-                                       columnNames=['Energy', 'Angle', 'Data'], makeAllColumns=makeAllColumns,
+    def getSimplified(self, unitOverride=None, makeAllColumns=False, failIfMissingErrors=False):
+        return X4DataSet.getSimplified(self, 
+                                       parserMap={'Energy': incidentEnergyParserList, 
+                                                  'Angle': angleParserList,
+                                                  'Data': angDistParserList},
+                                       columnNames=['Energy', 'Angle', 'Data', 'd(Energy)', 'd(Angle)', 'd(Data)'], 
+                                       unitOverride=unitOverride,
+                                       makeAllColumns=makeAllColumns,
                                        failIfMissingErrors=failIfMissingErrors)
 
 
@@ -384,18 +552,22 @@ class X4EnergyDistributionDataSet(X4DataSet):
         out += '\n' + COMMENTSTRING + '  Frame:     ' + self.referenceFrame
         return out
 
-    def getSimplified(self, makeAllColumns=False, failIfMissingErrors=False):
+    def getSimplified(self, unitOverride=None, makeAllColumns=False, failIfMissingErrors=False):
         return X4DataSet.getSimplified(self,
-                                       parserMap={'Energy': incidentEnergyParserList, "E'": outgoingEnergyParserList,
-                                                  'Data': energyDistParserList}, columnNames=['Energy', "E'", 'Data'],
-                                       makeAllColumns=makeAllColumns, failIfMissingErrors=failIfMissingErrors)
+                                       parserMap={'Energy': incidentEnergyParserList, 
+                                                  "Eout": outgoingEnergyParserList,
+                                                  'Data': energyDistParserList}, 
+                                       columnNames=['Energy', "Eout", 'Data', 'd(Energy)', "d(Eout)", 'd(Data)'],
+                                       unitOverride=unitOverride,
+                                       makeAllColumns=makeAllColumns, 
+                                       failIfMissingErrors=failIfMissingErrors)
 
 
 class X4EnergyAngleDistDataSet(X4DataSet):
     def __init__(self, meta=None, common=None, reaction=None, monitor=None, data=None, pointer=None):
         X4DataSet.__init__(self, meta, common, reaction, monitor, data, pointer)
 
-    def getSimplified(self, makeAllColumns=False, failIfMissingErrors=False): raise NotImplementedError()
+    def getSimplified(self, unitOverride=None, makeAllColumns=False, failIfMissingErrors=False): raise NotImplementedError()
 
 
 def X4DataSetFactory(quant, meta=None, common=None, reaction=None, monitor=None, data=None, pointer=None):

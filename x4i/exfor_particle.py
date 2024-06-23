@@ -57,8 +57,7 @@ __author__ = "David Brown <brown170@llnl.gov>"
 
 from .exfor_exceptions import *
 from .exfor_grammars import *
-from .exfor_dicts import *
-import x4i.pyparsing as pyparsing
+import pyparsing
 
 # ------------------------------------------------------
 # Global data
@@ -389,4 +388,4 @@ class X4ChemicalCompound(X4ParticleBase):
         return str(self.parse_results[0])
 
     def prettyStyle(self):
-        return X4DictionaryServer()["Compounds"][str(self.parse_results[0])][0]
+        return get_exfor_dict_entry("Chemical compounds", str(self.parse_results[0]))['expansion']

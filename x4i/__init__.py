@@ -43,7 +43,7 @@ import os
 
 MAJOR_VERSION = 1
 MINOR_VERSION = 0
-PATCH = 0
+PATCH = 4
 
 __package_name__ = "x4i -- The Exfor Interface"
 __version__ = '.'.join(map(str, [MAJOR_VERSION, MINOR_VERSION, PATCH]))
@@ -66,13 +66,14 @@ __disclaimer__ = """LLNL Disclaimer:
       and shall not be used for advertising or product endorsement purposes."""
 
 from x4i.exfor_paths import *
-
+from x4i.exfor_dicts import get_exfor_dict, get_exfor_dict_entry
 from x4i import exfor_manager, exfor_entry
 
 __databaseManager = exfor_manager.X4DBManagerDefault()
 
 
-def query(**kw): return __databaseManager.query(**kw)
+def query(**kw): 
+    return __databaseManager.query(**kw)
 
 
 def raw_retrieve(**kw):

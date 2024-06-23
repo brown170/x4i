@@ -138,12 +138,12 @@ class TestTheWorks(TestCaseWithTableTests):
                                      '#  Authors:   K.Hatanaka, N.Matsuoka, H.Sakai, T.Saito, H.Tamura, K.Hosono, M.Kondo, K.Imai, H.Shimizu, K.Nishimura\n'
                                      '#  Title:     Acceleration Of Protons And Deuterons Polarized In The Horizontal Planeby The Rcnp Cyclotron\n'
                                      '#  Year:      1983\n'
-                                     '#  Institute: Osaka Univ., Osaka (Research Center For Nuclear Physics, Osaka Univ.); Kyoto Univ.\n'
+                                     '#  Institute: Osaka Univ., Osaka (Research Center For Nuclear Physics, Osaka Univ.); Kyoto Univ., Kyoto\n'
                                      '#  Reference: Nuclear Instrum.and Methods in Physics Res. 217, 397 (1983)\n'
                                      '#  Subent:    E0783002\n'
-                                     '#  Reaction:  Vector analyzing power, A(y), for incident beam Spin-polarization probability d/dA for 1H(d,Elastic)1H \n'
-                                     '#        EN            ANG-CM        DATA          DATA-ERR      FLAG          \n'
-                                     '#        MEV           ADEG          NO-DIM        NO-DIM        NO-DIM        \n'
+                                     '#  Reaction:  Analyzing power Spin-polarization probability d/dA for 1H(d,Elastic)1H \n'
+                                     '#           EN    ANG-CM       DATA  DATA-ERR    FLAG\n'
+                                     '#          MeV       deg\n'
                                      '        56.0          30.712        -0.002211     None          1.0           \n'
                                      '        56.0          38.727        -0.005861     0.00821       None          \n'
                                      '        56.0          46.135        0.01022       None          1.0           \n'
@@ -170,6 +170,7 @@ class TestTheWorks(TestCaseWithTableTests):
                                      '        56.0          160.562       0.1265        0.0197        None          \n        ')
 
     def test_cs_Pun2n(self):
+        self.maxDiff = None
         # Get all the data
         subents = self.dbMgr.retrieve(target="PU-239", reaction="N,2N", quantity="CS", rawEntry=True)
         # Lougheed dataset
@@ -183,8 +184,8 @@ class TestTheWorks(TestCaseWithTableTests):
 #  Subent:    13883002
 #  Reaction:  Cross section for 239Pu(n,2n)238Pu
 #  Monitor(s): ((79-AU-197(N,2N)79-AU-196,SIG), 'Flux monitor. Neutron energy determined using 54Fe(n,p) reaction.', None)
-#        Energy        Data          d(Data)
-#        MeV           barns         barns
+#          Energy    Data    d(Data)
+#             MeV    b/sr       b/sr
         13.8          0.228         0.006384
         14.0          0.219         0.007884
         14.8          0.214         0.002996'''.strip())
@@ -193,12 +194,12 @@ class TestTheWorks(TestCaseWithTableTests):
         self.assertTablesAlmostEqual(str(ds[('21971', '21971003', ' ')]).strip(), '''
 #  Authors:   J.Frehaut, A.Bertin, R.Blois, E.Gryntakis, C.A.Philis
 #  Title:     -(N,2N) Cross Sections Of 2-H And 239-Pu
-#  Year:      1985\n#  Institute: 2FR
+#  Year:      1985\n#  Institute: CEA/DAM Ile-de-France, Bruyeres-le-Chatel, Arpajon
 #  Reference: Conf.on Nucl.Data f.Basic a.Appl.Sci.,Santa Fe 1985 , (IB06) (1985)
 #  Subent:    21971003
 #  Reaction:  Cross section for 239Pu(n,2n)238Pu
-#        Energy        Data          d(Energy)     d(Data)
-#        MeV           barns         MeV           barns
+#          Energy    Data    d(Energy)    d(Data)
+#             MeV    b/sr          MeV       b/sr
         6.49          0.024         0.085         0.063
         7.01          0.049         0.08          0.05
         7.52          0.054         0.075         0.058
@@ -219,13 +220,13 @@ class TestTheWorks(TestCaseWithTableTests):
 #  Authors:   D.S.Mather, P.F.Bampton, R.E.Coles, G.James, P.J.Nind
 #  Title:     -Measurement Of (N,2N) Cross Sections For Incident Energies Between 6 And 14 Mev-.
 #  Year:      1972
-#  Institute: 2UK
+#  Institute: Atomic Weapons Establishment (AWE), Aldermaston
 #  Reference: Report other than progress report: AWRE-O-72/72  (1972); Report other than progress report: AWRE-O-47/69  (1969)
 #  Subent:    20795014
 #  Reaction:  Cross section for 239Pu(n,2n)238Pu
 #  Monitor(s): ((94-PU-239(N,F),SIG), '1917MB+-8PERCENT  AT 6.5MEV 2030MB+-8.5PERCENT AT 7.1MEV 2213MB+-9PERCENT   AT 8.0MEV 2252MB+-9.5PERCENT AT 9.0MEV', None)
-#        Energy        Data          d(Data)
-#        MeV           barns         barns
+#          Energy    Data    d(Data)
+#             MeV    b/sr       b/sr
         6.5           0.419         0.053
         7.1           0.451         0.06
         8.0           0.49          0.057
@@ -236,12 +237,12 @@ class TestTheWorks(TestCaseWithTableTests):
 #  Authors:   J.A.Becker, L.A.Bernstein, W.Younes, D.P.Mcnabb, P.E.Garrett, D.E.Archer, C.A.Mcgrath, M.A.Stoyer, H.Chen, W.E.Ormand, R.O.Nelson, M.B.Chadwick, G.D.Johns, D.Drake, P.G.Young, M.Devlin, N.Fotiades, W.S.Wilburn
 #  Title:     Partial Gamma-Ray Cross Sections For The Reaction 239Pu(N,2Ng) And The 239Pu(N,2N) Cross Section
 #  Year:      2002
-#  Institute: Lawrence Livermore National Laboratory, Livermore, CA
-#  Reference: J.Nucl.Science and Technol.Tokyo,Supplement 2, (1), 620 (2002)
+#  Institute: Los Alamos National Laboratory, NM; Lawrence Livermore National Laboratory, Livermore, CA
+#  Reference: Jour. of Nuclear Science and Technology Suppl. 2, (1), 620 (2002)
 #  Subent:    14129002
 #  Reaction:  Cross section for 239Pu(n,2n)238Pu
-#        Energy        Data          d(Energy)     d(Data)
-#        MeV           barns         MeV           barns
+#          Energy    Data    d(Energy)    d(Data)
+#             MeV    b/sr          MeV       b/sr
         6.481         0.1009        0.2239        0.03081
         6.942         0.1261        0.1894        0.02015
         7.49          0.1525        0.2412        0.01422
@@ -268,8 +269,8 @@ class TestTheWorks(TestCaseWithTableTests):
                                      '#  Reference: Physical Review 109, 2105 (1958)\n#  Subent:    11321004\n'
                                      '#  Reaction:  Differential c/s with respect to angle for 27Al(n,Elastic)27Al \n'
                                      '#  Frame:     Lab\n'
-                                     '#        EN            EN-RSL        ANG-RSL       COS           DATA          DATA-ERR      \n'
-                                     '#        MEV           MEV           ADEG          NO-DIM        MB/SR         MB/SR         \n'
+                                     '#           EN    EN-RSL    ANG-RSL       COS     DATA    DATA-ERR\n'
+                                     '#          MeV       MeV        deg    cosine    mb/sr       mb/sr\n'
                                      '        5.0           0.1           10.0          0.866         290.0         30.0          \n'
                                      '        5.0           0.1           10.0          0.766         212.0         10.0          \n'
                                      '        5.0           0.1           10.0          0.643         140.0         10.0          \n'
@@ -285,6 +286,7 @@ class TestTheWorks(TestCaseWithTableTests):
                                      '        5.0           0.1           10.0          -0.866        25.0          4.0           \n        ')
         simple = ds[('11321', '11321004', ' ')].getSimplified()
         # open( 'b', mode = 'w' ).writelines( str( simple ) )
+        self.maxDiff = None
         self.assertTablesAlmostEqual(str(simple),
                                      '#  Authors:   R.W.Hill\n'
                                      '#  Title:     Angular Distributions Of Elastic Scattering Of 5-Mev Neutrons.\n'
@@ -292,8 +294,8 @@ class TestTheWorks(TestCaseWithTableTests):
                                      '#  Reference: Physical Review 109, 2105 (1958)\n#  Subent:    11321004\n'
                                      '#  Reaction:  Differential c/s with respect to angle for 27Al(n,Elastic)27Al \n'
                                      '#  Frame:     Lab\n'
-                                     '#        Energy        Angle         Data          d(Energy)     d(Angle)      d(Data)       \n'
-                                     '#        MeV           degrees       barns/ster    MeV           degrees       barns/ster    \n'
+                                     '#          Energy     Angle    Data    d(Energy)    d(Angle)    d(Data)\n'
+                                     '#             MeV       deg    b/sr          MeV         deg       b/sr\n'
                                      '        5.0           30.0029109312 0.29          0.05          5.0           0.03          \n'
                                      '        5.0           40.0039613369 0.212         0.05          5.0           0.01          \n'
                                      '        5.0           49.9841125607 0.14          0.05          5.0           0.01          \n'
@@ -319,8 +321,8 @@ class TestTheWorks(TestCaseWithTableTests):
                                      '#  Reference: Physical Review 98, 728 (1955)\n#  Subent:    11314002\n'
                                      '#  Reaction:  Differential c/s with respect to angle for 14N(n,Elastic)14N \n'
                                      '#  Frame:     Center of mass\n'
-                                     '#        EN            EN-RSL        COS-CM        DATA-CM       \n'
-                                     '#        MEV           MEV           NO-DIM        MB/SR         \n'
+                                     '#           EN    EN-RSL    COS-CM    DATA-CM\n'
+                                     '#          MeV       MeV    cosine      mb/sr\n'
                                      '        0.8           0.05          0.85          164.0         \n'
                                      '        0.8           0.05          0.65          170.0         \n'
                                      '        0.8           0.05          0.46          157.0         \n'
@@ -664,8 +666,8 @@ class TestTheWorks(TestCaseWithTableTests):
                                      '#  Subent:    11314002\n'
                                      '#  Reaction:  Differential c/s with respect to angle for 14N(n,Elastic)14N \n'
                                      '#  Frame:     Center of mass\n'
-                                     '#        Energy        Angle         Data          d(Energy)     \n'
-                                     '#        MeV           degrees       barns/ster    MeV           \n'
+                                     '#          Energy     Angle    Data    d(Energy)\n'
+                                     '#             MeV       deg    b/sr          MeV\n'
                                      '        0.8           31.7883306171 0.164         0.025         \n'
                                      '        0.8           49.4583981265 0.17          0.025         \n'
                                      '        0.8           62.6128924973 0.157         0.025         \n'
@@ -1000,6 +1002,7 @@ class TestTheWorks(TestCaseWithTableTests):
                                      '        2.36          147.140119621 0.103         0.01          \n        ')
 
     def test_nubar(self):
+        self.maxDiff=None
         subent = self.dbMgr.retrieve(SUBENT='12326006', rawEntry=True)
         ds = exfor_entry.X4Entry(subent['12326']).getDataSets()
         fullanswer = '#  Authors:   J.C.Hopkins, B.C.Diven\n' \
@@ -1009,14 +1012,14 @@ class TestTheWorks(TestCaseWithTableTests):
                      '#  Reference: Nuclear Physics 48, 433 (1963)\n' \
                      '#  Subent:    12326006\n' \
                      '#  Reaction:  Prompt neutron yield (nu-bar) for 239Pu(n,Fission) \n' \
-                     '#        MONIT         EN            EN-RSL        DATA          ERR-SYS       ERR-T         \n' \
-                     '#        PRT/FIS       MEV           MEV           PRT/FIS       PRT/FIS       PRT/FIS       \n' \
-                     '        3.771         0.25          0.05          2.931         0.029         0.039         \n' \
-                     '        3.771         0.42          0.11          2.957         0.03          0.046         \n' \
-                     '        3.771         0.61          0.07          2.904         0.029         0.041         \n' \
-                     '        3.771         0.9           0.08          3.004         0.03          0.041         \n' \
-                     '        3.771         3.9           0.29          3.422         0.038         0.039         \n' \
-                     '        3.771         14.5          1.0           4.942         0.076         0.119         \n' \
+                     '#                     MONIT     EN    EN-RSL                DATA             ERR-SYS               ERR-T\n' \
+                     '#          particle/fission    MeV       MeV    particle/fission    particle/fission    particle/fission\n' \
+                     '                      3.771   0.25       0.05              2.931               0.029               0.039\n' \
+                     '                      3.771   0.42       0.11              2.957                0.03               0.046\n' \
+                     '                      3.771   0.61       0.07              2.904               0.029               0.041\n' \
+                     '                      3.771   0.9        0.08              3.004                0.03               0.041\n' \
+                     '                      3.771   3.9        0.29              3.422               0.038               0.039\n' \
+                     '                      3.771   14.5       1.0               4.942               0.076               0.119\n' \
                      '        '
         #open( 'a', mode = 'w' ).writelines(fullanswer)
         #open( 'b', mode = 'w' ).writelines( str( ds[ ('12326', '12326006', ' ') ] ) )
@@ -1029,8 +1032,8 @@ class TestTheWorks(TestCaseWithTableTests):
                        '#  Reference: Nuclear Physics 48, 433 (1963)\n' \
                        '#  Subent:    12326006\n' \
                        '#  Reaction:  Prompt neutron yield (nu-bar) for 239Pu(n,Fission) \n' \
-                       '#        Energy        Data          d(Energy)     d(Data)       \n' \
-                       '#        MeV           ptcls/fis     MeV           ptcls/fis     \n' \
+                       '#          Energy                Data    d(Energy)             d(Data)\n' \
+                       '#             MeV    particle/fission          MeV    particle/fission\n' \
                        '        0.25          2.931         0.025         0.039         \n' \
                        '        0.42          2.957         0.055         0.046         \n' \
                        '        0.61          2.904         0.035         0.041         \n' \
@@ -1043,6 +1046,7 @@ class TestTheWorks(TestCaseWithTableTests):
         self.assertTablesAlmostEqual(str(simple), simpleanswer)
 
     def test_energy_spectrum(self):
+        self.maxDiff=None
         subent = self.dbMgr.retrieve(SUBENT='20576003', rawEntry=True)
         ds = exfor_entry.X4Entry(subent['20576']).getDataSets()
         # open( 'c', mode = 'w' ).writelines( str( ds[ ('20576', '20576003', ' ') ] ) )
@@ -1050,12 +1054,12 @@ class TestTheWorks(TestCaseWithTableTests):
 #  Authors:   H.Knitter
 #  Title:     -Measurement Of The Energy Spectrum Of Prompt Neutrons From The Fission Of Pu239 By 0.215 Mev Neutrons-
 #  Year:      1975
-#  Institute: Inst. for Ref. Mat. and Meas. (IRNM), Geel
+#  Institute: EC Joint Research Centre (EC-JRC), Geel
 #  Reference: Atomkernenergie 26, 76 (1975)
 #  Subent:    20576003
-#  Reaction:  Relative data  for 239Pu(n,Fission) Reference quantity not given
-#        EN            EN-RSL        E             E-RSL         DATA          DATA-ERR      ERR-1
-#        KEV           KEV           MEV           MEV           ARB-UNITS     ARB-UNITS     PER-CENT
+#  Reaction:  Relative data Diff. fiss. neutron multiplicity d/dE(n) for 239Pu(n,Fission) Reference quantity not given
+#           EN    EN-RSL      E    E-RSL        DATA    DATA-ERR  ERR-1
+#          keV       keV    MeV      MeV    arb_unit    arb_unit  %
         215.0         32.0          0.28          0.01          66.8          2.5           2.0
         215.0         32.0          0.31          0.01          70.2          2.4           2.0
         215.0         32.0          0.34          0.01          65.1          2.2           2.0
@@ -1244,12 +1248,12 @@ class TestTheWorks(TestCaseWithTableTests):
         simpleAnswer = """#  Authors:   H.Knitter
 #  Title:     -Measurement Of The Energy Spectrum Of Prompt Neutrons From The Fission Of Pu239 By 0.215 Mev Neutrons-
 #  Year:      1975
-#  Institute: Inst. for Ref. Mat. and Meas. (IRNM), Geel
+#  Institute: EC Joint Research Centre (EC-JRC), Geel
 #  Reference: Atomkernenergie 26, 76 (1975)
 #  Subent:    20576003
-#  Reaction:  Relative data  for 239Pu(n,Fission) Reference quantity not given
-#        EN            EN-RSL        E             E-RSL         DATA          DATA-ERR      ERR-1
-#        KEV           KEV           MEV           MEV           ARB-UNITS     ARB-UNITS     PER-CENT
+#  Reaction:  Relative data Diff. fiss. neutron multiplicity d/dE(n) for 239Pu(n,Fission) Reference quantity not given
+#           EN    EN-RSL      E    E-RSL        DATA    DATA-ERR  ERR-1
+#          keV       keV    MeV      MeV    arb_unit    arb_unit  %
         215.0         32.0          0.28          0.01          66.8          2.5           2.0
         215.0         32.0          0.31          0.01          70.2          2.4           2.0
         215.0         32.0          0.34          0.01          65.1          2.2           2.0

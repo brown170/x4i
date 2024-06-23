@@ -66,7 +66,7 @@ import x4i.exfor_dicts as exfor_dicts
 import x4i.exfor_grammars as exfor_grammars
 import x4i.exfor_reference as exfor_reference
 import x4i.exfor_exceptions as exfor_exceptions
-import x4i.pyparsing as pyparsing
+import pyparsing
 import copy
 
 
@@ -484,21 +484,27 @@ class X4InstituteField(X4PlainField):
 
     def __init__(self, x):
         X4PlainField.__init__(self, x)
-        self.exfor_institutes_dictionary = exfor_dicts.X4DictionaryServer()['Institutes']
         self.institutes = []
         for p in self:
             try:
-                il = exfor_grammars.x4textfield.parseString(str(self[p])).asList()
+                pil = exfor_grammars.x4institutefield.parseString(str(self[p])).asList()
             except pyparsing.ParseException as err:
                 raise exfor_exceptions.InstituteParsingError(
                     'Can not parse institute "' + str(x) + '",\n    got error "' + str(err) + '"\n   ')
-            for i in il:
-                tok = i[0][0]
-                comment = (' '.join(i[1:])).title()
-                if tok[-3:] in self.exfor_institutes_dictionary.keys():
-                    self.institutes.append((tok, self.exfor_institutes_dictionary[tok[-3:]][0], comment))
-                else:
-                    self.institutes.append((tok, tok, comment))
+            il = {}
+            ikey = None
+            for tok in pil:
+                if type(tok)==list:  # is an institute
+                    for ikey in tok:
+                        il[ikey] = []
+                else:   # is part of a comment on the last institute entry
+                    il[ikey].append(tok.title())
+            for ikey in il:          
+                comment_string = ' '.join(il[ikey])
+                try:
+                    self.institutes.append((ikey, exfor_dicts.get_exfor_dict_entry('Institutes', ikey)['expansion'], comment_string))
+                except:
+                    self.institutes.append((ikey, ikey, comment_string))
 
     def __str__(self):
         """Pretty version of field"""

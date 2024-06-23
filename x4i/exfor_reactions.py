@@ -55,8 +55,8 @@ VERBOSELEVEL = 2
 x4ReactionMap = {'TOT': 'Total', 'EL': 'Elastic', 'ABS': 'Absorption', 'INL': 'Inelastic', 'TCC': 'TotalChargeChanging',
                  'FUS': 'Fusion', 'NON': 'Nonelastic', 'SCT': 'Scattering', 'F': 'Fission', 'PAI': 'PairProduction',
                  'THS': 'ThermalScattering', 'X': 'Unspecified', '0': 'None'}
-x4QuantityMap = x4Dictionaries['Quantities']
-x4ModifierMap = x4Dictionaries['Modifiers']
+x4QuantityMap = get_exfor_dict('Quantities (REACTION SF 5-8)')
+x4ModifierMap = get_exfor_dict('Modifiers (REACTION SF 8)')
 
 
 class X4Process:
@@ -228,12 +228,12 @@ class X4Reaction(X4Process, X4Measurement):
         # Try most general quantity
         result = ','.join(self.quantity)
         if result in x4QuantityMap.keys():
-            return x4QuantityMap[result][0]
+            return x4QuantityMap[result]['expansion']
         # Didn't work, try taking list apart
         result = ''
         for i in self.quantity:
             if i in x4ModifierMap.keys():
-                result = x4ModifierMap[i][0] + ' '
+                result = x4ModifierMap[i]['expansion'] + ' '
                 break
 
         def addcomma(x):
@@ -241,7 +241,7 @@ class X4Reaction(X4Process, X4Measurement):
 
         for i in self.quantity + [addcomma(x) for x in self.quantity]:
             if i in x4QuantityMap.keys():
-                result += x4QuantityMap[i][0]
+                result += x4QuantityMap[i]['expansion']
                 break
         return result
 

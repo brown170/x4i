@@ -38,7 +38,7 @@ from __future__ import print_function, division
 from .exfor_utilities import *
 from .exfor_grammars import *
 from .exfor_exceptions import ReferenceParsingError
-import x4i.pyparsing as pyparsing
+import pyparsing
 
 
 def parseX4Year(date):
@@ -83,7 +83,7 @@ class X4ReferenceCode:
         if not str:
             raise TypeError("X4ReferenceCode.__init__ takes a string as an argument")
         try:
-            self.refcode = commaSeparatedList.parseString(x).asList()
+            self.refcode = pyparsing.common.comma_separated_list.parseString(x).asList()
         except pyparsing.ParseException as err:
             raise ReferenceParsingError(
                 'Can not parse reference code "' + x + '",\n    got error "' + str(err) + '"\n   ')
@@ -103,15 +103,15 @@ class X4ReferenceCode:
 
     def getRefName(self):
         if self.reftype in ['A', 'B', 'C']:
-            return x4Dictionaries['ConferencesAndBooks'][self.name][0] + ' '
+            return get_exfor_dict_entry('Conferences', self.name)['expansion'] + ' '
         elif self.reftype in ['J', 'K']:
-            return x4Dictionaries['Journals'][self.name][0] + ' '
+            return get_exfor_dict_entry('Journals', self.name)['expansion'] + ' '
         elif self.reftype in ['P', 'R', 'S']:
-            return x4Dictionaries['ReferenceTypes'][self.reftype][1] + ': ' + self.name + ' '
+            return get_exfor_dict_entry('Reference types', self.reftype)['expansion'] + ': ' + self.name + ' '
         elif self.reftype in ['T', 'W', 'X']:
-            return x4Dictionaries['ReferenceTypes'][self.reftype][1] + ': ' + self.name.capitalize() + ' '
+            return get_exfor_dict_entry('Reference types', self.reftype)['expansion'] + ': ' + self.name.capitalize() + ' '
         elif self.reftype in ['0', '3', '4']:
-            return x4Dictionaries['ReferenceTypes'][self.reftype][1] + ': ' + self.name.capitalize() + ' '
+            return get_exfor_dict_entry('Reference types', self.reftype)['expansion'] + ': ' + self.name.capitalize() + ' '
         else:
             raise LookupError("X4ReferenceCode.__str__: can't find type of reference for '" + self.reftype + "'")
         return None

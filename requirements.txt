@@ -1,0 +1,8 @@
+numpy
+pint
+pandas
+pint_pandas
+pytest
+pyparsing
+bidict
+tabulate

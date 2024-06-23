@@ -32,6 +32,8 @@
 #   3.     Switch dictionary metadata to use JSON so I can avoid exec() calls in the dictionary parser (David Brown <dbrown@bnl.gov>, 2018-12-04T20:49:58)
 #   4.     Clean up column parser and dicts (David Brown <dbrown@bnl.gov>, 2018-12-04T19:37:40)
 #   5.     Clear a few uninitialized variable warnings (David Brown <dbrown@bnl.gov>, 2014-03-04T13:53:51)
+#   6.     Removed all dictionaries, now pull down latest JSON version from the IAEA (https://www-nds.iaea.org/nrdc/file/dson.html), 
+#          this required refactoring this code and all codes that use EXFOR dictionaries (David Brown <dbrown@bnl.gov> 2024-06-07)
 #
 ################################################################################
 
@@ -39,167 +41,42 @@
 """
 exfor_dicts module - Class and Methods for Server that gives look-up tables for abbreviations in EXFOR files
 """
-from __future__ import print_function, division
-
 import os
 import json
-from . import __path__
+from x4i import DICTPATH
 
 
-# ---------- getDictionary ----------
-def getDictionary(filename, VERBOSELEVEL=0):
-    if type(filename) is not str:
-        raise TypeError('Variable filename is supposed to be a string, got a ' + str(type(filename)))
-    try:
-        f = open(filename, mode='r')
-    except IOError:
-        if VERBOSELEVEL > 0:
-            print("Dictionary file " + filename + " not found")
-        return None
-
-    flines=f.readlines()
-
-    # Initialize variables
-    namespace=json.loads(''.join(flines[0:3]))
-    Title = namespace["Title"]
-    FieldBreaks = namespace["FieldBreaks"]
-    NumFields = namespace["NumFields"]
-    if VERBOSELEVEL > 1:
-        print("*** " + Title + " ***")
-    FieldBreaks.insert(0, 0)
-
-    # rest of file is dictionary
-    d = {}
-    for line in flines[3:]:
-        line = line.strip()
-        FieldBreaks.append(len(line))
-        if line != "":
-            fieldlist = []
-            for i in range(NumFields):
-                fieldlist.append(line[FieldBreaks[i]:FieldBreaks[i + 1]].strip())
-            item = []
-            for i in range(1, NumFields):
-                item.append(fieldlist[i])
-            d[fieldlist[0]] = item
-        FieldBreaks.pop()
-    f.close()
-    return d
+ALL_DICTIONARIES=json.load(open(DICTPATH + os.sep + "dict_arc_all.json"))
 
 
-# -------------------------------------------
-#
-# X4DictionaryServer
-#
-# -------------------------------------------
-class X4DictionaryServer:
+def get_exfor_dict(_dict_key):
+    """
+    _dict_key: either int, zfilled string of an int, or the key word itself
 
-    # ---------- __init__ ----------
-    def __init__(self, pathToDictionaryFiles=__path__[0] + os.sep + "dicts" + os.sep):
-        self.pathToDictionaryFiles = pathToDictionaryFiles
-        self.DictionaryNames = (
-            (3, "Institutes"),
-            (4, "ReferenceTypes"),
-            (5, "Journals"),
-            (7, "ConferencesAndBooks"),
-            (9, "Compounds"),
-            (15, "History"),
-            (16, "Status"),
-            (17, "Rel_Ref"),
-            (18, "Facility"),
-            (19, "IncidentSource"),
-            (20, "AdditionalResults"),
-            (21, "Method"),
-            (22, "Detectors"),
-            (23, "Analysis"),
-            (24, "DataHeadings"),
-            (30, "Process"),
-            (33, "Particles"),
-            (34, "Modifiers"),
-            (35, "DataType"),
-            (36, "Quantities"),
-            (37, "Result"))
+    >>> print(dict["236"]["CUM,FY,,FRC"]["expansion"])
+    """
+    # If it is an int (like thing), turn it into a zfilled index
+    _dict_index = None 
+    try: 
+        _dict_index = str(int(_dict_key)).zfill(3)
+        return ALL_DICTIONARIES[_dict_index]
+    except ValueError:
+        pass 
 
-    # ---------- __getitem__ ----------
-    def __getitem__(self, i):
-        """
-        Shortcut for getDictionary method
-        """
-        return self.getDictionary(i)
+    # OK, have to look it up by name
+    for key, val in ALL_DICTIONARIES['950'].items():  # Dict 950 is the "dictionary of dictionaries"
+        if _dict_key == val['dictionary_name']:
+            return ALL_DICTIONARIES[key]
 
-    # ---------- getDictionaryName ----------
-    def getDictionaryName(self, x):
-        """
-        Look up dictionary name
-        @type x: int
-        @param x: index of the dictionary
-        @rtype: string or None
-        @return: name of the dictionary
-        """
-        if isinstance(x, int):
-            for i in self.DictionaryNames:
-                if i[0] == x:
-                    return i[1]
-        return None
+    raise KeyError("Could not find key %s" % _dict_key)
+  
 
-    # ---------- getDictionaryIndex ----------
-    def getDictionaryIndex(self, x):
-        """
-        Look up index for dictionary named "x"
-        @type x: string
-        @param x: name of the dictionary
-        @rtype: int or None
-        @return: index of the dictionary
-        """
-        if isinstance(x, str):
-            for i in self.DictionaryNames:
-                if i[1] == x:
-                    return i[0]
-        return None
+def get_exfor_dict_entry(_dict_key, _dict_entry):
+    """
+    _dict_key: either int, zfilled string of an int, or the key word itself
+    _dict_entry: the entry in the _dict_key's dictionary aought for
 
-    # ---------- getDictionaryFilename ----------
-    def getDictionaryFilename(self, x):
-        """
-        Figure out file name of requested dictionary
-        @type x: string or int
-        @param x: name or index of the dictionary
-        @rtype: string or None
-        @return: filename for the dictionary
-        """
-        if isinstance(x, int):
-            for i in self.DictionaryNames:
-                if i[0] == x:
-                    return "dict" + repr(i[0]).zfill(2) + ".txt"
-        elif isinstance(x, str):
-            for i in self.DictionaryNames:
-                if i[1] == x:
-                    return "dict" + repr(i[0]).zfill(2) + ".txt"
-        return None
+    >>> print(dict["236"]["CUM,FY,,FRC"]["expansion"])
+    """
+    return get_exfor_dict(_dict_key)[_dict_entry]
 
-    # ---------- getDictionary ----------
-    def getDictionary(self, x, VERBOSELEVEL=0):
-        """
-        Retrieve requested dictionary
-        @type x: string or int
-        @param x: name or index of the dictionary
-        @param VERBOSELEVEL: verbosity
-        @rtype: matrix
-        @return: the dictionary
-        """
-        filename = self.getDictionaryFilename(x)
-        return getDictionary(self.pathToDictionaryFiles + filename, VERBOSELEVEL=VERBOSELEVEL)
-
-    # ---------- getAllDictionaries ----------
-    def getAllDictionaries(self, VERBOSELEVEL=0):
-        """
-        Retrieve requested dictionary
-        @rtype: map or matrices
-        @return: map of dictionaries, key is dictionary name
-        """
-        if VERBOSELEVEL > 1:
-            print('Loading EXFOR Dictionaries:')
-        dictmap = {}
-        for i in self.DictionaryNames:
-            tmp = self.getDictionary(i[0], VERBOSELEVEL=VERBOSELEVEL)
-            if tmp is not None:
-                dictmap[i[1]] = tmp
-        return dictmap
