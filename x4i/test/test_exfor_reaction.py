@@ -196,6 +196,8 @@ class TestX4Reaction(unittest.TestCase):
         self.assertEqual(str(exfor_reactions.X4Reaction("(1-H-1(D,EL)1-H-1,SL,POL/DA,,ANA)")),
                          'Analyzing power Spin-polarization probability d/dA for 1H(d,Elastic)1H')
 
+    def test_beta_decay(self):
+        self.assertEqual(str(exfor_reactions.X4Reaction("(36-KR-93(0,B-)37-RB-93,,PN)")), "Delayed neutron emission probability for 93Kr(None,beta)93Rb")
 
 class TestX4ReactionCombination(unittest.TestCase):
     def test_sum(self):

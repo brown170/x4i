@@ -83,7 +83,7 @@ x4projectile = Group(x4nucleus) ^ x4particle ^ Literal('0')
 x4target = Group(x4chemical_compound | x4nucleus) ^ Literal("ELEM/MASS") ^ Literal("MASS") ^ Literal("ELEM")
 x4residual = Group(x4chemical_compound | x4nucleus) ^ Literal("ELEM/MASS") ^ Literal("MASS") ^ Literal(
     "ELEM") ^ Literal("NPART")
-x4product = Group(x4nucleus) ^ x4basicparticle ^ x4particle ^ Group(Optional(Word(nums)) + x4particle) ^ Literal('0')
+x4product = x4basicparticle ^ Group(x4nucleus) ^ x4particle ^ Group(Optional(Word(nums)) + x4particle) ^ Literal('0') ^ Literal('B-')
 
 x4products = delimitedList(x4product, "+")
 
