@@ -70,15 +70,14 @@ may be accessed with the built-in help (`install-exfor-db.py -h`).
 
 How do I import new EXFOR data?
 ===============================
-The IAEA distributes zipfiles containing the entire EXFOR database, one entry per file, 
-at https://www-nds.iaea.org/exfor-master/x4toc4/.  x4i can ben updated with the contents of this file.  
-Assuming you just downloaded the EXFOR file X4-2010-12-31.zip, do:
-
-> $ python bin/x4i/setup-exfor-db.py --x4c4-master X4-2010-12-31.zip
-
-Please read the help message (`python setup-exfor-db.py -h`) for more information.  After you finish this step,
-be sure to update the information in the `x4i/data/database_info.json` file.
-
+The IAEA distributes the EXFOR files in a variety of ways as of the time of writing.  
+At this time, all have equivalent content, but different arrangements of data:
+  - https://github.com/IAEA-NDS/exfor_master.git
+  - https://github.com/IAEA-NRDCNetwork/EXFOR-Archive.git
+  - https://www-nds.iaea.org/nrdc/exfor-master/ - this is the main master, and all contents combined in one file
+  - https://www-nds.iaea.org/nrdc/exfor-master/entry/, specifically https://www-nds.iaea.org/nrdc/exfor-master/entry/entry.zip
+The repo at https://github.com/IAEA-NDS/exfor_master.git is our default scheme, as encoded in the 
+`setup-exfor-db-index.py` script.  Other options have not been fully implemented.
 
 
 Changes since LLNL release (x4i-1.0)

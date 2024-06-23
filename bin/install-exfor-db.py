@@ -144,6 +144,8 @@ if __name__ == "__main__":
     archive_metadata(DATAPATH, metadata)
 
     # Rebuild index
+    if args.source != "NDS-git":
+        raise NotImplementedError("Only the default option is currently coded")
     if args.verbose:
         subprocess.run(["setup-exfor-db-index.py", "-v"])
     else:
