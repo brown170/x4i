@@ -74,6 +74,7 @@ from .exfor_units import *
 
 pint_pandas.PintType.ureg = exfor_unit_registry
 pint_pandas.PintType.ureg.default_format = "P~"  # by default, display units in non-silly ways
+pandas.set_option('future.no_silent_downcasting', True) # this needed to supress silly pandas warning
 
 
 def dataframe_from_datasection(_data):
@@ -344,14 +345,12 @@ class X4DataSet(X4BibMetaData):
                 uncertainties = best_parser.get_uncertainties()
                 if uncertainties is not None:
                     _columns["d(%s)" % _label] = pandas.Series(uncertainties, dtype="pint[%s]" % best_parser.get_unit())
+                elif makeAllColumns:
+                     _columns["d(%s)" % _label] = pandas.Series(best_parser.get_dummy_column(), dtype="pint[%s]" % best_parser.get_unit())
 
         # Save the data in the results
         for col in _columns:
             results.data[col] = _columns[col]
-        
-        # Make all the columns if required
-        if makeAllColumns:
-            raise NotImplementedError() 
 
         # Convert all units to our favs
         for col in results.data.columns:
@@ -372,6 +371,7 @@ class X4DataSet(X4BibMetaData):
             results.data = results.data[temp_columnNames]
         
         # All done
+        results.data = results.data.fillna(0)  # final sanitization
         results.simplified = True
         return results
 
