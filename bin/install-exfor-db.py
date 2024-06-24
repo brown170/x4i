@@ -83,6 +83,8 @@ def parse_args():
                         help="Output format (Default: %s)" % DEFAULTEXFORSOURCE)
     parser.add_argument('--skip-download', default=False, action='store_true',
                         help="Skip downloading from data source (i.e., you already have it for some reason)")
+    parser.add_arguemtn('--skip-indexing', default=False, action='store_true', 
+                        help="Skip indexing the data (i.e., you want to somehow do it separately)")
     parser.add_argument("--db", default=DATAPATH+os.sep+"db", help="Location of local EXFOR data files (Default %s)" % (DATAPATH+os.sep+"db"))
     return parser.parse_args()
 
@@ -111,7 +113,8 @@ if __name__ == "__main__":
     metadata.update(EXFORSOURCES[args.source])
 
     # Remove old database (link)
-    os.unlink(args.db) 
+    if os.path.exists(args.db):
+        os.unlink(args.db) 
 
     if not args.skip_download:
         if EXFORSOURCES[args.source]['mode'] == 'git':
@@ -144,11 +147,12 @@ if __name__ == "__main__":
     archive_metadata(DATAPATH, metadata)
 
     # Rebuild index
-    if args.source != "NDS-git":
-        raise NotImplementedError("Only the default option is currently coded")
-    if args.verbose:
-        subprocess.run(["setup-exfor-db-index.py", "-v"])
-    else:
-        subprocess.run(["setup-exfor-db-index.py"])
+    if not args.skip_indexing:
+        if args.source != "NDS-git":
+            raise NotImplementedError("Only the default option is currently coded")
+        if args.verbose:
+            subprocess.run(["setup-exfor-db-index.py", "-v"])
+        else:
+            subprocess.run(["setup-exfor-db-index.py"])
 
 

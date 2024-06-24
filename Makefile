@@ -14,7 +14,8 @@ venv:
 	$(PYTHON) -m venv venv --system-site-packages; . venv/bin/activate; $(PYTHON) -m pip install --upgrade pip; pip install -r requirements.txt ; deactivate
 
 x4i/data/index.tbl:
-	$(PYTHON)  install-exfor-db.py
+	$(PYTHON)  bin/install-exfor-db.py --skip-indexing
+	$(PYTHON)  bin/setup-exfor-db-index.py
 
 x4i/dicts/dict_arc_all.json:
 	$(CURL) https://www-nds.iaea.org/nrdc/file/dict_arc_all.9929.json > $@
