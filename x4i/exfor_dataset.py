@@ -647,4 +647,5 @@ def X4DataSetFactory(quant, meta=None, common=None, reaction=None, monitor=None,
         return X4EnergyDistributionDataSet(meta, common, reaction, monitor, data, pointer)
     else:
         # raise NotImplementedError( "Unknown observable quantity: " + ','.join( quant ) )
+        warnings.warn("NotImplementedError: Simplification scheme for observable quantit(ies) %s not written yet" % str(','.join( quant )))
         return X4DataSet(meta, common, reaction, monitor, data, pointer)
