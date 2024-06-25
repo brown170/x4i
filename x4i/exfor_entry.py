@@ -49,12 +49,11 @@
 """
 exfor_entry module
 """
-from .exfor_utilities import COMMENTSTRING, open_for_reading_universal_newline_flag
-from .exfor_paths import DATAPATH, exfor_file_path
 import x4i.exfor_subentry as exfor_subentry
 import x4i.exfor_dataset as exfor_dataset
 import x4i.exfor_exceptions as exfor_exceptions
-import os
+from .exfor_utilities import COMMENTSTRING, open_for_reading_universal_newline_flag
+from .exfor_paths import exfor_file_path
 
 
 def x4EntryFactory(enum, subentsList=None, rawEntry=False, dataPath=None, filePath=None):
@@ -74,8 +73,8 @@ def x4EntryFactory(enum, subentsList=None, rawEntry=False, dataPath=None, filePa
             filePath = exfor_file_path(enum, dataPath)
         with open_for_reading_universal_newline_flag(filePath) as entryfile:
             entry =entryfile.readlines()
-    except IOError:
-        raise IOError("Rebuild your index with setup-exfor-db.py, x4i could not find entry %s" % enum)
+    except IOError as err:
+        raise IOError("Rebuild your index with setup-exfor-db.py, x4i could not find entry %s" % enum) from err
     subent = ''
     for line in entry:
         if line.startswith('ENTRY') or line.startswith('ENDENTRY') or line.startswith('NOSUBENT'):
@@ -128,7 +127,7 @@ class X4Entry(dict):
                 subent = exfor_subentry.X4SubEntry(x)
                 self[subent.accnum] = subent
             except IndexError as err:
-                raise IndexError(str(err) + ' while processing "' + str(x[:22]) + '"')
+                raise IndexError(str(err) + ' while processing "' + str(x[:22]) + '"') from err
 
     def __repr__(self):
         """A string representation that should match what comes from IAEA and should be suitable for parsing with x4i"""
