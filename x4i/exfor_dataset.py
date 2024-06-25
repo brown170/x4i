@@ -193,10 +193,15 @@ class X4DataSet(X4BibMetaData):
                 self.__labels += one_common.labels
                 self.__units += one_common.units
                 common_df = dataframe_from_datasection(one_common)
-                if self.__data is None:
+                try:
+                    if self.__data is None:
+                        self.__data = common_df
+                    else:
+                        self.__data = self.__data.join(common_df, how='cross')
+                except ValueError as err:
+                    warnings.warn(str(err) + '.  Suspect issue with COMMON fields:\n %s\n\nand\n\n %s' % (str(self.__data), str(common_df)) )
                     self.__data = common_df
-                else:
-                    self.__data = self.__data.join(common_df, how='cross')
+
 
         # Select out the pointer-ed columns
         temp_data = dataframe_from_datasection(data)
