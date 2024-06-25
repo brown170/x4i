@@ -83,7 +83,7 @@ def parse_args():
                         help="Output format (Default: %s)" % DEFAULTEXFORSOURCE)
     parser.add_argument('--skip-download', default=False, action='store_true',
                         help="Skip downloading from data source (i.e., you already have it for some reason)")
-    parser.add_arguemtn('--skip-indexing', default=False, action='store_true', 
+    parser.add_argument('--skip-indexing', default=False, action='store_true', 
                         help="Skip indexing the data (i.e., you want to somehow do it separately)")
     parser.add_argument("--db", default=DATAPATH+os.sep+"db", help="Location of local EXFOR data files (Default %s)" % (DATAPATH+os.sep+"db"))
     return parser.parse_args()
