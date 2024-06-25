@@ -357,11 +357,16 @@ class X4DataSet(X4BibMetaData):
                 _columns[_label] = pandas.Series(values, dtype="pint[%s]" % best_parser.get_unit())
                 
                 # Attempt to extract uncertainties
-                uncertainties = best_parser.get_uncertainties()
-                if uncertainties is not None:
-                    _columns["d(%s)" % _label] = pandas.Series(uncertainties, dtype="pint[%s]" % str(best_parser.get_unit()))
-                elif makeAllColumns:
-                     _columns["d(%s)" % _label] = pandas.Series(best_parser.get_dummy_column(), dtype="pint[%s]" % str(best_parser.get_unit()))
+                try:
+                    uncertainties = best_parser.get_uncertainties()
+                    if uncertainties is not None:
+                        _columns["d(%s)" % _label] = pandas.Series(uncertainties, dtype="pint[%s]" % str(best_parser.get_unit()))
+                    elif makeAllColumns:
+                         _columns["d(%s)" % _label] = pandas.Series(best_parser.get_dummy_column(), dtype="pint[%s]" % str(best_parser.get_unit()))
+                except pint.errors.DimensionalityError as err:
+                    warnings.warn(str(err) + "indicates problem with DATA or COMMON field, check pointers?")
+                except ValueError as err:
+                    warnings.warn(str(err) + "indicates problem with DATA or COMMON field, check pointers?")
 
         # Save the data in the results
         for col in _columns:
