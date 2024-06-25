@@ -39,7 +39,6 @@
 #
 ################################################################################
 
-from __future__ import print_function
 import argparse
 from x4i import exfor_entry, exfor_manager
 
