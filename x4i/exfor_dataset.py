@@ -63,6 +63,7 @@ import pint
 import pint_pandas
 import pandas
 import tabulate
+import warnings
 import numpy as np
 from .exfor_column_parsing import *
 from .exfor_exceptions import *
@@ -212,10 +213,14 @@ class X4DataSet(X4BibMetaData):
             temp_data = temp_data.rename(columns=renames)
         
         # Final assembly
-        if self.__data is None:
+        try:
+            if self.__data is None:
+                self.__data = temp_data
+            else:
+                self.__data = self.__data.join(temp_data, how='cross')
+        except ValueError as err:
+            warnings.warn(str(err) + '.  Suspect issue with COMMON vs. DATA fields:\n %s\n\nand\n\n %s' % (str(self.__data), str(temp_data)) )
             self.__data = temp_data
-        else:
-            self.__data = self.__data.join(temp_data, how='cross')
         self.__labels += data.labels
         self.__units += data.units
 
