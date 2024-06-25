@@ -100,10 +100,10 @@ class X4ColumnProcessor:
     def get_uncertainty_helper(self, labels, value_column, as_list=True):
         for label in labels:
             if label in self.data:
-                if self.data[label].pint.units == exfor_unit_registry.percent:
+                if hasattr(self.data[label].pint, "units") and self.data[label].pint.units == exfor_unit_registry.percent:
                     self.data[label] *= value_column
                 if as_list:
-                    return self.data[label].to_list()
+                    return self.data[label].values.tolist()
                 else:
                     return self.data[label]
         
