@@ -101,7 +101,7 @@ class X4ColumnProcessor:
         for label in labels:
             if label in self.data:
                 if hasattr(self.data[label].pint, "units") and self.data[label].pint.units == exfor_unit_registry.percent:
-                    self.data[label] *= value_column
+                    self.data[label] = self.data[label] * value_column
                 if as_list:
                     return self.data[label].values.tolist()
                 else:
