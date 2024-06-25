@@ -231,12 +231,12 @@ class X4DataSet(X4BibMetaData):
         try:
             out += '\n' + COMMENTSTRING + '  Reaction:  ' + ' '.join(map(str, self.reaction))
         except TypeError as e:
-            raise TypeError(str(e) + ', got ' + str(type(self.reaction)) + " with value " + str(self.reaction))
+            raise TypeError(str(e) + ', got ' + str(type(self.reaction)) + " with value " + str(self.reaction)) from e
         try:
             if self.monitor is not None:
                 out += '\n' + COMMENTSTRING + '  Monitor(s): ' + ' '.join(map(str, self.monitor))
         except TypeError as e:
-            raise TypeError(str(e) + ', got ' + str(type(self.monitor)) + " with value " + str(self.monitor))
+            raise TypeError(str(e) + ', got ' + str(type(self.monitor)) + " with value " + str(self.monitor)) from e
         return out
 
     def reprHeader(self):
@@ -364,7 +364,7 @@ class X4DataSet(X4BibMetaData):
         if columnNames is not None:
             temp_columnNames = [c for c in columnNames if c in results.data]                        
             if failIfMissingErrors and columnNames != temp_columnNames:
-                raise Exception("No uncertainties on one or more columns")
+                raise KeyError("No uncertainties on one or more columns")
             # How to sort columns in pandas:
             # If:      df.columns.tolist() = ['0', '1', '2', '3', 'mean']
             # Do this: df = df[['mean', '0', '1', '2', '3']]
