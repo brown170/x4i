@@ -234,9 +234,9 @@ class X4HighMidLowColumnTriplet(X4ColumnTransformer):
 
     def get_uncertainties(self):
         highs = self.get_uncertainty_helper(self.__labels_for_highs, as_list=False,
-                                            values_column=self.get_column_helper(self.__labels_for_values, as_list=False))
+                                            value_column=self.get_column_helper(self.__labels_for_values, as_list=False))
         lows = self.get_uncertainty_helper(self.__labels_for_lows, as_list=False,
-                                           values_column=self.get_column_helper(self.__labels_for_values, as_list=False))
+                                           value_column=self.get_column_helper(self.__labels_for_values, as_list=False))
         return (0.5 * (highs-lows)).abs().to_list()
 
     def get_unit(self):
