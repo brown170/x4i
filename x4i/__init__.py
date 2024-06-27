@@ -38,15 +38,18 @@
 #
 ################################################################################
 
-# General info
 import os
+from x4i.exfor_paths import *
+from x4i.exfor_dicts import get_exfor_dict, get_exfor_dict_entry
+from x4i import exfor_manager, exfor_entry
 
+# General info
 MAJOR_VERSION = 1
 MINOR_VERSION = 0
 PATCH = 4
 
 __package_name__ = "x4i -- The Exfor Interface"
-__version__ = '.'.join(map(str, [MAJOR_VERSION, MINOR_VERSION, PATCH]))
+__version__ = '.'.join([str(x) for x in [MAJOR_VERSION, MINOR_VERSION, PATCH]])
 __author__ = 'David Brown <brown170@llnl.gov>'
 __url__ = 'http://nuclear.llnl.gov/'
 __license__ = 'not assigned yet'
@@ -64,10 +67,6 @@ __disclaimer__ = """LLNL Disclaimer:
       views and opinions of authors expressed herein do not necessarily state or
       reflect those of the United States Government or the University of California,
       and shall not be used for advertising or product endorsement purposes."""
-
-from x4i.exfor_paths import *
-from x4i.exfor_dicts import get_exfor_dict, get_exfor_dict_entry
-from x4i import exfor_manager, exfor_entry
 
 __databaseManager = exfor_manager.X4DBManagerDefault()
 
@@ -87,5 +86,5 @@ def retrieve(**kw):
 
 __all__ = [
     '__init__', 'exfor_dataset', 'exfor_exceptions', 'exfor_manager', 'exfor_reference', 'exfor_utilities',
-    'endl_Z', 'exfor_dicts', 'exfor_field', 'exfor_particle', 'exfor_section', 'pyparsing',
+    'endl_Z', 'exfor_dicts', 'exfor_field', 'exfor_particle', 'exfor_section',
     'exfor_column_parsing', 'exfor_entry', 'exfor_grammars', 'exfor_reactions', 'exfor_subentry']
