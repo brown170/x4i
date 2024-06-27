@@ -251,57 +251,58 @@ class X4AddErrorBarsColumnPair(X4ColumnTransformer):
 
     def score_label_match(self):
         raise NotImplementedError("X4AddErrorBarsColumnPair")
-        return self.score_helper(self.__labels_for_values) + 4
+        # return self.score_helper(self.__labels_for_values) + 4
 
     def get_values(self):
         return self.get_column_helper(self.__labels_for_values)
 
     def get_uncertainties(self):
         raise NotImplementedError("X4AddErrorBarsColumnPair")
-        return (0.5 * (self.get_column_helper(self.__labels_for_highs) - \
-                       self.get_column_helper(self.__labels_for_lows))).abs().to_list()
+        # return (0.5 * (self.get_column_helper(self.__labels_for_highs) - \
+        #                self.get_column_helper(self.__labels_for_lows))).abs().to_list()
 
     def get_unit(self):
         return self.get_unit_helper(self.__labels_for_values)
 
     def getError(self, data):
-        if not self.isMatch(data):
-            return self.getDummyColumn(data)
-        self.set_icols(data)
-        if self.column2Transformer is not None:
-            col2 = self.column2Transformer.getColumn(self.icol2, data)
-        else:
-            col2 = self.getDummyColumn(data)
-        if self.column3Transformer is not None:
-            col3 = self.column3Transformer.getColumn(self.icol3, data)
-        else:
-            col3 = self.getDummyColumn(data)
-        ans = ['ERR', None]
-        if 'PER-CENT' in [col2[1], col3[1]]:
-            col1 = self.getValue(data)
-            ans[1] = col1[1]
-            for i in range(2, data.numrows() + 2):
-                try:
-                    col2[i] = col1[i] * col2[i] / 100.0
-                except:
-                    col2[i] = None
-                try:
-                    col3[i] = col1[i] * col3[i] / 100.0
-                except:
-                    col3[i] = None
-        else:
-            for j in [col2[1], col3[1]]:
-                if j != None: ans[1] = j
-        for i in range(2, data.numrows() + 2):
-            x2 = col2[i]
-            x3 = col3[i]
-            if x2 is None and x3 is None:
-                ans.append(None)
-            else:
-                if x2 is None: x2 = 0.0
-                if x3 is None: x3 = 0.0
-                ans.append(math.sqrt(x2 * x2 + x3 * x3))
-        return [absOrNone(x) for x in ans]
+        raise NotImplementedError()
+        # if not self.isMatch(data):
+        #     return self.getDummyColumn(data)
+        # self.set_icols(data)
+        # if self.column2Transformer is not None:
+        #     col2 = self.column2Transformer.getColumn(self.icol2, data)
+        # else:
+        #     col2 = self.getDummyColumn(data)
+        # if self.column3Transformer is not None:
+        #     col3 = self.column3Transformer.getColumn(self.icol3, data)
+        # else:
+        #     col3 = self.getDummyColumn(data)
+        # ans = ['ERR', None]
+        # if 'PER-CENT' in [col2[1], col3[1]]:
+        #     col1 = self.getValue(data)
+        #     ans[1] = col1[1]
+        #     for i in range(2, data.numrows() + 2):
+        #         try:
+        #             col2[i] = col1[i] * col2[i] / 100.0
+        #         except:
+        #             col2[i] = None
+        #         try:
+        #             col3[i] = col1[i] * col3[i] / 100.0
+        #         except:
+        #             col3[i] = None
+        # else:
+        #     for j in [col2[1], col3[1]]:
+        #         if j != None: ans[1] = j
+        # for i in range(2, data.numrows() + 2):
+        #     x2 = col2[i]
+        #     x3 = col3[i]
+        #     if x2 is None and x3 is None:
+        #         ans.append(None)
+        #     else:
+        #         if x2 is None: x2 = 0.0
+        #         if x3 is None: x3 = 0.0
+        #         ans.append(math.sqrt(x2 * x2 + x3 * x3))
+        # return [absOrNone(x) for x in ans]
 
 
 # -----------------------------------
