@@ -4,17 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "x4i"
-version = "1.0.4"
-dependencies = [
-    "numpy",
-    "pint",
-    "pandas",
-    "pint_pandas",
-    "pytest",
-    "pyparsing",
-    "bidict",
-    "tabulate"
-]
+dynamic = ["version"]
 requires-python = ">=3.0"
 authors = [
   {name = "David A. Brown", email = "dbrown@bnl.gov"}
