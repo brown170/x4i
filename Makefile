@@ -18,7 +18,7 @@ x4i/data/index.tbl:
 	$(PYTHON)  bin/setup-exfor-db-index.py
 
 x4i/dicts/dict_arc_all.json:
-	$(CURL) https://www-nds.iaea.org/nrdc/file/dict_arc_all.9929.json > $@
+	$(CURL) https://nds.iaea.org/nrdc/file/dict.9130.json > $@
 
 realclean:
 	rm -rf venv
