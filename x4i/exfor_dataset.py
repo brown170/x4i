@@ -65,7 +65,7 @@ import pandas
 import tabulate
 import warnings
 import numpy as np
-from .exfor_column_parsing import *
+from .exfor_column_transformer import *
 from .exfor_exceptions import *
 from .exfor_reactions import X4ReactionCombination
 from .exfor_section import X4BibMetaData
