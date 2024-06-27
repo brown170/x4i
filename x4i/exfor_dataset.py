@@ -280,7 +280,7 @@ class X4DataSet(X4BibMetaData):
                       unitOverride=None, preferredUnits=['MeV', 'b', 'sr', 'deg', 'fm', 'b/sr']):
         """Returns a simplified version of self.
         inputs:
-            parserMap:           { 'column name 1':parserList1, 'column name 2':parserList2, ... }
+            parserMap:           { 'column name 1':TransformerList1, 'column name 2':TransformerList2, ... }
             columnNames:         [ 'column name 1', 'column name 2', ... ] #put them in the order *you* want
             makeAllColumns:      will make uncertainty columns even if no uncertainties are given on a particular column
             failIfMissingErrors: fail (raising exception) if missing an error column
@@ -480,7 +480,7 @@ class X4CrossSectionDataSet(X4DataSet):
 
     def getSimplified(self, unitOverride=None, makeAllColumns=False, failIfMissingErrors=False):
         return X4DataSet.getSimplified(self, 
-                                       parserMap={'Energy': incidentEnergyParserList, 'Data': csDataParserList},
+                                       parserMap={'Energy': incidentEnergyTransformerList, 'Data': csDataTransformerList},
                                        columnNames=['Energy', 'Data', 'd(Energy)', 'd(Data)'], 
                                        unitOverride=unitOverride,
                                        makeAllColumns=makeAllColumns,
@@ -493,7 +493,7 @@ class X4NubarDataSet(X4DataSet):
 
     def getSimplified(self, unitOverride=None, makeAllColumns=False, failIfMissingErrors=False):
         return X4DataSet.getSimplified(self, 
-                                       parserMap={'Energy': incidentEnergyParserList, 'Data': nubarParserList},
+                                       parserMap={'Energy': incidentEnergyTransformerList, 'Data': nubarTransformerList},
                                        columnNames=['Energy', 'Data', 'd(Energy)', 'd(Data)'], 
                                        unitOverride=unitOverride,
                                        makeAllColumns=makeAllColumns,
@@ -507,7 +507,7 @@ class X4SpectrumAveCrossSectionDataSet(X4DataSet):
 
     def getSimplified(self, unitOverride=None, makeAllColumns=False, failIfMissingErrors=False):
         return X4DataSet.getSimplified(self, 
-                                       parserMap={'Energy': spectrumArgumentParserList, 'Data': csDataParserList},
+                                       parserMap={'Energy': spectrumArgumentTransformerList, 'Data': csDataTransformerList},
                                        columnNames=['Energy', 'Data', 'd(Energy)', 'd(Data)'], 
                                        unitOverride=unitOverride,
                                        makeAllColumns=makeAllColumns,
@@ -520,7 +520,7 @@ class X4ResonanceIntCrossSectionDataSet(X4DataSet):
 
     def getSimplified(self, unitOverride=None, makeAllColumns=False, failIfMissingErrors=False):
         return X4DataSet.getSimplified(self, 
-                                       parserMap={'Data': csDataParserList}, columnNames=['Data'],
+                                       parserMap={'Data': csDataTransformerList}, columnNames=['Data'],
                                        unitOverride=unitOverride,
                                        makeAllColumns=makeAllColumns, 
                                        failIfMissingErrors=failIfMissingErrors)
@@ -549,9 +549,9 @@ class X4AngularDistributionDataSet(X4DataSet):
 
     def getSimplified(self, unitOverride=None, makeAllColumns=False, failIfMissingErrors=False):
         return X4DataSet.getSimplified(self, 
-                                       parserMap={'Energy': incidentEnergyParserList, 
-                                                  'Angle': angleParserList,
-                                                  'Data': angDistParserList},
+                                       parserMap={'Energy': incidentEnergyTransformerList, 
+                                                  'Angle': angleTransformerList,
+                                                  'Data': angDistTransformerList},
                                        columnNames=['Energy', 'Angle', 'Data', 'd(Energy)', 'd(Angle)', 'd(Data)'], 
                                        unitOverride=unitOverride,
                                        makeAllColumns=makeAllColumns,
@@ -574,9 +574,9 @@ class X4EnergyDistributionDataSet(X4DataSet):
 
     def getSimplified(self, unitOverride=None, makeAllColumns=False, failIfMissingErrors=False):
         return X4DataSet.getSimplified(self,
-                                       parserMap={'Energy': incidentEnergyParserList, 
-                                                  "Eout": outgoingEnergyParserList,
-                                                  'Data': energyDistParserList}, 
+                                       parserMap={'Energy': incidentEnergyTransformerList, 
+                                                  "Eout": outgoingEnergyTransformerList,
+                                                  'Data': energyDistTransformerList}, 
                                        columnNames=['Energy', "Eout", 'Data', 'd(Energy)', "d(Eout)", 'd(Data)'],
                                        unitOverride=unitOverride,
                                        makeAllColumns=makeAllColumns, 
