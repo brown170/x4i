@@ -76,6 +76,7 @@ At this time, all have equivalent content, but different arrangements of data:
   - https://github.com/IAEA-NRDCNetwork/EXFOR-Archive.git
   - https://www-nds.iaea.org/nrdc/exfor-master/ - this is the main master, and all contents combined in one file
   - https://www-nds.iaea.org/nrdc/exfor-master/entry/, specifically https://www-nds.iaea.org/nrdc/exfor-master/entry/entry.zip
+  - https://github.com/vzerkin/EXFOR-Archive 
 The repo at https://github.com/IAEA-NDS/exfor_master.git is our default scheme, as encoded in the 
 `setup-exfor-db-index.py` script.  Other options have not been fully implemented.
 
