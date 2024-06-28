@@ -80,6 +80,8 @@ At this time, all have equivalent content, but different arrangements of data:
 The repo at https://github.com/IAEA-NDS/exfor_master.git is our default scheme, as encoded in the 
 `setup-exfor-db-index.py` script.  Other options have not been fully implemented.
 
+Note, the previous distribution of the EXFOR x4toc4 master has apparently been discontinued.
+
 
 Changes since LLNL release (x4i-1.0)
 ====================================
