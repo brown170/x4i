@@ -50,6 +50,7 @@ setup(
         'x4i': [
             os.sep.join( [ 'dicts', '*.txt' ] ),
             os.sep.join( [ 'dicts', '*.json' ] ),
+            os.sep.join( [ 'dicts', '*.csv' ] ),
             os.sep.join( [ 'data', '*.t*' ] ),
             os.sep.join( [ 'data', '*.pickle' ] ),
             os.sep.join( [ 'data', 'db', '*', '*.x4' ] ) ],
