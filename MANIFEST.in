@@ -1,5 +1,6 @@
 include *.txt
 include *.md
+recursive-include x4i/data *.json
 recursive-include doc *.txt *.pdf *.gif *.css *.html *.js *.png *.md
 recursive-include bin *.py
 recursive-include examples *.py
