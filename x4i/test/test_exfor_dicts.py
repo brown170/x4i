@@ -87,8 +87,8 @@ class TestX4Dicts(unittest.TestCase):
         (7, "ConferencesAndBooks"),
         """
         self.assertEqual(len(exfor_dicts.get_exfor_dict("Reference types")), 14)
-        self.assertEqual(len(exfor_dicts.get_exfor_dict("Journals")), 522)
-        self.assertEqual(len(exfor_dicts.get_exfor_dict("Conferences")), 485)
+        self.assertEqual(len(exfor_dicts.get_exfor_dict("Journals")), 524)
+        self.assertEqual(len(exfor_dicts.get_exfor_dict("Conferences")), 488)
 
     def test_dataheadings_contents(self):
         """(24, "DataHeadings"),"""
