@@ -33,7 +33,7 @@
 import os
 import argparse
 import json
-from x4i import exfor_entry, exfor_section
+from x4i import exfor_entry, exfor_section, exfor_dataset
 
 
 def process_args():
@@ -85,6 +85,7 @@ if __name__ == "__main__":
             if not vv.simplified:
                 print('   ','Simplification of set', kk, 'FAILED')
             nds['_'.join(kk)] = vv
+            print(vv.to_tabulate(units="keys"))
         print(json.dumps(nds, cls=TEMPEncoder))
     
     # Export original file
