@@ -238,14 +238,18 @@ class X4Entry(dict):
                 try:
                     if p in main_monitors:
                         datasets[k] = exfor_dataset.X4DataSetFactory(quant=main_reactions[p][0].quantity,
-                                                                     meta=meta_list, common=common_list,
+                                                                     meta=meta_list, 
+                                                                     common=common_list,
                                                                      reaction=main_reactions[p],
-                                                                     monitor=main_monitors[p], data=subent['DATA'],
+                                                                     monitor=main_monitors[p], 
+                                                                     data=subent['DATA'],
                                                                      pointer=p)
                     else:
                         datasets[k] = exfor_dataset.X4DataSetFactory(quant=main_reactions[p][0].quantity,
-                                                                     meta=meta_list, common=common_list,
-                                                                     reaction=main_reactions[p], data=subent['DATA'],
+                                                                     meta=meta_list, 
+                                                                     common=common_list,
+                                                                     reaction=main_reactions[p], 
+                                                                     data=subent['DATA'],
                                                                      pointer=p)
                 except NotImplementedError as err:
                     self.errors[k] = 'Encountered NotImplementedError: ' + str(err)
