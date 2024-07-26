@@ -38,11 +38,12 @@
 #   8.     better name (David Brown <dbrown@bnl.gov>, 2012-07-24T13:17:21)
 #
 ################################################################################
-
 import argparse
 from x4i import exfor_entry, exfor_manager
 
+
 def process_args():
+    """Command line"""
     parser = argparse.ArgumentParser(description = 'Get an EXFOR entry')
     parser.set_defaults( verbose = True )
     parser.add_argument("-v", action="store_true", dest='verbose', help="enable verbose output")
@@ -60,45 +61,51 @@ def process_args():
 
 if __name__ == "__main__":
     args = process_args()
-    if args.subent == None and args.ent == None:
+    if args.subent is None and args.ent is None:
         raise ValueError("No ENTRY or SUBENT specified")
-    if args.subent != None and len( args.subent ) != 8: 
+    if args.subent is not None and len( args.subent ) != 8:
         raise ValueError( "SUBENT must have 8 characters" )
-    if args.ent != None and len( args.ent ) != 5: 
-        raise ValueError( "ENTRY must have 5 characters, have '%s'" % args.ent )
+    if args.ent is not None and len( args.ent ) != 5:
+        raise ValueError( f"ENTRY must have 5 characters, have '{args.ent}'" )
 
     # Get the ENTRY/SUBENTRY requested
     if not args.file:
         dbMgr = exfor_manager.X4DBManagerPlainFS( )
-        if args.ent != None:    searchResult = dbMgr.retrieve( ENTRY = args.ent, rawEntry=args.raw )
-        else:                   searchResult = dbMgr.retrieve( SUBENT = args.subent, rawEntry=args.raw  )
+        if args.ent is not None:
+            searchResult = dbMgr.retrieve( ENTRY = args.ent, rawEntry=args.raw )
+        else:
+            searchResult = dbMgr.retrieve( SUBENT = args.subent, rawEntry=args.raw  )
     else:
         searchResult = exfor_entry.x4EntryFactory( args.ent, filePath=args.file, rawEntry=args.raw )
-        if args.subent != None: # must filter
-            if args.raw: pass
+        if args.subent is not None: # must filter
+            if args.raw:
+                pass
             else:
-                if args.subent not in searchResult[ theEntry ]: raise KeyError( "SUBENT "+args.subent+" not found!" )
-                for k in list(searchResult[ theEntry ].keys()):
-                    if k.endswith( '001' ) or k == args.subent: continue
-                    del( searchResult[ theEntry ][k] )
+                if args.subent not in searchResult[ args.ent ]:
+                    raise KeyError( "SUBENT "+args.subent+" not found!" )
+                for k in list(searchResult[ args.ent ].keys()):
+                    if k.endswith( '001' ) or k == args.subent:
+                        continue
+                    del( searchResult[ args.ent ][k] )
 
     print(searchResult)
 
     # Just print out the SUBENT keys
-    if args.ent != None:
+    if args.ent is not None:
         print("This ENTRY:      ", list(searchResult.keys())[0])
         for i in searchResult[ list(searchResult.keys())[0] ]:
             print("   ", i.split('\n')[0][0:22])
 
     # Examine a SUBENT
-    if args.subent != None:
+    if args.subent is not None:
         subent = searchResult
         keys = list(searchResult.keys())
         keys.sort()
         if not args.nada:
             if args.raw:
                 print('\n\n')
-                for k in keys: print('\n'.join( searchResult[k] ) )
+                for k in keys:
+                    print('\n'.join( searchResult[k] ) )
             if args.rawdoc:
                 print('\n\n')
                 print(repr(searchResult[keys[0]][1]))
@@ -106,13 +113,15 @@ if __name__ == "__main__":
                 print('\n\n')
                 print(searchResult[keys[0]][1])
             if args.rawdata:
-                if args.subent.endswith( '001' ): raise ValueError( "Documentation SUBENTs (those ending in '001') do not have DATA sections" )
+                if args.subent.endswith( '001' ):
+                    raise ValueError( "Documentation SUBENTs (those ending in '001') do not have DATA sections" )
                 print(10*'-','Raw Data',10*'-')
                 print(searchResult[keys[-1]][args.subent]['DATA'])
                 print(10*'-','Errors',10*'-')
                 print(searchResult[keys[-1]].errors)
             if args.data:
-                if args.subent.endswith( '001' ): raise ValueError( "Documentation SUBENTs (those ending in '001') do not have DATA sections" )
+                if args.subent.endswith( '001' ):
+                    raise ValueError( "Documentation SUBENTs (those ending in '001') do not have DATA sections" )
                 print(10*'-','Data',10*'-')
                 print(searchResult[keys[-1]].getDataSets())
                 print(10*'-','Errors',10*'-')
