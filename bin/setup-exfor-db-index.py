@@ -82,36 +82,42 @@
 import os
 import argparse
 import collections
-from x4i import DATAPATH, fullIndexFileName, fullErrorFileName, fullCoupledFileName, fullMonitoredFileName, \
-    fullReactionCountFileName, fullDBPath, fullDoiFileName, exfor_file_glob
+import multiprocessing
+import sqlite3
+import pickle
+from x4i import DATAPATH
+from x4i import fullIndexFileName as FULL_INDEX_FILENAME
+from x4i import fullErrorFileName as FULL_ERROR_FILENAME
+from x4i import fullCoupledFileName as FULL_COUPLED_FILENAME
+from x4i import fullMonitoredFileName as FULL_MONITORED_FILENAME
+from x4i import fullReactionCountFileName as FULL_REACTION_COUNT_FILENAME
+from x4i import fullDBPath as FULL_DB_PATH
+from x4i import fullDoiFileName as FULL_DOI_FILENAME
+from x4i import exfor_file_glob as EXFOR_FILE_GLOB
+from x4i import exfor_entry, exfor_reactions, exfor_manager, exfor_exceptions
+
 
 # ------------------------------------------------------
-# Global data
+# Class definitions
 # ------------------------------------------------------
-
-buggyEntries = {}
-coupledReactionEntries = {}
-monitoredReactionEntries = {}
-reactionCount = {}
+SimpleReaction = collections.namedtuple("SimpleReaction", "proj targ prod rtext quant simpleRxn")
 
 
 # ------------------------------------------------------
 #   Tools to actually build the database
 # ------------------------------------------------------
-def buildDOIIndex(doiFile, verbose=False): # creates doiXref database
+def buildDOIIndex(_doiFile, _fullIndexFileName=FULL_INDEX_FILENAME, verbose=False): # creates doiXref database
     """
     Adds the DOI cross reference table to the main index.
     The IAEA should probably tightly associated this data with the EXFOR data, but for some reason it is not.
     """
-    import sqlite3
-
     # set up database & create the table
-    connection = sqlite3.connect(fullIndexFileName)
+    connection = sqlite3.connect(_fullIndexFileName)
     cursor = connection.cursor()
     cursor.execute("""drop table if exists doiXref""")
     cursor.execute("""create table doiXref (entry text, nsr text, doi text, reference text )""")
 
-    for line in open(doiFile).readlines():
+    for line in open(_doiFile).readlines():
         entry = line[32:46].strip().replace('$ENTRY=', '')
         nsr = line[46:61].strip().replace('$NSR=', '')
         doi = line[61:].strip().replace('$DOI=', '')
@@ -123,7 +129,7 @@ def buildDOIIndex(doiFile, verbose=False): # creates doiXref database
     cursor.close()
 
 
-def buildMainIndex(verbose=False, stopOnException=False):
+def buildMainIndex(verbose=False, fullIndexFileName=FULL_INDEX_FILENAME, stopOnException=False):
     """
     This function build up the index of the database.
 
@@ -160,112 +166,116 @@ def buildMainIndex(verbose=False, stopOnException=False):
         ENTRY = None
 
     """
-    import sqlite3
-    import pickle
+
     import pprint
     import glob
     import pyparsing
-    import multiprocessing
-    from x4i import exfor_exceptions
 
-    # clean up previous runs
-    if os.path.exists(fullIndexFileName):
-        os.remove(fullIndexFileName)
-    if os.path.exists(fullErrorFileName):
-        os.remove(fullErrorFileName)
-    if os.path.exists(fullCoupledFileName):
-        os.remove(fullCoupledFileName)
-    if os.path.exists(fullReactionCountFileName):
-        os.remove(fullReactionCountFileName)
-    if os.path.exists(fullMonitoredFileName):
-        os.remove(fullMonitoredFileName)
+    # ------------------------------------------------------
+    # Global(ish) data
+    # ------------------------------------------------------
+    with multiprocessing.Manager() as manager:
+        buggyEntries = manager.dict()
+        coupledReactionEntries = manager.dict()
+        monitoredReactionEntries = manager.dict()
+        reactionCount = manager.dict()
 
-    # set up database & create the table
-    connection = sqlite3.connect(fullIndexFileName)
-    cursor = connection.cursor()
-    cursor.execute(
-        "create table if not exists theworks (entry text, subent text, pointer text, author text, reaction text, "
-        "projectile text, target text, quantity text, rxncombo bool, monitored bool, reference text)")
+        # clean up previous runs
+        if os.path.exists(fullIndexFileName):
+            os.remove(fullIndexFileName)
+        if os.path.exists(fullErrorFileName):
+            os.remove(fullErrorFileName)
+        if os.path.exists(fullCoupledFileName):
+            os.remove(fullCoupledFileName)
+        if os.path.exists(fullReactionCountFileName):
+            os.remove(fullReactionCountFileName)
+        if os.path.exists(fullMonitoredFileName):
+            os.remove(fullMonitoredFileName)
 
-    # Guts of the entry processing
-    def process_entry_guts(_f, _cursor, _coupledReactionEntries, _monitoredReactionEntries, _reactionCount, 
-                           _buggyEntries, _DEBUG=False, _verbose=False, _stopOnException=False):
-        if _DEBUG:  # Then we are debugging
-            skipme = True
-            # "12763.20363.22188.22782.41434.41541.A0026.A0206.A0208.A0222.A0227.A0291.A0425.A0462.A0578.A0648.
-            # A0650.A0727.A0882.A0926.C0082.C0256.C0299.C0346.C1248.C1654.D0046.D6011.D6043.D6170.E1306.E1792.E2324.
-            # E2371.G0016.G4035.M0763.M0806",  '20363.22188.22782.41434.41541'
+        # set up database & create the table
+        connection = sqlite3.connect(fullIndexFileName)
+        cursor = connection.cursor()
+        cursor.execute(
+            "create table if not exists theworks (entry text, subent text, pointer text, author text, reaction text, "
+            "projectile text, target text, quantity text, rxncombo bool, monitored bool, reference text)")
 
-            for myENTRYForTesting in '11125.30230'.split('.'):
-                if myENTRYForTesting in _f:
-                    skipme = False
-            if skipme:
-                return False
+        # Guts of the entry processing
+        def process_entry_guts(_f, _cursor, _coupledReactionEntries, _monitoredReactionEntries, _reactionCount, 
+                            _buggyEntries, _DEBUG=False, _verbose=False, _stopOnException=False):
+            if _DEBUG:  # Then we are debugging
+                skipme = True
+                # "12763.20363.22188.22782.41434.41541.A0026.A0206.A0208.A0222.A0227.A0291.A0425.A0462.A0578.A0648.
+                # A0650.A0727.A0882.A0926.C0082.C0256.C0299.C0346.C1248.C1654.D0046.D6011.D6043.D6170.E1306.E1792.E2324.
+                # E2371.G0016.G4035.M0763.M0806",  '20363.22188.22782.41434.41541'
 
-        if _verbose:
-            print('    ', _f)
+                for myENTRYForTesting in '11125.30230'.split('.'):
+                    if myENTRYForTesting in _f:
+                        skipme = False
+                if skipme:
+                    return False
 
+            if _verbose:
+                print('    ', _f)
+
+            try:
+                processEntry(_f,
+                            _cursor,
+                            _coupledReactionEntries,
+                            _monitoredReactionEntries,
+                            _reactionCount,
+                            verbose=_verbose)
+            except (
+                    exfor_exceptions.IsomerMathParsingError,
+                    exfor_exceptions.ReferenceParsingError,
+                    exfor_exceptions.ParticleParsingError,
+                    exfor_exceptions.AuthorParsingError,
+                    exfor_exceptions.InstituteParsingError,
+                    exfor_exceptions.ReactionParsingError,
+                    exfor_exceptions.BrokenNumberError) as err:
+                _buggyEntries[f] = (err, str(err))
+                return not _stopOnException  # if we are supposed to stop, then _stopOnException will be True and this run failed
+            except (Exception, pyparsing.ParseException) as err:
+                _buggyEntries[f] = (err, str(err))
+                return not _stopOnException  # if we are supposed to stop, then _stopOnException will be True and this run failed
+            
+            return True  # presummed success
+
+        # build up the table
         try:
-            processEntry(_f,
-                         _cursor,
-                         _coupledReactionEntries,
-                         _monitoredReactionEntries,
-                         _reactionCount,
-                         verbose=_verbose)
-        except (
-                exfor_exceptions.IsomerMathParsingError,
-                exfor_exceptions.ReferenceParsingError,
-                exfor_exceptions.ParticleParsingError,
-                exfor_exceptions.AuthorParsingError,
-                exfor_exceptions.InstituteParsingError,
-                exfor_exceptions.ReactionParsingError,
-                exfor_exceptions.BrokenNumberError) as err:
-            _buggyEntries[f] = (err, str(err))
-            return not _stopOnException  # if we are supposed to stop, then _stopOnException will be True and this run failed
-        except (Exception, pyparsing.ParseException) as err:
-            _buggyEntries[f] = (err, str(err))
-            return not _stopOnException  # if we are supposed to stop, then _stopOnException will be True and this run failed
-        
-        return True  # presummed success
-        
+            if verbose:
+                print(exfor_file_glob(DATAPATH)) 
 
+            for f in glob.glob(exfor_file_glob(DATAPATH)):  
+                if not \
+                    process_entry_guts(f, cursor, coupledReactionEntries, monitoredReactionEntries, reactionCount, 
+                                    buggyEntries, _DEBUG=False, _verbose=verbose, _stopOnException=stopOnException):
+                    break
+    
+        except KeyboardInterrupt:
+            pass
+        except Exception as err:
+            print("Encountered error:", repr(err), str(err))
+            print("Saving work")
 
-    # build up the table
-    try:
+        # log all the errors
         if verbose:
-            print(exfor_file_glob(DATAPATH)) 
+            print('\nNumber of Buggy Entries:', len(buggyEntries))
+            print('\nBuggy entries:')
+            pprint.pprint(buggyEntries)
+        pickle.dump(buggyEntries, open(fullErrorFileName, mode='wb'))
 
-        for f in glob.glob(exfor_file_glob(DATAPATH)):  
-            if not \
-                process_entry_guts(f, cursor, coupledReactionEntries, monitoredReactionEntries, reactionCount, 
-                                   buggyEntries, _DEBUG=False, _verbose=verbose, _stopOnException=stopOnException):
-                break
- 
-    except KeyboardInterrupt:
-        pass
-    except Exception as err:
-        print("Encountered error:", repr(err), str(err))
-        print("Saving work")
+        # log all the coupled data sets
+        if verbose:
+            print('\nNumber of entries with coupled data sets:', len(coupledReactionEntries))
+            print('\nNumber of entries with reaction monitors sets:', len(monitoredReactionEntries))
+            print('\nNumber of distinct reactions:', len(reactionCount))
+        pickle.dump(coupledReactionEntries, open(fullCoupledFileName, mode='wb'))
+        pickle.dump(monitoredReactionEntries, open(fullMonitoredFileName, mode='wb'))
+        pickle.dump(reactionCount, open(fullReactionCountFileName, mode='wb'))
 
-    # log all the errors
-    if verbose:
-        print('\nNumber of Buggy Entries:', len(buggyEntries))
-        print('\nBuggy entries:')
-        pprint.pprint(buggyEntries)
-    pickle.dump(buggyEntries, open(fullErrorFileName, mode='wb'))
-
-    # log all the coupled data sets
-    if verbose:
-        print('\nNumber of entries with coupled data sets:', len(coupledReactionEntries))
-        print('\nNumber of entries with reaction monitors sets:', len(monitoredReactionEntries))
-        print('\nNumber of distinct reactions:', len(reactionCount))
-    pickle.dump(coupledReactionEntries, open(fullCoupledFileName, mode='wb'))
-    pickle.dump(monitoredReactionEntries, open(fullMonitoredFileName, mode='wb'))
-    pickle.dump(reactionCount, open(fullReactionCountFileName, mode='wb'))
-
-    # commit & close connection to database
-    connection.commit()
-    cursor.close()
+        # commit & close connection to database
+        connection.commit()
+        cursor.close()
 
 
 def getQuantity(quantList):
@@ -284,9 +294,6 @@ def getQuantity(quantList):
     if 'POT' in quantList:
         return 'POT'
     return quantList[0]
-
-
-SimpleReaction = collections.namedtuple("SimpleReaction", "proj targ prod rtext quant simpleRxn")
 
 
 def getSimpleReaction(complicatedReaction):
@@ -330,7 +337,6 @@ def processEntry(entryFileName, cursor=None, coupledReactionEntries={}, monitore
     """
     Computes the rows for a single entry and puts it in the database
     """
-    from x4i import exfor_entry, exfor_reactions, exfor_manager
     if verbose:
         print('        ', entryFileName.split(os.sep)[-1], end=' ')
     e = exfor_entry.x4EntryFactory(entryFileName.split(os.sep)[-1].split('.')[0], filePath=entryFileName)
@@ -576,7 +582,7 @@ if __name__ == "__main__":
 
     if args.build_index:
         buildMainIndex(verbose=args.verbose)
-        buildDOIIndex(fullDoiFileName, verbose=args.verbose)
+        buildDOIIndex(fullDoiFileName, _fullIndexFileName=FULL_INDEX_FILENAME, verbose=args.verbose)
 
     # ------- View/save logs -------
     if args.error_log is not None:
