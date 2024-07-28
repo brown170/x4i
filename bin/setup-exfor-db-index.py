@@ -85,6 +85,7 @@ import collections
 import multiprocessing
 import sqlite3
 import pickle
+import time
 from x4i import DATAPATH
 from x4i import fullIndexFileName as FULL_INDEX_FILENAME
 from x4i import fullErrorFileName as FULL_ERROR_FILENAME
@@ -182,6 +183,7 @@ def buildMainIndex(verbose=False, _data_path=DATAPATH, _fullIndexFileName=FULL_I
         coupledReactionEntries = manager.dict()
         monitoredReactionEntries = manager.dict()
         reactionCount = manager.dict()
+        databaseContent = manager.list()
 
         # clean up previous runs
         if os.path.exists(_fullIndexFileName):
@@ -202,57 +204,29 @@ def buildMainIndex(verbose=False, _data_path=DATAPATH, _fullIndexFileName=FULL_I
             "create table if not exists theworks (entry text, subent text, pointer text, author text, reaction text, "
             "projectile text, target text, quantity text, rxncombo bool, monitored bool, reference text)")
 
-        # Guts of the entry processing
-        def process_entry_guts(_f, _cursor, _coupledReactionEntries, _monitoredReactionEntries, _reactionCount, 
-                            _buggyEntries, _DEBUG=False, _verbose=False, _stopOnException=False):
-            if _DEBUG:  # Then we are debugging
-                skipme = True
-                # "12763.20363.22188.22782.41434.41541.A0026.A0206.A0208.A0222.A0227.A0291.A0425.A0462.A0578.A0648.
-                # A0650.A0727.A0882.A0926.C0082.C0256.C0299.C0346.C1248.C1654.D0046.D6011.D6043.D6170.E1306.E1792.E2324.
-                # E2371.G0016.G4035.M0763.M0806",  '20363.22188.22782.41434.41541'
-
-                for myENTRYForTesting in '11125.30230'.split('.'):
-                    if myENTRYForTesting in _f:
-                        skipme = False
-                if skipme:
-                    return False
-
-            if _verbose:
-                print('    ', _f)
-
-            try:
-                processEntry(_f,
-                            _cursor,
-                            _coupledReactionEntries,
-                            _monitoredReactionEntries,
-                            _reactionCount,
-                            verbose=_verbose)
-            except (
-                    exfor_exceptions.IsomerMathParsingError,
-                    exfor_exceptions.ReferenceParsingError,
-                    exfor_exceptions.ParticleParsingError,
-                    exfor_exceptions.AuthorParsingError,
-                    exfor_exceptions.InstituteParsingError,
-                    exfor_exceptions.ReactionParsingError,
-                    exfor_exceptions.BrokenNumberError) as err:
-                _buggyEntries[f] = (err, str(err))
-                return not _stopOnException  # if we are supposed to stop, then _stopOnException will be True and this run failed
-            except (Exception, pyparsing.ParseException) as err:
-                _buggyEntries[f] = (err, str(err))
-                return not _stopOnException  # if we are supposed to stop, then _stopOnException will be True and this run failed
-            
-            return True  # presummed success
-
         # build up the table
         try:
             if verbose:
                 print(_exfor_file_glob(_data_path)) 
 
-            for f in glob.glob(_exfor_file_glob(_data_path)):  
-                if not \
-                    process_entry_guts(f, cursor, coupledReactionEntries, monitoredReactionEntries, reactionCount, 
-                                    buggyEntries, _DEBUG=False, _verbose=verbose, _stopOnException=stopOnException):
-                    break
+            parallel=True
+
+            if parallel:
+                with multiprocessing.Pool() as pool:
+                    work = [(f, databaseContent, coupledReactionEntries, monitoredReactionEntries, reactionCount, 
+                             buggyEntries) for f in glob.glob(_exfor_file_glob(_data_path))[:500]]
+                    results = [pool.apply_async(process_entry_wrapper, w).get() for w in work]
+
+                    #pool.apply(process_entry_wrapper, [(f, databaseContent, coupledReactionEntries, 
+                    #                                          monitoredReactionEntries, reactionCount, buggyEntries) 
+                    #                                          for f in glob.glob(_exfor_file_glob(_data_path))[:500]])
+            
+            else:
+                for f in glob.glob(_exfor_file_glob(_data_path))[:500]:  
+                    if not process_entry_wrapper(f, databaseContent, coupledReactionEntries, monitoredReactionEntries, 
+                                                 reactionCount, buggyEntries, _DEBUG=False, _verbose=verbose, 
+                                                 _stopOnException=stopOnException):
+                        break
     
         except KeyboardInterrupt:
             pass
@@ -260,11 +234,15 @@ def buildMainIndex(verbose=False, _data_path=DATAPATH, _fullIndexFileName=FULL_I
             print("Encountered error:", repr(err), str(err))
             print("Saving work")
 
+        # Save what we've got to the database
+        for l in databaseContent:
+            cursor.execute("insert into theworks values(?,?,?,?,?,?,?,?,?,?,?)", l)  # this populates the database 
+
         # log all the errors
         if verbose:
             print('\nNumber of Buggy Entries:', len(buggyEntries))
             print('\nBuggy entries:')
-            pprint.pprint(buggyEntries)
+            pprint.pprint(str(buggyEntries))  # FIXME: with the multiproxying dict proxy, this is attempted workaround
         pickle.dump(buggyEntries, open(_fullErrorFileName, mode='wb'))
 
         # log all the coupled data sets
@@ -335,7 +313,49 @@ def extract_reference_code(line):
     return line[line.find('(')+1:last]
 
 
-def processEntry(entryFileName, cursor=None, coupledReactionEntries={}, monitoredReactionEntries={}, reactionCount={},
+# Guts of the entry processing
+def process_entry_wrapper(_f, _databaseContent, _coupledReactionEntries, _monitoredReactionEntries, _reactionCount, 
+                          _buggyEntries, _DEBUG=False, _verbose=False, _stopOnException=False):
+    if _DEBUG:  # Then we are debugging
+        skipme = True
+        # "12763.20363.22188.22782.41434.41541.A0026.A0206.A0208.A0222.A0227.A0291.A0425.A0462.A0578.A0648.
+        # A0650.A0727.A0882.A0926.C0082.C0256.C0299.C0346.C1248.C1654.D0046.D6011.D6043.D6170.E1306.E1792.E2324.
+        # E2371.G0016.G4035.M0763.M0806",  '20363.22188.22782.41434.41541'
+
+        for myENTRYForTesting in '11125.30230'.split('.'):
+            if myENTRYForTesting in _f:
+                skipme = False
+        if skipme:
+            return False
+
+    if _verbose:
+        print('    ', _f)
+
+    try:
+        processEntry(_f,
+                    _databaseContent,
+                    _coupledReactionEntries,
+                    _monitoredReactionEntries,
+                    _reactionCount,
+                    verbose=_verbose)
+    except (
+            exfor_exceptions.IsomerMathParsingError,
+            exfor_exceptions.ReferenceParsingError,
+            exfor_exceptions.ParticleParsingError,
+            exfor_exceptions.AuthorParsingError,
+            exfor_exceptions.InstituteParsingError,
+            exfor_exceptions.ReactionParsingError,
+            exfor_exceptions.BrokenNumberError) as err:
+        _buggyEntries[f] = (err, str(err))
+        return not _stopOnException  # if we are supposed to stop, then _stopOnException will be True and this run failed
+    except (Exception, pyparsing.ParseException) as err:
+        _buggyEntries[f] = (err, str(err))
+        return not _stopOnException  # if we are supposed to stop, then _stopOnException will be True and this run failed
+    
+    return True  # presummed success
+
+
+def processEntry(entryFileName, databaseContent=None, coupledReactionEntries=None, monitoredReactionEntries=None, reactionCount=None,
                  verbose=False):
     """
     Computes the rows for a single entry and puts it in the database
@@ -389,7 +409,7 @@ def processEntry(entryFileName, cursor=None, coupledReactionEntries={}, monitore
 
         nrxns = 0
         nmons = 0
-        if cursor is not None:
+        if databaseContent is not None:
             for p in rxnf:
                 if verbose:
                     if p == ' ':
@@ -468,10 +488,9 @@ def processEntry(entryFileName, cursor=None, coupledReactionEntries={}, monitore
                             for a in auth: # this is the "population loop"
                                 #                        print "insert into theworks values(?,?,?,?,?,?,?,?,?) ", \
                                 #                            ( e.accnum, snum, p, a, simpleRxn.rtext, simpleRxn.proj,
-                                #                            repr(simpleRxn.targ), simpleRxn.quant, rxn_combo, monitored_rxn )    +-------------------+
-                                cursor.execute("insert into theworks values(?,?,?,?,?,?,?,?,?,?,?)",#                             |  this populates   |
-                                               (e.accnum, snum, p, a, simpleRxn.rtext, simpleRxn.proj, simpleRxn.targ,#           |  the database     |
-                                                simpleRxn.quant, rxn_combo, monitored_rxn, clean_reference))#                     +-------------------+
+                                #                            repr(simpleRxn.targ), simpleRxn.quant, rxn_combo, monitored_rxn )    
+                                databaseContent.append((e.accnum, snum, p, a, simpleRxn.rtext, simpleRxn.proj, simpleRxn.targ,
+                                                        simpleRxn.quant, rxn_combo, monitored_rxn, clean_reference))
 
                     if simpleRxn.simpleRxn not in reactionCount:
                         reactionCount[simpleRxn.simpleRxn] = 0
@@ -584,8 +603,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.build_index:
+        start_time = time.perf_counter()
         buildMainIndex(verbose=args.verbose)
         buildDOIIndex(FULL_DOI_FILENAME, _fullIndexFileName=FULL_INDEX_FILENAME, verbose=args.verbose)
+        if args.verbose:
+            print(f"Process ran in {time.perf_counter() - start_time:0.4f} s")
 
     # ------- View/save logs -------
     if args.error_log is not None:
