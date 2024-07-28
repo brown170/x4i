@@ -79,7 +79,6 @@
 #
 ################################################################################
 
-from __future__ import print_function
 import os
 import argparse
 import collections
@@ -166,6 +165,7 @@ def buildMainIndex(verbose=False, stopOnException=False):
     import pprint
     import glob
     import pyparsing
+    import multiprocessing
     from x4i import exfor_exceptions
 
     # clean up previous runs
@@ -187,47 +187,60 @@ def buildMainIndex(verbose=False, stopOnException=False):
         "create table if not exists theworks (entry text, subent text, pointer text, author text, reaction text, "
         "projectile text, target text, quantity text, rxncombo bool, monitored bool, reference text)")
 
+    # Guts of the entry processing
+    def process_entry_guts(_f, _cursor, _coupledReactionEntries, _monitoredReactionEntries, _reactionCount, 
+                           _buggyEntries, _DEBUG=False, _verbose=False, _stopOnException=False):
+        if _DEBUG:  # Then we are debugging
+            skipme = True
+            # "12763.20363.22188.22782.41434.41541.A0026.A0206.A0208.A0222.A0227.A0291.A0425.A0462.A0578.A0648.
+            # A0650.A0727.A0882.A0926.C0082.C0256.C0299.C0346.C1248.C1654.D0046.D6011.D6043.D6170.E1306.E1792.E2324.
+            # E2371.G0016.G4035.M0763.M0806",  '20363.22188.22782.41434.41541'
+
+            for myENTRYForTesting in '11125.30230'.split('.'):
+                if myENTRYForTesting in _f:
+                    skipme = False
+            if skipme:
+                return False
+
+        if _verbose:
+            print('    ', _f)
+
+        try:
+            processEntry(_f,
+                         _cursor,
+                         _coupledReactionEntries,
+                         _monitoredReactionEntries,
+                         _reactionCount,
+                         verbose=_verbose)
+        except (
+                exfor_exceptions.IsomerMathParsingError,
+                exfor_exceptions.ReferenceParsingError,
+                exfor_exceptions.ParticleParsingError,
+                exfor_exceptions.AuthorParsingError,
+                exfor_exceptions.InstituteParsingError,
+                exfor_exceptions.ReactionParsingError,
+                exfor_exceptions.BrokenNumberError) as err:
+            _buggyEntries[f] = (err, str(err))
+            return not _stopOnException  # if we are supposed to stop, then _stopOnException will be True and this run failed
+        except (Exception, pyparsing.ParseException) as err:
+            _buggyEntries[f] = (err, str(err))
+            return not _stopOnException  # if we are supposed to stop, then _stopOnException will be True and this run failed
+        
+        return True  # presummed success
+        
+
+
     # build up the table
     try:
         if verbose:
             print(exfor_file_glob(DATAPATH)) 
 
         for f in glob.glob(exfor_file_glob(DATAPATH)):  
-
-            if False:  # Then we are debugging
-                skipme = True
-                # "12763.20363.22188.22782.41434.41541.A0026.A0206.A0208.A0222.A0227.A0291.A0425.A0462.A0578.A0648.
-                # A0650.A0727.A0882.A0926.C0082.C0256.C0299.C0346.C1248.C1654.D0046.D6011.D6043.D6170.E1306.E1792.E2324.
-                # E2371.G0016.G4035.M0763.M0806",  '20363.22188.22782.41434.41541'
-
-                for myENTRYForTesting in '11125.30230'.split('.'):
-                    if myENTRYForTesting in f:
-                        skipme = False
-                if skipme:
-                    continue
-
-            if verbose:
-                print('    ', f)
-            if stopOnException:
-                processEntry(f, cursor, coupledReactionEntries, monitoredReactionEntries, reactionCount,
-                             verbose=verbose)
-            else:
-                try:
-                    processEntry(f, cursor, coupledReactionEntries, monitoredReactionEntries, reactionCount,
-                                 verbose=verbose)
-                except (
-                        exfor_exceptions.IsomerMathParsingError,
-                        exfor_exceptions.ReferenceParsingError,
-                        exfor_exceptions.ParticleParsingError,
-                        exfor_exceptions.AuthorParsingError,
-                        exfor_exceptions.InstituteParsingError,
-                        exfor_exceptions.ReactionParsingError,
-                        exfor_exceptions.BrokenNumberError) as err:
-                    buggyEntries[f] = (err, str(err))
-                    continue
-                except (Exception, pyparsing.ParseException) as err:
-                    buggyEntries[f] = (err, str(err))
-                    continue
+            if not \
+                process_entry_guts(f, cursor, coupledReactionEntries, monitoredReactionEntries, reactionCount, 
+                                   buggyEntries, _DEBUG=False, _verbose=verbose, _stopOnException=stopOnException):
+                break
+ 
     except KeyboardInterrupt:
         pass
     except Exception as err:
