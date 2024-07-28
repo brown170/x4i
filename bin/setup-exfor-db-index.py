@@ -129,7 +129,10 @@ def buildDOIIndex(_doiFile, _fullIndexFileName=FULL_INDEX_FILENAME, verbose=Fals
     cursor.close()
 
 
-def buildMainIndex(verbose=False, fullIndexFileName=FULL_INDEX_FILENAME, stopOnException=False):
+def buildMainIndex(verbose=False, _data_path=DATAPATH, _fullIndexFileName=FULL_INDEX_FILENAME, 
+                   _fullErrorFileName=FULL_ERROR_FILENAME, _fullCoupledFileName=FULL_COUPLED_FILENAME, 
+                   _fullReactionCountFileName=FULL_REACTION_COUNT_FILENAME, _fullMonitoredFileName=FULL_MONITORED_FILENAME, 
+                   _exfor_file_glob=EXFOR_FILE_GLOB, stopOnException=False):
     """
     This function build up the index of the database.
 
@@ -181,19 +184,19 @@ def buildMainIndex(verbose=False, fullIndexFileName=FULL_INDEX_FILENAME, stopOnE
         reactionCount = manager.dict()
 
         # clean up previous runs
-        if os.path.exists(fullIndexFileName):
-            os.remove(fullIndexFileName)
-        if os.path.exists(fullErrorFileName):
-            os.remove(fullErrorFileName)
-        if os.path.exists(fullCoupledFileName):
-            os.remove(fullCoupledFileName)
-        if os.path.exists(fullReactionCountFileName):
-            os.remove(fullReactionCountFileName)
-        if os.path.exists(fullMonitoredFileName):
-            os.remove(fullMonitoredFileName)
+        if os.path.exists(_fullIndexFileName):
+            os.remove(_fullIndexFileName)
+        if os.path.exists(_fullErrorFileName):
+            os.remove(_fullErrorFileName)
+        if os.path.exists(_fullCoupledFileName):
+            os.remove(_fullCoupledFileName)
+        if os.path.exists(_fullReactionCountFileName):
+            os.remove(_fullReactionCountFileName)
+        if os.path.exists(_fullMonitoredFileName):
+            os.remove(_fullMonitoredFileName)
 
         # set up database & create the table
-        connection = sqlite3.connect(fullIndexFileName)
+        connection = sqlite3.connect(_fullIndexFileName)
         cursor = connection.cursor()
         cursor.execute(
             "create table if not exists theworks (entry text, subent text, pointer text, author text, reaction text, "
@@ -243,9 +246,9 @@ def buildMainIndex(verbose=False, fullIndexFileName=FULL_INDEX_FILENAME, stopOnE
         # build up the table
         try:
             if verbose:
-                print(exfor_file_glob(DATAPATH)) 
+                print(_exfor_file_glob(_data_path)) 
 
-            for f in glob.glob(exfor_file_glob(DATAPATH)):  
+            for f in glob.glob(_exfor_file_glob(_data_path)):  
                 if not \
                     process_entry_guts(f, cursor, coupledReactionEntries, monitoredReactionEntries, reactionCount, 
                                     buggyEntries, _DEBUG=False, _verbose=verbose, _stopOnException=stopOnException):
@@ -262,16 +265,16 @@ def buildMainIndex(verbose=False, fullIndexFileName=FULL_INDEX_FILENAME, stopOnE
             print('\nNumber of Buggy Entries:', len(buggyEntries))
             print('\nBuggy entries:')
             pprint.pprint(buggyEntries)
-        pickle.dump(buggyEntries, open(fullErrorFileName, mode='wb'))
+        pickle.dump(buggyEntries, open(_fullErrorFileName, mode='wb'))
 
         # log all the coupled data sets
         if verbose:
             print('\nNumber of entries with coupled data sets:', len(coupledReactionEntries))
             print('\nNumber of entries with reaction monitors sets:', len(monitoredReactionEntries))
             print('\nNumber of distinct reactions:', len(reactionCount))
-        pickle.dump(coupledReactionEntries, open(fullCoupledFileName, mode='wb'))
-        pickle.dump(monitoredReactionEntries, open(fullMonitoredFileName, mode='wb'))
-        pickle.dump(reactionCount, open(fullReactionCountFileName, mode='wb'))
+        pickle.dump(coupledReactionEntries, open(_fullCoupledFileName, mode='wb'))
+        pickle.dump(monitoredReactionEntries, open(_fullMonitoredFileName, mode='wb'))
+        pickle.dump(reactionCount, open(_fullReactionCountFileName, mode='wb'))
 
         # commit & close connection to database
         connection.commit()
@@ -489,11 +492,11 @@ def processEntry(entryFileName, cursor=None, coupledReactionEntries={}, monitore
 #   Error reporting
 # ------------------------------------------------------
 
-def reportErrors(outFile, verbose=False):
+def reportErrors(outFile, _fullErrorFileName=FULL_ERROR_FILENAME, verbose=False):
     import pickle
     import csv
 
-    with open(fullErrorFileName, mode='rb') as pickleFile:
+    with open(_fullErrorFileName, mode='rb') as pickleFile:
         f = pickle.load(pickleFile)
         sortedErrors = {}
         for i in f:
@@ -517,10 +520,10 @@ def reportErrors(outFile, verbose=False):
                 fullReport.writerow(row)
 
 
-def viewErrors(verbose=False):
+def viewErrors(_fullErrorFileName=FULL_ERROR_FILENAME, verbose=False):
     import pickle
 
-    with open(fullErrorFileName, mode='rb') as pickleFile:
+    with open(_fullErrorFileName, mode='rb') as pickleFile:
         f = pickle.load(pickleFile)
         sortedErrors = {}
         for i in f:
@@ -582,12 +585,12 @@ if __name__ == "__main__":
 
     if args.build_index:
         buildMainIndex(verbose=args.verbose)
-        buildDOIIndex(fullDoiFileName, _fullIndexFileName=FULL_INDEX_FILENAME, verbose=args.verbose)
+        buildDOIIndex(FULL_DOI_FILENAME, _fullIndexFileName=FULL_INDEX_FILENAME, verbose=args.verbose)
 
     # ------- View/save logs -------
     if args.error_log is not None:
-        reportErrors(args.error_log, verbose=args.verbose)
+        reportErrors(args.error_log, _fullErrorFileName=FULL_ERROR_FILENAME, verbose=args.verbose)
     if args.coupled_log is not None:
         raise NotImplementedError()
     if args.view_errors:
-        viewErrors(verbose=args.verbose)
+        viewErrors(_fullErrorFileName=FULL_ERROR_FILENAME, verbose=args.verbose)
