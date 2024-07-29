@@ -86,6 +86,9 @@ import multiprocessing
 import sqlite3
 import pickle
 import time
+import pprint
+import glob
+import pyparsing
 from x4i import DATAPATH
 from x4i import fullIndexFileName as FULL_INDEX_FILENAME
 from x4i import fullErrorFileName as FULL_ERROR_FILENAME
@@ -171,10 +174,6 @@ def buildMainIndex(verbose=False, _data_path=DATAPATH, _fullIndexFileName=FULL_I
 
     """
 
-    import pprint
-    import glob
-    import pyparsing
-
     # ------------------------------------------------------
     # Global(ish) data
     # ------------------------------------------------------
@@ -214,15 +213,16 @@ def buildMainIndex(verbose=False, _data_path=DATAPATH, _fullIndexFileName=FULL_I
             if parallel:
                 with multiprocessing.Pool() as pool:
                     work = [(f, databaseContent, coupledReactionEntries, monitoredReactionEntries, reactionCount, 
-                             buggyEntries) for f in glob.glob(_exfor_file_glob(_data_path))[:500]]
+                             buggyEntries) for f in glob.glob(_exfor_file_glob(_data_path))]
                     results = [pool.apply_async(process_entry_wrapper, w).get() for w in work]
+                    #results = pool.starmap_async(process_entry_wrapper, work)
 
                     #pool.apply(process_entry_wrapper, [(f, databaseContent, coupledReactionEntries, 
                     #                                          monitoredReactionEntries, reactionCount, buggyEntries) 
                     #                                          for f in glob.glob(_exfor_file_glob(_data_path))[:500]])
             
             else:
-                for f in glob.glob(_exfor_file_glob(_data_path))[:500]:  
+                for f in glob.glob(_exfor_file_glob(_data_path)):  
                     if not process_entry_wrapper(f, databaseContent, coupledReactionEntries, monitoredReactionEntries, 
                                                  reactionCount, buggyEntries, _DEBUG=False, _verbose=verbose, 
                                                  _stopOnException=stopOnException):
@@ -346,10 +346,10 @@ def process_entry_wrapper(_f, _databaseContent, _coupledReactionEntries, _monito
             exfor_exceptions.InstituteParsingError,
             exfor_exceptions.ReactionParsingError,
             exfor_exceptions.BrokenNumberError) as err:
-        _buggyEntries[f] = (err, str(err))
+        _buggyEntries[_f] = (err, str(err))
         return not _stopOnException  # if we are supposed to stop, then _stopOnException will be True and this run failed
     except (Exception, pyparsing.ParseException) as err:
-        _buggyEntries[f] = (err, str(err))
+        _buggyEntries[_f] = (err, str(err))
         return not _stopOnException  # if we are supposed to stop, then _stopOnException will be True and this run failed
     
     return True  # presummed success
