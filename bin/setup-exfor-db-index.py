@@ -174,9 +174,7 @@ def buildMainIndex(verbose=False, _data_path=DATAPATH, _fullIndexFileName=FULL_I
 
     """
 
-    # ------------------------------------------------------
-    # Global(ish) data
-    # ------------------------------------------------------
+    start_time = time.perf_counter()
     with multiprocessing.Manager() as manager:
         buggyEntries = manager.dict()
         coupledReactionEntries = manager.dict()
@@ -211,11 +209,12 @@ def buildMainIndex(verbose=False, _data_path=DATAPATH, _fullIndexFileName=FULL_I
             parallel=True
 
             if parallel:
-                with multiprocessing.Pool() as pool:
+                print(f"Processing entries, I have {multiprocessing.cpu_count()} cores.")
+                with multiprocessing.get_context("spawn").Pool() as pool:
                     work = [(f, databaseContent, coupledReactionEntries, monitoredReactionEntries, reactionCount, 
                              buggyEntries) for f in glob.glob(_exfor_file_glob(_data_path))]
-                    results = [pool.apply_async(process_entry_wrapper, w).get() for w in work]
-                    #results = pool.starmap_async(process_entry_wrapper, work)
+                    #results = [pool.apply_async(process_entry_wrapper, w).get() for w in work]
+                    results = pool.starmap(process_entry_wrapper, work)
 
                     #pool.apply(process_entry_wrapper, [(f, databaseContent, coupledReactionEntries, 
                     #                                          monitoredReactionEntries, reactionCount, buggyEntries) 
@@ -233,10 +232,13 @@ def buildMainIndex(verbose=False, _data_path=DATAPATH, _fullIndexFileName=FULL_I
         except Exception as err:
             print("Encountered error:", repr(err), str(err))
             print("Saving work")
+        print(f"Entry processing time: {time.perf_counter() - start_time:0.4f} s")
 
         # Save what we've got to the database
+        start_time = time.perf_counter()
         for l in databaseContent:
             cursor.execute("insert into theworks values(?,?,?,?,?,?,?,?,?,?,?)", l)  # this populates the database 
+        print(f"Database load time: {time.perf_counter() - start_time:0.4f} s")
 
         # log all the errors
         if verbose:
@@ -606,8 +608,8 @@ if __name__ == "__main__":
         start_time = time.perf_counter()
         buildMainIndex(verbose=args.verbose)
         buildDOIIndex(FULL_DOI_FILENAME, _fullIndexFileName=FULL_INDEX_FILENAME, verbose=args.verbose)
-        if args.verbose:
-            print(f"Process ran in {time.perf_counter() - start_time:0.4f} s")
+        #if args.verbose:
+        print(f"Process ran in {time.perf_counter() - start_time:0.4f} s")
 
     # ------- View/save logs -------
     if args.error_log is not None:
