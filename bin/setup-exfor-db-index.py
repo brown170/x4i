@@ -213,13 +213,7 @@ def buildMainIndex(verbose=False, _data_path=DATAPATH, _fullIndexFileName=FULL_I
                 with multiprocessing.get_context("spawn").Pool() as pool:
                     work = [(f, databaseContent, coupledReactionEntries, monitoredReactionEntries, reactionCount, 
                              buggyEntries) for f in glob.glob(_exfor_file_glob(_data_path))]
-                    #results = [pool.apply_async(process_entry_wrapper, w).get() for w in work]
                     results = pool.starmap(process_entry_wrapper, work)
-
-                    #pool.apply(process_entry_wrapper, [(f, databaseContent, coupledReactionEntries, 
-                    #                                          monitoredReactionEntries, reactionCount, buggyEntries) 
-                    #                                          for f in glob.glob(_exfor_file_glob(_data_path))[:500]])
-            
             else:
                 for f in glob.glob(_exfor_file_glob(_data_path)):  
                     if not process_entry_wrapper(f, databaseContent, coupledReactionEntries, monitoredReactionEntries, 
@@ -236,8 +230,7 @@ def buildMainIndex(verbose=False, _data_path=DATAPATH, _fullIndexFileName=FULL_I
 
         # Save what we've got to the database
         start_time = time.perf_counter()
-        for l in databaseContent:
-            cursor.execute("insert into theworks values(?,?,?,?,?,?,?,?,?,?,?)", l)  # this populates the database 
+        cursor.executemany("insert into theworks values(?,?,?,?,?,?,?,?,?,?,?)", databaseContent)  # this populates the database
         print(f"Database load time: {time.perf_counter() - start_time:0.4f} s")
 
         # log all the errors
