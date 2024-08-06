@@ -1,6 +1,6 @@
 __pycache__/
 x4i/__pycache__/
-x4i/test/__pycache__/
+/test/x4i/__pycache__/
 build/
 *.zip
 x4i/data/*.zip
@@ -24,3 +24,4 @@ x4i/data/*.pickle
 x4i/data/*.json
 x4i/data/db
 .vscode/
+
