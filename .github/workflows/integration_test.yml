@@ -1,0 +1,35 @@
+name: Integration Tests
+
+on:
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.12"
+    - name: Install package
+      run: |
+        python -m pip install --upgrade pip
+        pip install .
+    - name: Fetch Database
+      run: |
+        python bin/install-exfor-db.py
+    - name: Update Index
+      run: |
+        python bin/setup-exfor-db-index.py
+    - name: Testing scripts
+      run: |
+        python bin/check-exfor.py 10001
+        python bin/check-exfor.py O1941
+
+        python bin/exfor2json.py -v O1941
