@@ -1,7 +1,3 @@
-[build-system]
-requires = ["setuptools >= 61.0"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "x4i"
 version = '1.0.5dev'
@@ -42,3 +38,20 @@ Documentation = "https://github.com/brown170/x4i/blob/main/doc/x4i/user-guide/x4
 Repository = "https://github.com/brown170/x4i.git"
 "Bug Tracker" = "https://github.com/brown170/x4i/issues"
 Changelog = "https://github.com/brown170/x4i/blob/main/CHANGES.txt"
+
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ['src']
+
+[tool.setuptools.package-data]
+x4i = [
+  "dicts/*.txt",
+  "dicts/*.json",
+  "dicts/*.csv",
+  "data/*.t",
+  "data/*pickle",
+  "data/db/*/*.x4"
+]
