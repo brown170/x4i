@@ -74,7 +74,7 @@ def x4EntryFactory(enum, subentsList=None, rawEntry=False, dataPath=None, filePa
         with open_for_reading_universal_newline_flag(filePath) as entryfile:
             entry =entryfile.readlines()
     except IOError as err:
-        raise IOError("Rebuild your index with setup-exfor-db.py, x4i could not find entry %s" % enum) from err
+        raise IOError("Rebuild your index with setup-exfor-db-index.py, x4i could not find entry %s" % enum) from err
     subent = ''
     for line in entry:
         if line.startswith('ENTRY') or line.startswith('ENDENTRY') or line.startswith('NOSUBENT'):
