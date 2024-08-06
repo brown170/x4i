@@ -21,8 +21,8 @@ src/x4i/data/db.tar.gz
 .DS_Store
 
 # build
-dist
-build
+dist/
+build/
 *.egg-info
 
 # environment
