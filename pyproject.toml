@@ -32,6 +32,11 @@ test = [
     "pytest > 8.2",
 ]
 
+[project.scripts]
+setup-exfor-db-index = "x4i.cli.setup_exfor_db_index:main"
+get-exfor-entry = "x4i.cli.get_exfor_entry:main"
+install-exfor-db = "x4i.cli.install_exfor_db:main"
+
 [project.urls]
 Homepage = "https://github.com/brown170/x4i"
 Documentation = "https://github.com/brown170/x4i/blob/main/doc/x4i/user-guide/x4i.pdf"
