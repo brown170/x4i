@@ -4,7 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "x4i"
-dynamic = ["version"]
+version = '1.0.5dev'
+
 requires-python = ">=3.0"
 dependencies = [
   "numpy > 1.2",
@@ -21,7 +22,7 @@ authors = [
 maintainers = [
   {name = "David A. Brown", email = "dbrown@bnl.gov"}
 ]
-description = "x4i - The EXFOR Interface"
+description = 'A "simple" python interface to the EXFOR library'
 readme = "README.md"
 license = {file = "LICENSE.txt"}
 keywords = ["EXFOR", "nuclear reaction data"]
