@@ -60,3 +60,7 @@ x4i = [
   "data/*pickle",
   "data/db/*/*.x4"
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v -ra -q"
