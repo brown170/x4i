@@ -1,5 +1,4 @@
 import unittest
-import math
 from x4i import exfor_units
 from pint import DimensionalityError
 

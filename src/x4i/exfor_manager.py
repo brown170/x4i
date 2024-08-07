@@ -193,6 +193,8 @@ class X4DBManagerPlainFS(X4DBManager):
         if 'datapath' in kw:
             del kw['datapath']
         import sqlite3
+        # ensure folder exists
+        os.makedirs(os.path.dirname(self.database), exist_ok=True)
         self.CONNECTION = sqlite3.connect(self.database, **kw)
         self.CURSOR = self.CONNECTION.cursor()
 

@@ -1,8 +1,0 @@
-numpy > 1.2
-pint > 0.20
-pandas > 2
-pint_pandas
-pytest > 8.2
-pyparsing >= 3.1.2
-bidict
-tabulate >= 0.9

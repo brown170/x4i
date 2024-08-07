@@ -55,11 +55,10 @@ import numpy
 from x4i import exfor_manager
 from x4i import exfor_entry
 from x4i import exfor_dataset
-from x4i.test import __path__
-from x4i.test.utilities import TestCaseWithTableTests
+from .utilities import TestCaseWithTableTests
 import pint_pandas
 
-testDBPath = __path__[0] + os.sep + 'data'
+testDBPath = os.path.dirname(__file__) + os.sep + 'data'
 testIndexFileName = testDBPath + os.sep + 'index.tbl'
 db = exfor_manager.X4DBManagerPlainFS(datapath=testDBPath, database=testIndexFileName)
 
@@ -68,7 +67,7 @@ class TestX4NewDataSet(TestCaseWithTableTests):
     def setUp(self):
         self.frehaut = exfor_entry.x4EntryFactory('21971', dataPath=testDBPath)
         self.other = exfor_entry.x4EntryFactory('O1732', dataPath=testDBPath)
-        self.idunno = exfor_entry.x4EntryFactory('12898', filePath=__path__[0] + os.sep + '12898.x4')
+        self.idunno = exfor_entry.x4EntryFactory('12898', filePath=os.path.dirname(__file__) + os.sep + '12898.x4')
         
     def test_easy(self):
         entry = '21971'

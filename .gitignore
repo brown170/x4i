@@ -1,26 +1,34 @@
+# python
 __pycache__/
-x4i/__pycache__/
-x4i/test/__pycache__/
-build/
+*.pyc
+
+# package specific
 *.zip
-x4i/data/*.zip
-x4i/data/db.tar.gz
-x4i/data/db/
-.idea/
 doc/x4i/user-guide/_minted-x4i/
-x4i.egg-info/
+
+# package sources
+src/x4i/data/EXFOR-Archive/
+src/x4i/data/entry/
+src/x4i/data/exfor_master/
+src/x4i/data/*.tbl
+src/x4i/data/*.pickle
+src/x4i/data/*.json
+src/x4i/data/db
+src/x4i/data/*.zip
+src/x4i/data/db.tar.gz
+
+# OS
 .DS_Store
-*/.DS_Store
-*/*/.DS_Store
-x4i/*.pyc
+
+# build
 dist/
-MANIFEST
-venv/
-x4i/data/EXFOR-Archive/
-x4i/data/entry/
-x4i/data/exfor_master/
-x4i/data/*.tbl
-x4i/data/*.pickle
-x4i/data/*.json
-x4i/data/db
-.vscode/
+build/
+*.egg-info
+
+# environment
+venv
+
+# IDE
+.idea
+.vscode
+

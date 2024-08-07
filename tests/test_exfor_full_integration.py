@@ -46,10 +46,9 @@ import unittest
 # Set up the paths to x4i & friends
 from x4i import exfor_entry
 from x4i import exfor_manager
-from x4i.test import __path__
-from x4i.test.utilities import TestCaseWithTableTests
+from .utilities import TestCaseWithTableTests
 
-testDBPath = __path__[0] + os.sep + 'data'
+testDBPath = os.path.dirname(__file__) + os.sep + 'data'
 testIndexFileName = testDBPath + os.sep + 'index.tbl'
 
 NEWENTRYANSWER = {'E0783': [

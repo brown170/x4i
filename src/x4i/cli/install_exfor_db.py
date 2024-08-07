@@ -105,7 +105,8 @@ def archive_metadata(_datapath, _metadata):
 # ------------------------------------------------------------------------------
 #                            .... MAIN ....
 # ------------------------------------------------------------------------------
-if __name__ == "__main__":
+
+def main():
     args = parse_args()
 
     # Metadata about this data source download
@@ -156,3 +157,5 @@ if __name__ == "__main__":
             subprocess.run(["setup-exfor-db-index.py"])
 
 
+if __name__ == "__main__":
+    main()
