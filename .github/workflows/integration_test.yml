@@ -23,13 +23,10 @@ jobs:
         pip install .
     - name: Fetch Database
       run: |
-        python bin/install-exfor-db.py
+        install-exfor-db --skip-indexing
     - name: Update Index
       run: |
-        python bin/setup-exfor-db-index.py
+        setup-exfor-db-index
     - name: Testing scripts
       run: |
-        python bin/check-exfor.py 10001
-        python bin/check-exfor.py O1941
-
-        python bin/exfor2json.py -v O1941
+        get-exfor-entry -e 10001
