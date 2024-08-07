@@ -48,9 +48,8 @@ import unittest
 
 # Set up the paths to x4i & friends
 from x4i import exfor_manager
-from x4i.test import __path__
 
-testDBPath = __path__[0] + os.sep + 'data'
+testDBPath = os.path.dirname(__file__) + os.sep + 'data'
 testIndexFileName = testDBPath + os.sep + 'index.tbl'
 
 ENTRYANSWER = {'E0783': [
