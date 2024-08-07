@@ -57,6 +57,7 @@ x4i = [
   "dicts/*.txt",
   "dicts/*.json",
   "dicts/*.csv",
+  "data/x4doi.txt" # not sure if this should be included here or automatically build during the library setup.
 ]
 
 [tool.pytest.ini_options]
