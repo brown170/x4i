@@ -56,9 +56,6 @@ x4i = [
   "dicts/*.txt",
   "dicts/*.json",
   "dicts/*.csv",
-  "data/*.t",
-  "data/*pickle",
-  "data/db/*/*.x4"
 ]
 
 [tool.pytest.ini_options]
