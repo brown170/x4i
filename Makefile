@@ -11,7 +11,7 @@ check:
 	. venv/bin/activate; pytest; deactivate
 
 venv:
-	$(PYTHON) -m venv venv --system-site-packages; . venv/bin/activate; $(PYTHON) -m pip install --upgrade pip; pip install -r requirements.txt ; deactivate
+	$(PYTHON) -m venv venv --system-site-packages; . venv/bin/activate; $(PYTHON) -m pip install --upgrade pip; pip install -e . ; deactivate
 
 src/x4i/data/index.tbl:
 	$(PYTHON)  bin/install-exfor-db.py --skip-indexing
