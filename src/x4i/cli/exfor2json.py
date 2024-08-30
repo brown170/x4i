@@ -55,7 +55,7 @@ class TEMPEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, o)
 
 
-if __name__ == "__main__":
+def main():
     args = process_args()
 
     # Get the ENTRY/SUBENTRY requested
@@ -92,3 +92,6 @@ if __name__ == "__main__":
     else:
         print(json.dumps(searchResult, cls=TEMPEncoder))
 
+
+if __name__ == "__main__":
+    main()

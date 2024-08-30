@@ -1,18 +1,25 @@
-[build-system]
-requires = ["setuptools >= 61.0"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "x4i"
-dynamic = ["version"]
+version = '1.0.5dev'
+
 requires-python = ">=3.0"
+dependencies = [
+  "numpy > 1.2",
+  "pint > 0.20",
+  "pandas > 2",
+  "pint-pandas",
+  "pyparsing >= 3.1.2",
+  "bidict",
+  "tabulate >= 0.9",
+  "packaging" # this is a forgotten dependency of pint-pandas
+]
 authors = [
   {name = "David A. Brown", email = "dbrown@bnl.gov"}
 ]
 maintainers = [
   {name = "David A. Brown", email = "dbrown@bnl.gov"}
 ]
-description = "x4i - The EXFOR Interface"
+description = 'A "simple" python interface to the EXFOR library'
 readme = "README.md"
 license = {file = "LICENSE.txt"}
 keywords = ["EXFOR", "nuclear reaction data"]
@@ -21,9 +28,38 @@ classifiers = [
   "Programming Language :: Python"
 ]
 
+[project.optional-dependencies]
+test = [
+    "pytest > 8.2",
+]
+
+[project.scripts]
+setup-exfor-db-index = "x4i.cli.setup_exfor_db_index:main"
+get-exfor-entry = "x4i.cli.get_exfor_entry:main"
+install-exfor-db = "x4i.cli.install_exfor_db:main"
+
 [project.urls]
 Homepage = "https://github.com/brown170/x4i"
 Documentation = "https://github.com/brown170/x4i/blob/main/doc/x4i/user-guide/x4i.pdf"
 Repository = "https://github.com/brown170/x4i.git"
 "Bug Tracker" = "https://github.com/brown170/x4i/issues"
 Changelog = "https://github.com/brown170/x4i/blob/main/CHANGES.txt"
+
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ['src']
+
+[tool.setuptools.package-data]
+x4i = [
+  "dicts/*.txt",
+  "dicts/*.json",
+  "dicts/*.csv",
+  "data/x4doi.txt" # not sure if this should be included here or automatically build during the library setup.
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v -ra -q"

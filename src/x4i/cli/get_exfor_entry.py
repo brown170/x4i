@@ -59,7 +59,9 @@ def process_args():
     parser.add_argument("--nada", default=False, dest="nada", action="store_true", help="Don't actually do anything with the SUBENT" )
     return parser.parse_args()
 
-if __name__ == "__main__":
+
+def main():
+
     args = process_args()
     if args.subent is None and args.ent is None:
         raise ValueError("No ENTRY or SUBENT specified")
@@ -126,3 +128,7 @@ if __name__ == "__main__":
                 print(searchResult[keys[-1]].getDataSets())
                 print(10*'-','Errors',10*'-')
                 print(searchResult[keys[-1]].errors)
+
+if __name__ == "__main__":
+    main()
+

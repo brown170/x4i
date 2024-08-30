@@ -54,12 +54,11 @@ import unittest
 
 # Set up the paths to x4i & friends
 from x4i import exfor_field
-from x4i.test import __path__
 
-test_entry = (''.join(open(__path__[0] + os.sep + 'E0783.x4', mode='r').readlines())).replace('\r', '')
+test_entry = (''.join(open(os.path.dirname(__file__) + os.sep + 'E0783.x4', mode='r').readlines())).replace('\r', '')
 test_bib = '''BIB                 10         19\nTITLE       ACCELERATION OF PROTONS AND DEUTERONS POLARIZED IN\n            THE HORIZONTAL PLANEBY THE RCNP CYCLOTRON\nAUTHOR     (K.HATANAKA,N.MATSUOKA,H.SAKAI,T.SAITO,H.TAMURA,\n           K.HOSONO,M.KONDO,K.IMAI,H.SHIMIZU,K.NISHIMURA)\nINSTITUTE  (2JPNOSA) RESEARCH CENTER FOR NUCLEAR PHYSICS, OSAKA\n            UNIV.\n           (2JPNKTO)\nREFERENCE  (J,NIM,217,397,1983)\nFACILITY   (CYCLO,2JPNOSA)\nINC-SOURCE  BEAM-INTENSITY IS 0.5NA\n            BEAM-POLARIZATION IS NOT GIVEN\n           (ATOMI) with a Wien filter\nSAMPLE      TARGET IS NOT POLARIZED\n            TARGET IS NOT ALIGNED\nPART-DET   (D)\nSTATUS     (CURVE) DATA TAKEN FROM GRAPH\nHISTORY    (19881027T) CONVERTED FROM NRDF DATA NO. D783\n           (20040401A) Author's name is corrected. Code is added\n                       into INC-SOURCE. E-EXC=0.0 MeV is deleted.\nENDBIB              19'''
 test_common = '''COMMON               1          3\nEN         \nMEV        \n56.        \nENDCOMMON            3'''
-test_entry_2 = (''.join(open(__path__[0] + os.sep + '12898.x4', mode='r').readlines())).replace('\r', '')
+test_entry_2 = (''.join(open(os.path.dirname(__file__) + os.sep + '12898.x4', mode='r').readlines())).replace('\r', '')
 
 
 class TestX4PlainField(unittest.TestCase):

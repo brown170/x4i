@@ -43,7 +43,8 @@ def process_args():
     parser.add_argument('--entry', type=str, default=None, help="Entry in the file to check")
     return parser.parse_args()
 
-if __name__ == "__main__":
+def main():
+
     args = process_args()
 
     # Get the ENTRY/SUBENTRY requested
@@ -70,5 +71,6 @@ if __name__ == "__main__":
         if not ds[kk].simplified:
             print('   ','Simplification of set', kk, 'FAILED')
 
-
+if __name__ == "__main__":
+    main()
 

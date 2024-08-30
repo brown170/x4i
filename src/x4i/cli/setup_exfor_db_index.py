@@ -564,7 +564,8 @@ def viewErrors(_fullErrorFileName=FULL_ERROR_FILENAME, verbose=False):
 # ------------------------------------------------------
 #  Main !!
 # ------------------------------------------------------
-if __name__ == "__main__":
+
+def main():
 
     parser = argparse.ArgumentParser(
         description="Manage the installation & update of x4i's internal copy of the EXFOR database.")
@@ -611,3 +612,7 @@ if __name__ == "__main__":
         raise NotImplementedError()
     if args.view_errors:
         viewErrors(_fullErrorFileName=FULL_ERROR_FILENAME, verbose=args.verbose)
+
+
+if __name__ == "__main__":
+    main()

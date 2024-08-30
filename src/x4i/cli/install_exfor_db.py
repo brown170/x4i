@@ -105,7 +105,8 @@ def archive_metadata(_datapath, _metadata):
 # ------------------------------------------------------------------------------
 #                            .... MAIN ....
 # ------------------------------------------------------------------------------
-if __name__ == "__main__":
+
+def main():
     args = parse_args()
 
     # Metadata about this data source download
@@ -151,8 +152,10 @@ if __name__ == "__main__":
         if args.source != "NDS-git":
             raise NotImplementedError("Only the default option is currently coded")
         if args.verbose:
-            subprocess.run(["setup-exfor-db-index.py", "-v"])
+            subprocess.run(["setup-exfor-db-index", "-v"])
         else:
-            subprocess.run(["setup-exfor-db-index.py"])
+            subprocess.run(["setup-exfor-db-index"])
 
 
+if __name__ == "__main__":
+    main()
