@@ -15,15 +15,15 @@ Easiest installation: using pip & git
 =====================================
 1. Install the package:
 
-  ```sh
-  pip install git+https://github.com/brown170/x4i -v
-  ```
+    ```sh
+    pip install git+https://github.com/brown170/x4i -v
+    ```
 
 2. Acquire, install and index the EXFOR file
 
-  ```sh
-  install-exfor-db
-  ```
+    ```sh
+    install-exfor-db
+    ```
 
 This version of the installation process automatically installs the 2021-03-08 version of the EXFOR database.  
 As x4i must rebuild the database, installation may take some time.  `install-exfor-db` has other options that
@@ -38,15 +38,15 @@ Installation from a tarball distribution (not recommended)
 
 * Installation with pip (You can delete the x4i project once this is complete)
 
-    ```sh
-    pip install path/to/x4i/pyproject.toml/directory
-    ```
+        ```sh
+        pip install path/to/x4i/pyproject.toml/directory
+        ```
 
 * Editable pip installation (Don't delete the x4i project folder as this is continued to be used as code source)
 
-    ```sh
-    pip install -e path/to/x4i/pyproject.toml/directory
-    ```
+        ```sh
+        pip install -e path/to/x4i/pyproject.toml/directory
+        ```
 
 Source installation from git (only needed when working on development versions)
 ============================---------------------------------------------------
@@ -56,23 +56,23 @@ You will need to download them yourself as described in step 3. below.
 
 1. Clone the project
 
-  ```sh
-  git clone https://github.com/brown170/x4i.git
-  ```
+    ```sh
+    git clone https://github.com/brown170/x4i.git
+    ```
 
 2. Installation options:
 
    * Editable installation using pip:
 
-    ```sh
-    pip install -e path/to/x4i/pyproject.toml/directory
-    ```
+      ```sh
+      pip install -e path/to/x4i/pyproject.toml/directory
+      ```
 
 3. Acquire, install and index the EXFOR file
 
-  ```sh
-  install-exfor-db
-  ```
+    ```sh
+    install-exfor-db
+    ```
 
 This version of the installation process automatically installs the 2021-03-08 version of the EXFOR database.  
 As x4i must rebuild the database, installation may take some time.  `install-exfor-db` has other options that
