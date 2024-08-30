@@ -36,13 +36,13 @@ Installation from a tarball distribution (not recommended)
 
 2. Installation options:
 
-* Installation with pip (You can delete the x4i project once this is complete)
+    * Installation with pip (You can delete the x4i project once this is complete)
 
         ```sh
         pip install path/to/x4i/pyproject.toml/directory
         ```
 
-* Editable pip installation (Don't delete the x4i project folder as this is continued to be used as code source)
+    * Editable pip installation (Don't delete the x4i project folder as this is continued to be used as code source)
 
         ```sh
         pip install -e path/to/x4i/pyproject.toml/directory
@@ -62,7 +62,7 @@ You will need to download them yourself as described in step 3. below.
 
 2. Installation options:
 
-   * Editable installation using pip:
+    * Editable installation using pip:
 
       ```sh
       pip install -e path/to/x4i/pyproject.toml/directory
