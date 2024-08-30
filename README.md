@@ -49,7 +49,7 @@ Installation from a tarball distribution (not recommended)
         ```
 
 Source installation from git (only needed when working on development versions)
-============================---------------------------------------------------
+===============================================================================
 This assumes that you will be editing the project in some fashion.
 This installation does not automatically include the IAEA data files.
 You will need to download them yourself as described in step 3. below.
