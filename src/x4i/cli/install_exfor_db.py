@@ -152,9 +152,9 @@ def main():
         if args.source != "NDS-git":
             raise NotImplementedError("Only the default option is currently coded")
         if args.verbose:
-            subprocess.run(["setup-exfor-db-index.py", "-v"])
+            subprocess.run(["setup-exfor-db-index", "-v"])
         else:
-            subprocess.run(["setup-exfor-db-index.py"])
+            subprocess.run(["setup-exfor-db-index"])
 
 
 if __name__ == "__main__":
