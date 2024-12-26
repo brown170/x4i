@@ -197,6 +197,7 @@ MB/KEV,millibarns per keV,,millibarn/keV
 MB/MEV,millibarns per MeV,,millibarn/MeV
 MU-B/MEV,micro-barns/MeV,,microbarns/MeV
 NB/MEV,nanobarns per MeV,,nanobarns/MeV
-MB/MEV/C,millibarns/(MeV/c),,millibarns/(MeV/c)
-MUB/GEV/C,microbarns/(GeV/c),,microbarns/(GeV/c)
-MUB/MEV/C,microbarns/(MeV/c),,microbarns/(MeV/c)
+MB/MEV/C,millibarns/MeV/c,,millibarns/(MeV/c)
+MUB/GEV/C,microbarns per GeV*c,,microbarns/GeV/c
+MUB/MEV/C,microbarns per MeV*c,,microbarns/MeV/c
+B/SR/GEVC,barns per GeV*c,,barns/(GeV*c)

@@ -36,7 +36,7 @@ class TestX4Dicts(unittest.TestCase):
         #self.maxDiff=None
         print(list(exfor_dicts.get_exfor_dict("Chemical compounds").keys()))
         self.assertEqual(list(exfor_dicts.get_exfor_dict("Particles").keys()), 
-            ['comment', '0', 'A', 'AN', 'AP', 'AR', 'B', 'B+', 'B-', 'B12', 'B8', 'BE10', 
+            ['', '0', 'A', 'AN', 'AP', 'AR', 'B', 'B+', 'B-', 'B12', 'B8', 'BE10', 
             'C14', 'CA40', 'D', 'DG', 'DN', 'E', 'EC', 'ER', 'ETA', 'FF', 'G', 'HE2', 'HE3', 
             'HE6', 'HF', 'ICE', 'K', 'K0', 'KN', 'KP', 'LCP', 'LF', 'LI6', 'LI7', 'LI9', 'N', 
             'NE20', 'O15', 'O16', 'P', 'PI', 'PI0', 'PIN', 'PIP', 'PN', 'RCL', 'RSD', 'SF', 'T', 'U238', 'XR']) 
@@ -50,7 +50,7 @@ class TestX4Dicts(unittest.TestCase):
              '23-V-CMP', '24-CR-CMP', '24-CR-OXI', '25-MN-CMP', '26-FE-CMP', '26-FE-OXI', '27-CO-CMP', 
              '27-CO-OXI', '28-NI-CMP', '28-NI-OXI', '29-CU-CMP', '30-ZN-CMP', '31-GA-CMP', '31-GA-OXI', 
              '32-GE-CMP', '32-GE-OXI', '33-AS-CMP', '33-AS-OXI', '34-SE-CMP', '35-BR-CMP', '37-RB-CMP', 
-             '38-SR-CMP', '38-SR-OXI', '39-Y-CMP', '40-ZR-ALY', '40-ZR-CMP', '40-ZR-HYD', '40-ZR-OXI', 
+             '38-SR-CMP', '38-SR-OXI', '39-Y-CMP', '39-Y-HYD', '40-ZR-ALY', '40-ZR-CMP', '40-ZR-HYD', '40-ZR-OXI', 
              '41-NB-CMP', '44-RU-CMP', '44-RU-OXI', '45-RH-CMP', '46-PD-CMP', '47-AG-CMP', '48-CD-CMP', 
              '48-CD-OXI', '49-IN-CMP', '50-SN-CMP', '50-SN-OXI', '51-SB-CMP', '52-TE-CMP', '52-TE-OXI', 
              '53-I-CMP', '55-CS-CMP', '56-BA-CMP', '57-LA-CMP', '57-LA-OXI', '58-CE-CMP', '58-CE-OXI', 
@@ -70,7 +70,7 @@ class TestX4Dicts(unittest.TestCase):
 
     def test_institute_contents(self):
         """(3, "Institutes"),"""
-        self.assertEqual(len(exfor_dicts.get_exfor_dict("Institutes")), 1243)
+        self.assertEqual(len(exfor_dicts.get_exfor_dict("Institutes")), 1244)
 
     def test_facility_like_contents(self):
         """
@@ -87,7 +87,7 @@ class TestX4Dicts(unittest.TestCase):
         (7, "ConferencesAndBooks"),
         """
         self.assertEqual(len(exfor_dicts.get_exfor_dict("Reference types")), 14)
-        self.assertEqual(len(exfor_dicts.get_exfor_dict("Journals")), 524)
+        self.assertEqual(len(exfor_dicts.get_exfor_dict("Journals")), 527)
         self.assertEqual(len(exfor_dicts.get_exfor_dict("Conferences")), 488)
 
     def test_dataheadings_contents(self):

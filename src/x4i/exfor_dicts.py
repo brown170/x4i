@@ -46,7 +46,26 @@ import json
 from x4i import DICTPATH
 
 
-ALL_DICTIONARIES=json.load(open(DICTPATH + os.sep + "dict_arc_all.json"))
+__dict = json.load(open(DICTPATH + os.sep + "dict_arc_all.json"))
+ALL_DICTIONARIES={}
+for __k, __v in __dict.items():
+    try:
+        if __k in ["name", "transmission_id", "time_stamp"]:
+            pass
+        elif __k in ['001', '002', '024', '025']:
+            ALL_DICTIONARIES[__k] = {__['keyword']:__ for __ in __v}
+        elif __k in ['008']:
+            ALL_DICTIONARIES[__k] = {__['element_symbol']:__ for __ in __v}
+        elif __k in ['950']:
+            ALL_DICTIONARIES[__k] = {__['dictionary_identification_number']:__ for __ in __v} 
+        else:
+            ALL_DICTIONARIES[__k] = {__['code']:__ for __ in __v}
+    except TypeError as t:
+        print(__k)
+        raise(t)
+    except KeyError as t:
+        print(__k)
+        raise(t)
 
 
 def get_exfor_dict(_dict_key):
