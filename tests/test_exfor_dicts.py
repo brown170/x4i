@@ -36,7 +36,7 @@ class TestX4Dicts(unittest.TestCase):
         #self.maxDiff=None
         print(list(exfor_dicts.get_exfor_dict("Chemical compounds").keys()))
         self.assertEqual(list(exfor_dicts.get_exfor_dict("Particles").keys()), 
-            ['comment', '0', 'A', 'AN', 'AP', 'AR', 'B', 'B+', 'B-', 'B12', 'B8', 'BE10', 
+            ['', '0', 'A', 'AN', 'AP', 'AR', 'B', 'B+', 'B-', 'B12', 'B8', 'BE10', 
             'C14', 'CA40', 'D', 'DG', 'DN', 'E', 'EC', 'ER', 'ETA', 'FF', 'G', 'HE2', 'HE3', 
             'HE6', 'HF', 'ICE', 'K', 'K0', 'KN', 'KP', 'LCP', 'LF', 'LI6', 'LI7', 'LI9', 'N', 
             'NE20', 'O15', 'O16', 'P', 'PI', 'PI0', 'PIN', 'PIP', 'PN', 'RCL', 'RSD', 'SF', 'T', 'U238', 'XR']) 
@@ -70,7 +70,7 @@ class TestX4Dicts(unittest.TestCase):
 
     def test_institute_contents(self):
         """(3, "Institutes"),"""
-        self.assertEqual(len(exfor_dicts.get_exfor_dict("Institutes")), 1243)
+        self.assertEqual(len(exfor_dicts.get_exfor_dict("Institutes")), 1244)
 
     def test_facility_like_contents(self):
         """
@@ -87,7 +87,7 @@ class TestX4Dicts(unittest.TestCase):
         (7, "ConferencesAndBooks"),
         """
         self.assertEqual(len(exfor_dicts.get_exfor_dict("Reference types")), 14)
-        self.assertEqual(len(exfor_dicts.get_exfor_dict("Journals")), 524)
+        self.assertEqual(len(exfor_dicts.get_exfor_dict("Journals")), 527)
         self.assertEqual(len(exfor_dicts.get_exfor_dict("Conferences")), 488)
 
     def test_dataheadings_contents(self):
