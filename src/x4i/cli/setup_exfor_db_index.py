@@ -238,6 +238,7 @@ def buildMainIndex(verbose=False, _data_path=DATAPATH, _fullIndexFileName=FULL_I
             print('\nNumber of Buggy Entries:', len(buggyEntries))
             print('\nBuggy entries:')
             pprint.pprint(str(buggyEntries))  # FIXME: with the multiproxying dict proxy, this is attempted workaround
+        reportErrors(outFile='indexing-errors.csv', errors=buggyEntries, verbose=verbose)
         pickle.dump(buggyEntries, open(_fullErrorFileName, mode='wb'))
 
         # log all the coupled data sets
@@ -506,59 +507,22 @@ def processEntry(entryFileName, databaseContent=None, coupledReactionEntries=Non
 #   Error reporting
 # ------------------------------------------------------
 
-def reportErrors(outFile, _fullErrorFileName=FULL_ERROR_FILENAME, verbose=False):
-    import pickle
+def reportErrors(outFile, errors, verbose=False):
     import csv
 
-    with open(_fullErrorFileName, mode='rb') as pickleFile:
-        f = pickle.load(pickleFile)
-        sortedErrors = {}
-        for i in f:
-            t = type(f[i][0])
-            if t not in sortedErrors:
-                sortedErrors[t] = []
-            sortedErrors[t].append(i)
+    if verbose: 
+        print(errors)
 
     # Full report to a csv file
     with open(outFile, mode='w') as csvFile:
         fullReport = csv.writer(csvFile)
-        fullReport.writerow(["Error", "Number Occurances", "Entry", "Full Message"])
-        for i in sortedErrors:
-            for j in range(len(sortedErrors[i])):
-                example = f[sortedErrors[i][j]][1]
-                entry = sortedErrors[i][j].replace('.x4', '')
-                if j == 0:
-                    row = [repr(i), str(len(sortedErrors[i])), entry, example]
-                else:
-                    row = [" ", " ", entry, example]
-                fullReport.writerow(row)
-
-
-def viewErrors(_fullErrorFileName=FULL_ERROR_FILENAME, verbose=False):
-    import pickle
-
-    with open(_fullErrorFileName, mode='rb') as pickleFile:
-        f = pickle.load(pickleFile)
-        sortedErrors = {}
-        for i in f:
-            t = type(f[i][0])
-            if t not in sortedErrors:
-                sortedErrors[t] = []
-            sortedErrors[t].append(i)
-
-    # Quick Report to stdout:
-    print("Error".rjust(55), " ", "Num.", " ", "Example".ljust(74), " ", "Entry")
-    for i in sortedErrors:
-        for j in range(len(sortedErrors[i])):
-            example = f[sortedErrors[i][j]][1]
-            if len(example) > 70:
-                example = example[0:70] + '...'
-            example = example.ljust(74)
-            entry = sortedErrors[i][j].replace('.x4', '')
-            if j == 0:
-                print(repr(i).rjust(55), " ", str(len(sortedErrors[i])).ljust(4), " ", example, " ", entry)
-            else:
-                print(55 * " ", " ", 4 * " ", " ", example, " ", entry)
+        fullReport.writerow(["Entry", "Error", "Full Message"])
+        for i in errors:
+            entry = i.split(os.sep)[-1].replace('.x4', '')
+            err =errors[i][0]
+            msg = errors[i][1]
+            row = [entry, repr(err), msg]
+            fullReport.writerow(row)
 
 
 # ------------------------------------------------------
@@ -582,14 +546,9 @@ def main():
                             help="Do not (re)builds the sqlite database indexing the EXFOR data in the project.")
 
         # ------- View/save logs -------
-        parser.add_argument("--view-errors", action="store_true", default=False,
-                            help="View all errors encountered while building the database index.")
-        parser.add_argument('--error-log', metavar="CSVFILE", type=str, default=None,
-                            help="Write all the errors encountered when generating the index of the EXFOR files to "
-                                 "this file.  This is a csv formatted file suitable for viewing in MS Excel.")
-        parser.add_argument('--coupled-log', metavar="CSVFILE", type=str, default=None,
-                            help="Write all the coupled data encountered when generating the index of the EXFOR files "
-                                 "to this file.  This is a csv formatted file suitable for viewing in MS Excel.")
+        #parser.add_argument('--error-log', metavar="CSVFILE", type=str, default=None,
+        #                    help="Write all the errors encountered when generating the index of the EXFOR files to "
+        #                         "this file.  This is a csv formatted file suitable for viewing in MS Excel.")
 
         # ------- Misc -------
         parser.add_argument("--doi", type=str, default=None,
@@ -604,14 +563,6 @@ def main():
         buildDOIIndex(FULL_DOI_FILENAME, _fullIndexFileName=FULL_INDEX_FILENAME, verbose=args.verbose)
         #if args.verbose:
         print(f"Process ran in {time.perf_counter() - start_time:0.4f} s")
-
-    # ------- View/save logs -------
-    if args.error_log is not None:
-        reportErrors(args.error_log, _fullErrorFileName=FULL_ERROR_FILENAME, verbose=args.verbose)
-    if args.coupled_log is not None:
-        raise NotImplementedError()
-    if args.view_errors:
-        viewErrors(_fullErrorFileName=FULL_ERROR_FILENAME, verbose=args.verbose)
 
 
 if __name__ == "__main__":

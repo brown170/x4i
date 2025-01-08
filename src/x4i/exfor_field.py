@@ -489,8 +489,11 @@ class X4InstituteField(X4PlainField):
             try:
                 pil = exfor_grammars.x4institutefield.parseString(str(self[p])).asList()
             except pyparsing.ParseException as err:
-                raise exfor_exceptions.InstituteParsingError(
-                    'Can not parse institute "' + str(x) + '",\n    got error "' + str(err) + '"\n   ')
+                if len(str(err)) > 100:
+                    _tmp = str(err)[:100] + " ..."
+                else:
+                    _tmp = str(err)
+                raise exfor_exceptions.InstituteParsingError(f'Can not parse institute "{str(x)}",\n    got error "{_tmp}"\n   ')
             il = {}
             ikey = None
             for tok in pil:
