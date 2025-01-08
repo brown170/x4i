@@ -34,6 +34,7 @@
 #
 ################################################################################
 import math
+import numpy as np
 from functools import reduce
 from .exfor_units import exfor_unit_registry
 
@@ -101,7 +102,7 @@ class X4ColumnTransformer:
         for label in labels:
             if label in self.data:
                 if hasattr(self.data[label].pint, "units") and self.data[label].pint.units == exfor_unit_registry.percent:
-                    self.data[label] = self.data[label] * value_column
+                    self.data[label] = np.abs(self.data[label] * value_column)
                 if as_list:
                     return self.data[label].values.tolist()
                 else:
